@@ -2,23 +2,25 @@
   --bg:#f6f3ee;
   --card:#ffffff;
   --text:#111;
-  --muted:#666;
+  --muted:#6b6b6b;
   --line:rgba(0,0,0,0.10);
+  --soft:rgba(0,0,0,0.04);
   --shadow:0 18px 40px rgba(0,0,0,0.10);
+  --radius:18px;
 }
 
-*{box-sizing:border-box;}
+*{ box-sizing:border-box; }
 
 html,body{
-  margin:0;
-  padding:0;
+  margin:0; padding:0;
   height:100%;
-  background:var(--bg);
-  color:var(--text);
+  background: var(--bg);
+  color: var(--text);
   font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
 }
 
-a{color:inherit;text-decoration:none;}
+a{ color: inherit; text-decoration:none; }
+button{ font: inherit; }
 
 .wrap{
   max-width:440px;
@@ -30,197 +32,255 @@ a{color:inherit;text-decoration:none;}
   -webkit-overflow-scrolling:touch;
 }
 
-.heroShowcase,.card{
-  scroll-snap-align:start;
-  scroll-snap-stop:always;
-}
+.heroShowcase,.card{ scroll-snap-align:start; scroll-snap-stop:always; }
 
 .card{
   margin-top:14px;
   padding:18px 16px;
-  background:var(--card);
-  border-radius:18px;
+  background: var(--card);
   border:1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.06);
 }
 
 .card__title{
   display:flex;
   align-items:center;
   gap:10px;
+  margin:0;
   font-size:16px;
+  letter-spacing: 0.01em;
 }
 .card__title::after{
   content:"";
-  flex:1;
   height:1px;
-  background:rgba(0,0,0,0.1);
+  background: rgba(0,0,0,0.10);
+  flex:1;
 }
 
+.message{
+  margin:12px 0 0;
+  line-height:1.85;
+  color: rgba(0,0,0,0.78);
+  white-space: pre-line;
+}
+
+.row{ display:flex; align-items:center; gap:10px; }
+.muted{ color: var(--muted); font-size:13px; }
+
+.hr-dashed{
+  margin-top:18px;
+  padding-top:14px;
+  border-top:1px dashed rgba(0,0,0,0.12);
+}
+
+/* 버튼: a/button 동일 */
 .btn{
   display:inline-flex;
-  justify-content:center;
   align-items:center;
-  padding:10px 12px;
+  justify-content:center;
+  padding:11px 12px;
   border-radius:14px;
-  border:1px solid rgba(0,0,0,0.15);
-  background:rgba(0,0,0,0.05);
+  border:1px solid rgba(0,0,0,0.14);
+  background: var(--soft);
+  color: rgba(0,0,0,0.88);
   cursor:pointer;
+  user-select:none;
+  -webkit-tap-highlight-color:transparent;
+  text-decoration:none;
 }
+.btn:hover{ background: rgba(0,0,0,0.06); }
 
 .btn--primary{
   background:#111;
-  color:white;
+  color:#fff;
   border-color:#111;
 }
+.btn--primary:hover{ background:#000; }
 
-.grid2{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
+.btn--mini{
+  padding:8px 10px;
+  border-radius:12px;
+  font-size:13px;
+  background: rgba(0,0,0,0.03);
 }
+
+.grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
 /* HERO */
 .heroShowcase{
   position:relative;
-  height:100svh;
+  height: calc(100svh - 36px);
   overflow:hidden;
   border-radius:22px;
+  box-shadow: var(--shadow);
+  border:1px solid var(--line);
 }
 
 .heroFinal{
-  position:absolute;
-  inset:0;
+  position:absolute; inset:0;
   opacity:0;
-  transition:opacity .8s ease;
+  transition: opacity 800ms ease;
 }
 .heroFinal__img{
-  width:100%;
-  height:100%;
+  width:100%; height:100%;
   object-fit:cover;
+  display:block;
 }
 .heroFinal__overlay{
-  position:absolute;
-  inset:0;
-  background:linear-gradient(to bottom,rgba(0,0,0,0.1),rgba(0,0,0,0.7));
+  position:absolute; inset:0;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.08), rgba(0,0,0,0.72));
   display:flex;
   flex-direction:column;
   justify-content:flex-end;
-  padding:24px;
-  color:white;
+  padding:22px 18px;
+  color:#fff;
 }
 
 .heroIntro{
-  position:absolute;
-  inset:0;
-  background:var(--bg);
-  transition:opacity .7s ease;
+  position:absolute; inset:0;
+  background: var(--bg);
+  transition: opacity 700ms ease;
 }
 
+/* 필기체 */
 .scribbleWrapper{
   position:absolute;
-  bottom:26px;
-  width:100%;
+  left:0; right:0;
+  bottom: 26px;
   text-align:center;
   pointer-events:none;
 }
-
 .scribbleLeft{
   font-family:"Dancing Script",cursive;
   font-size:28px;
-  color:#444;
+  color: rgba(0,0,0,0.55);
+  line-height:1.1;
 }
-
 .scribbleLine{
   display:inline-block;
   opacity:0;
-  clip-path:inset(0 100% 0 0);
+  clip-path: inset(0 100% 0 0);
 }
-@keyframes write{to{opacity:1;clip-path:inset(0 0 0 0);}}
-.heroIntro.is-write .scribbleLine{animation:write 1.2s ease forwards;}
+@keyframes write { to{ opacity:1; clip-path: inset(0 0 0 0);} }
+.heroIntro.is-write .scribbleLine{ animation: write 1.2s ease forwards; }
 
-.polStack{position:relative;width:100%;height:100%;}
-
+/* 폴라로이드 */
+.polStack{ position:relative; width:100%; height:100%; }
 .introPolaroid{
   position:absolute;
-  width:min(250px,66vw);
-  background:white;
+  width: min(250px, 66vw);
+  background:#fff;
   padding:14px 14px 44px;
   border-radius:10px;
   box-shadow:0 22px 50px rgba(0,0,0,0.15);
   opacity:0;
+  transition: opacity 400ms ease;
 }
-
 .introPolaroid__img{
   width:100%;
-  height:min(300px,48vw);
+  height: min(300px, 48vw);
   object-fit:cover;
+  border-radius:6px;
+  display:block;
+}
+/* 1 아래, 2 중간, 3 위 */
+.introPolaroid--1{ left:8%;  top:8%;  transform: rotate(-8deg); z-index:10; }
+.introPolaroid--2{ left:30%; top:34%; transform: rotate(7deg);  z-index:20; }
+.introPolaroid--3{ left:18%; top:58%; transform: rotate(-3deg); z-index:30; }
+.introPolaroid.is-in{ opacity:1; }
+
+.heroShowcase.is-done .heroIntro{ opacity:0; }
+.heroShowcase.is-done .heroFinal{ opacity:1; }
+
+/* 탭(고급 캡슐 세그먼트) */
+.tabs{
+  margin-top:12px;
+  background: rgba(0,0,0,0.04);
+  border:1px solid rgba(0,0,0,0.10);
+  border-radius: 999px;
+  padding: 4px;
+  display:flex;
+  gap:4px;
 }
 
-.introPolaroid--1{left:8%;top:8%;transform:rotate(-8deg);z-index:10;}
-.introPolaroid--2{left:30%;top:30%;transform:rotate(7deg);z-index:20;}
-.introPolaroid--3{left:18%;top:52%;transform:rotate(-3deg);z-index:30;}
-
-.introPolaroid.is-in{opacity:1;}
-
-.heroShowcase.is-done .heroIntro{opacity:0;}
-.heroShowcase.is-done .heroFinal{opacity:1;}
-
-/* 탭 */
-.tabs{display:flex;gap:8px;margin-top:12px;}
 .tab{
   flex:1;
-  padding:10px;
-  border-radius:12px;
-  border:1px solid rgba(0,0,0,0.15);
-  background:rgba(0,0,0,0.05);
+  border:0;
+  border-radius: 999px;
+  padding:10px 10px;
+  background: transparent;
+  color: rgba(0,0,0,0.70);
+  cursor:pointer;
 }
+
 .tab.is-active{
-  background:#111;
-  color:white;
+  background:#fff;
+  color:#111;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.08);
   font-weight:700;
 }
 
 /* 갤러리 */
-/* 갤러리 썸네일: 작게, 촘촘하게 */
-.gallery{ 
-  display: grid; 
-  gap: 6px;               /* ✅ 간격 줄임 */
-}
-
-/* Wedding: 3열로 줄여서 더 ‘썸네일’ 느낌 (원하면 2열 유지도 가능) */
-.gallery--wedding{
-  grid-template-columns: repeat(3, 1fr); /* ✅ 2→3열로 바꿔 작게 */
-}
+.gallery{ display:grid; gap:8px; }
+.gallery--wedding{ grid-template-columns: repeat(2, 1fr); }
 .gallery--wedding img{
-  width: 100%;
+  width:100%;
   aspect-ratio: 4 / 5;
   object-fit: cover;
-  border-radius: 10px;     /* ✅ 라운드 줄임 */
-  border: 1px solid rgba(0,0,0,0.10);
-  display: block;
+  border-radius: 14px;
+  border:1px solid rgba(0,0,0,0.10);
+  display:block;
 }
 
-/* Daily: 4열로 (아이폰에서도 썸네일처럼 작아짐) */
-.gallery--daily{
-  grid-template-columns: repeat(4, 1fr); /* ✅ 3→4열로 바꿔 작게 */
-}
+.gallery--daily{ grid-template-columns: repeat(3, 1fr); }
 .gallery--daily img{
-  width: 100%;
+  width:100%;
   aspect-ratio: 1 / 1;
   object-fit: cover;
-  border-radius: 10px;
-  border: 1px solid rgba(0,0,0,0.10);
-  display: block;
+  border-radius: 14px;
+  border:1px solid rgba(0,0,0,0.10);
+  display:block;
 }
-
-/* 아주 작은 화면에서는 열 수 줄이기 */
-@media (max-width: 360px){
-  .gallery--wedding{ grid-template-columns: repeat(2, 1fr); }
-  .gallery--daily{ grid-template-columns: repeat(3, 1fr); }
-}
-
 @media (max-width:360px){
-  .gallery--daily{grid-template-columns:repeat(2,1fr);}
+  .gallery--daily{ grid-template-columns: repeat(2, 1fr); }
 }
 
-.footer{text-align:center;margin-top:20px;font-size:12px;color:#777;}
+/* 모달(클릭하면 크게) */
+.modal{
+  position: fixed;
+  inset: 0;
+  display: none;
+  place-items: center;
+  z-index: 50;
+}
+.modal.is-open{ display:grid; }
+.modal__backdrop{
+  position:absolute; inset:0;
+  background: rgba(0,0,0,0.75);
+}
+.modal__img{
+  position: relative;
+  max-width: min(92vw, 520px);
+  max-height: 86vh;
+  border-radius: 16px;
+  border:1px solid rgba(255,255,255,0.18);
+  box-shadow: 0 18px 60px rgba(0,0,0,0.35);
+}
+
+/* 계좌 카드 */
+.account{
+  padding: 12px;
+  border-radius: 14px;
+  border:1px solid rgba(0,0,0,0.12);
+  background: rgba(0,0,0,0.03);
+  margin-top: 10px;
+}
+.account b{ display:block; margin-top:6px; }
+
+.footer{
+  margin-top:18px;
+  text-align:center;
+  color: var(--muted);
+  font-size:12px;
+}

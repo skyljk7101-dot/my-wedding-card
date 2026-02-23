@@ -51,13 +51,15 @@ function build() {
   const brideSms = (bride.phone || "").replace(/[^0-9]/g, "");
   const groomSms = (groom.phone || "").replace(/[^0-9]/g, "");
 
-  // 네이버 검색은 "공덕 아펠가모"
+  // 네이버는 "공덕 아펠가모"로 찾기
   const NAVER_QUERY = "공덕 아펠가모";
+
+  const inviteMessage = `“매일 네 하루에 조용히 구독했어.
+이제 평생, 내 마음으로만 자동연장되는 사랑💗”`;
 
   $("#app").innerHTML = `
   <main class="wrap">
 
-    <!-- HERO -->
     <header class="heroShowcase" id="heroShowcase">
       <div class="heroFinal">
         <img class="heroFinal__img" src="${d.heroImage}" alt="메인 사진">
@@ -89,33 +91,26 @@ function build() {
       </div>
     </header>
 
-    <!-- 초대 -->
     <section class="card">
       <h2 class="card__title">초대합니다</h2>
-      <p class="message">서로의 하루가 되기로 했습니다.\n이제는 평생으로.</p>
+      <p class="message">${inviteMessage}</p>
 
-      <div style="margin-top:16px; display:flex; flex-direction:column; gap:12px;">
-        <div class="row" style="align-items:flex-start;">
-          <span class="muted" style="width:42px; padding-top:2px;">신부</span>
-          <div style="flex:1; line-height:1.65;">
-            <span style="color:#666;">정대연 · 장영화의 장녀</span>
-            <b style="margin-left:6px;">${bride.name}</b>
-          </div>
-          <a class="btn" style="width:auto; padding:8px 10px;" href="sms:${brideSms}">문자</a>
+      <!-- ✅ 신부/신랑 한 줄(Row) + 문자 버튼 -->
+      <div style="margin-top:16px; display:flex; flex-direction:column; gap:10px;">
+        <div class="row">
+          <span class="muted" style="width:42px;">신부</span>
+          <span style="flex:1;">정대연 · 자영화의 장녀 <b>${bride.name}</b></span>
+          <a class="btn btn--mini" href="sms:${brideSms}">문자</a>
         </div>
 
-        <div class="row" style="align-items:flex-start;">
-          <span class="muted" style="width:42px; padding-top:2px;">신랑</span>
-          <div style="flex:1; line-height:1.65;">
-            <span style="color:#666;">유순덕의 장남</span>
-            <b style="margin-left:6px;">${groom.name}</b>
-          </div>
-          <a class="btn" style="width:auto; padding:8px 10px;" href="sms:${groomSms}">문자</a>
+        <div class="row">
+          <span class="muted" style="width:42px;">신랑</span>
+          <span style="flex:1;">유순덕의 장남 <b>${groom.name}</b></span>
+          <a class="btn btn--mini" href="sms:${groomSms}">문자</a>
         </div>
       </div>
     </section>
 
-    <!-- 예식 안내 -->
     <section class="card">
       <h2 class="card__title">예식 안내</h2>
 
@@ -135,43 +130,30 @@ function build() {
       </div>
 
       <div style="margin-top:14px;">
-        <button id="addCal" class="btn btn--primary">캘린더에 추가</button>
+        <button id="addCal" class="btn btn--primary" type="button">캘린더에 추가</button>
       </div>
 
-      <p style="
-        margin-top:18px;
-        padding-top:14px;
-        border-top:1px dashed rgba(0,0,0,0.12);
-        font-size:12px;
-        color:#777;
-        line-height:1.6;
-      ">
+      <p class="hr-dashed" style="font-size:12px; color:#777; line-height:1.6;">
         예식장 규정에 따라 화환 반입이 불가하여 마음만 감사히 받겠습니다.<br>
         (리본띠만 받습니다.)
       </p>
     </section>
 
-    <!-- 오시는 길 -->
     <section class="card">
       <h2 class="card__title">오시는 길</h2>
       <p class="muted" style="margin:10px 0 12px; line-height:1.6;">버튼을 누르면 지도 앱/웹으로 이동합니다.</p>
 
       <div class="grid2">
         <a class="btn" target="_blank" rel="noopener"
-           href="https://map.kakao.com/link/map/${encode(venueName)},${lat},${lng}">
-          카카오맵(위치)
-        </a>
+           href="https://map.kakao.com/link/map/${encode(venueName)},${lat},${lng}">카카오맵(위치)</a>
         <a class="btn" target="_blank" rel="noopener"
-           href="https://map.kakao.com/link/to/${encode(venueName)},${lat},${lng}">
-          카카오맵(길찾기)
-        </a>
+           href="https://map.kakao.com/link/to/${encode(venueName)},${lat},${lng}">카카오맵(길찾기)</a>
 
         <a class="btn" id="naverMap" href="#" rel="noopener">네이버지도(위치)</a>
         <a class="btn" id="naverRoute" href="#" rel="noopener">네이버지도(길찾기)</a>
       </div>
     </section>
 
-    <!-- 갤러리 (탭 전환형) -->
     <section class="card">
       <h2 class="card__title">Gallery</h2>
 
@@ -180,20 +162,18 @@ function build() {
         <button class="tab" id="tabDaily" type="button">Daily</button>
       </div>
 
-      <div class="galleryWrap">
+      <div style="margin-top:12px;">
         <div class="gallery gallery--wedding" id="weddingGallery"></div>
         <div class="gallery gallery--daily" id="dailyGallery" style="display:none;"></div>
       </div>
     </section>
 
-    <!-- 마음 전하실 곳 -->
     <section class="card">
       <h2 class="card__title">마음 전하실 곳</h2>
       <p class="muted" style="margin:10px 0 6px;">카드를 누르면 복사됩니다.</p>
       <div id="accounts"></div>
     </section>
 
-    <!-- RSVP -->
     <section class="card">
       <h2 class="card__title">RSVP</h2>
       <p class="muted" style="margin:10px 0 12px; line-height:1.6;">링크로 간단히 응답받는 방식이 가장 편합니다.</p>
@@ -203,6 +183,7 @@ function build() {
     <footer class="footer">${d.footerText}</footer>
   </main>
 
+  <!-- ✅ 모달(클릭하면 커짐) -->
   <div id="modal" class="modal" aria-hidden="true">
     <div class="modal__backdrop"></div>
     <img id="modalImg" class="modal__img" alt="확대 이미지" />
@@ -218,7 +199,7 @@ function build() {
   setTimeout(() => document.getElementById("p3")?.classList.add("is-in"), 6200);
   setTimeout(() => showcase.classList.add("is-done"), 9000);
 
-  // ===== 네이버 지도: "공덕 아펠가모"로 =====
+  // ===== 네이버 지도 =====
   const naverPlaceApp = `nmap://place?lat=${lat}&lng=${lng}&name=${encode(NAVER_QUERY)}&appname=com.example.weddinginvite`;
   const naverRouteApp = `nmap://route/car?dlat=${lat}&dlng=${lng}&dname=${encode(NAVER_QUERY)}&appname=com.example.weddinginvite`;
   const naverWeb = `https://map.naver.com/v5/search/${encode(NAVER_QUERY)}`;
@@ -287,14 +268,12 @@ function build() {
     weddingEl.style.display = "grid";
     dailyEl.style.display = "none";
   }
-
   function showDaily() {
     tabDaily.classList.add("is-active");
     tabWedding.classList.remove("is-active");
     weddingEl.style.display = "none";
     dailyEl.style.display = "grid";
   }
-
   tabWedding.addEventListener("click", showWedding);
   tabDaily.addEventListener("click", showDaily);
 
@@ -307,7 +286,7 @@ function build() {
     el.innerHTML = `
       <div class="row" style="justify-content:space-between;">
         <span class="muted">${a.label}</span>
-        <button class="btn" style="width:auto; padding:6px 10px; font-size:12px;" type="button">계좌복사</button>
+        <button class="btn btn--mini" type="button">계좌복사</button>
       </div>
       <b>${a.bank} ${a.number}</b>
       <div class="muted" style="margin-top:4px;">예금주: ${a.holder}</div>

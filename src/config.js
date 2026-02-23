@@ -1,4 +1,5 @@
 export const INVITE = {
+
   heroPolaroids: [
     "/assets/hero1.jpg",
     "/assets/hero2.jpg",
@@ -11,8 +12,6 @@ export const INVITE = {
     groom: { name: "이재기", phone: "010-8696-7101" },
     bride: { name: "정다솜", phone: "010-2413-8360" },
   },
-
-  message: "두 사람이 한 길을 걷는 날,\n귀한 걸음으로 축복해 주세요.",
 
   wedding: {
     dateTimeISO: "2026-05-31T14:00:00+09:00",
@@ -29,7 +28,20 @@ export const INVITE = {
     { label: "신랑 측", bank: "토스뱅크", number: "1000-0126-3854", holder: "이재기" },
   ],
 
-  gallery: ["/assets/g1.jpg", "/assets/g2.jpg", "/assets/g3.jpg"],
+  weddingGallery: [
+    "/assets/w1.jpg","/assets/w2.jpg","/assets/w3.jpg","/assets/w4.jpg",
+    "/assets/w5.jpg","/assets/w6.jpg","/assets/w7.jpg","/assets/w8.jpg",
+    "/assets/w9.jpg","/assets/w10.jpg","/assets/w11.jpg","/assets/w12.jpg",
+    "/assets/w13.jpg","/assets/w14.jpg"
+  ],
+
+  dailyGallery: [
+    "/assets/d1.jpg","/assets/d2.jpg","/assets/d3.jpg","/assets/d4.jpg",
+    "/assets/d5.jpg","/assets/d6.jpg","/assets/d7.jpg","/assets/d8.jpg",
+    "/assets/d9.jpg","/assets/d10.jpg","/assets/d11.jpg","/assets/d12.jpg",
+    "/assets/d13.jpg","/assets/d14.jpg","/assets/d15.jpg","/assets/d16.jpg",
+    "/assets/d17.jpg","/assets/d18.jpg"
+  ],
 
   footerText: "© 2026 Wedding Invitation",
 };

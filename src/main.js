@@ -48,33 +48,25 @@ function build() {
   const { groom, bride } = d.couple;
   const { lat, lng, venueName } = d.wedding;
 
-  // ✅ 네이버는 “공덕 아펠가모”로 검색/웹 폴백
-  const NAVER_QUERY = "공덕 아펠가모";
-
-  // 문자 버튼용 (하이픈 제거)
   const brideSms = (bride.phone || "").replace(/[^0-9]/g, "");
   const groomSms = (groom.phone || "").replace(/[^0-9]/g, "");
+
+  // 네이버 검색은 "공덕 아펠가모"
+  const NAVER_QUERY = "공덕 아펠가모";
 
   $("#app").innerHTML = `
   <main class="wrap">
 
     <!-- HERO -->
     <header class="heroShowcase" id="heroShowcase">
-
-      <!-- 최종 메인 -->
       <div class="heroFinal">
         <img class="heroFinal__img" src="${d.heroImage}" alt="메인 사진">
         <div class="heroFinal__overlay">
-          <div style="font-weight:700; font-size:18px;">
-            DASOM · JAEGI
-          </div>
-          <div style="margin-top:6px; font-size:14px;">
-            ${d.wedding.dateText}
-          </div>
+          <div style="font-weight:700; font-size:18px;">DASOM · JAEGI</div>
+          <div style="margin-top:6px; font-size:14px;">${d.wedding.dateText}</div>
         </div>
       </div>
 
-      <!-- 인트로 -->
       <div class="heroIntro" id="heroIntro">
         <div class="polStack">
           <div class="introPolaroid introPolaroid--1" id="p1">
@@ -88,7 +80,6 @@ function build() {
           </div>
         </div>
 
-        <!-- 라틴어 그대로 -->
         <div class="scribbleWrapper">
           <div class="scribbleLeft">
             <span class="scribbleLine">Ad nuptias nostras</span><br>
@@ -96,21 +87,14 @@ function build() {
           </div>
         </div>
       </div>
-
     </header>
 
-    <!-- 초대합니다 -->
+    <!-- 초대 -->
     <section class="card">
       <h2 class="card__title">초대합니다</h2>
-
-      <p class="message" style="margin-top:6px;">
-서로의 하루가 되기로 했습니다.
-이제는 평생으로.
-      </p>
+      <p class="message">서로의 하루가 되기로 했습니다.\n이제는 평생으로.</p>
 
       <div style="margin-top:16px; display:flex; flex-direction:column; gap:12px;">
-
-        <!-- 신부 -->
         <div class="row" style="align-items:flex-start;">
           <span class="muted" style="width:42px; padding-top:2px;">신부</span>
           <div style="flex:1; line-height:1.65;">
@@ -120,7 +104,6 @@ function build() {
           <a class="btn" style="width:auto; padding:8px 10px;" href="sms:${brideSms}">문자</a>
         </div>
 
-        <!-- 신랑 -->
         <div class="row" style="align-items:flex-start;">
           <span class="muted" style="width:42px; padding-top:2px;">신랑</span>
           <div style="flex:1; line-height:1.65;">
@@ -129,7 +112,6 @@ function build() {
           </div>
           <a class="btn" style="width:auto; padding:8px 10px;" href="sms:${groomSms}">문자</a>
         </div>
-
       </div>
     </section>
 
@@ -137,7 +119,7 @@ function build() {
     <section class="card">
       <h2 class="card__title">예식 안내</h2>
 
-      <div style="display:flex; flex-direction:column; gap:12px;">
+      <div style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">
         <div class="row">
           <div class="muted" style="width:54px;">일시</div>
           <div><b>${d.wedding.dateText}</b></div>
@@ -152,9 +134,8 @@ function build() {
         </div>
       </div>
 
-      <!-- 캘린더 -->
-      <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
-        <button id="addCal" class="btn btn--primary" style="flex:1;">캘린더에 추가</button>
+      <div style="margin-top:14px;">
+        <button id="addCal" class="btn btn--primary">캘린더에 추가</button>
       </div>
 
       <p style="
@@ -173,10 +154,9 @@ function build() {
     <!-- 오시는 길 -->
     <section class="card">
       <h2 class="card__title">오시는 길</h2>
-      <p class="muted" style="margin:0 0 12px; line-height:1.6;">버튼을 누르면 지도 앱/웹으로 이동합니다.</p>
+      <p class="muted" style="margin:10px 0 12px; line-height:1.6;">버튼을 누르면 지도 앱/웹으로 이동합니다.</p>
 
       <div class="grid2">
-        <!-- 카카오 -->
         <a class="btn" target="_blank" rel="noopener"
            href="https://map.kakao.com/link/map/${encode(venueName)},${lat},${lng}">
           카카오맵(위치)
@@ -186,29 +166,37 @@ function build() {
           카카오맵(길찾기)
         </a>
 
-        <!-- 네이버 -->
         <a class="btn" id="naverMap" href="#" rel="noopener">네이버지도(위치)</a>
         <a class="btn" id="naverRoute" href="#" rel="noopener">네이버지도(길찾기)</a>
       </div>
     </section>
 
-    <!-- 갤러리 -->
+    <!-- 갤러리 (탭 전환형) -->
     <section class="card">
-      <h2 class="card__title">갤러리</h2>
-      <div class="gallery" id="gallery"></div>
+      <h2 class="card__title">Gallery</h2>
+
+      <div class="tabs">
+        <button class="tab is-active" id="tabWedding" type="button">Wedding</button>
+        <button class="tab" id="tabDaily" type="button">Daily</button>
+      </div>
+
+      <div class="galleryWrap">
+        <div class="gallery gallery--wedding" id="weddingGallery"></div>
+        <div class="gallery gallery--daily" id="dailyGallery" style="display:none;"></div>
+      </div>
     </section>
 
     <!-- 마음 전하실 곳 -->
     <section class="card">
       <h2 class="card__title">마음 전하실 곳</h2>
-      <p class="muted" style="margin:0 0 6px;">카드를 누르면 복사됩니다.</p>
+      <p class="muted" style="margin:10px 0 6px;">카드를 누르면 복사됩니다.</p>
       <div id="accounts"></div>
     </section>
 
     <!-- RSVP -->
     <section class="card">
-      <h2 class="card__title">참석 여부 (RSVP)</h2>
-      <p class="muted" style="margin:0 0 12px; line-height:1.6;">링크로 간단히 응답받는 방식이 가장 편합니다.</p>
+      <h2 class="card__title">RSVP</h2>
+      <p class="muted" style="margin:10px 0 12px; line-height:1.6;">링크로 간단히 응답받는 방식이 가장 편합니다.</p>
       <a class="btn btn--primary" target="_blank" rel="noopener" href="${d.rsvpUrl}">참석 여부 남기기</a>
     </section>
 
@@ -224,22 +212,18 @@ function build() {
   // ===== 인트로 타이밍 =====
   const intro = document.getElementById("heroIntro");
   const showcase = document.getElementById("heroShowcase");
-
   setTimeout(() => intro.classList.add("is-write"), 2000);
   setTimeout(() => document.getElementById("p1")?.classList.add("is-in"), 200);
   setTimeout(() => document.getElementById("p2")?.classList.add("is-in"), 3200);
   setTimeout(() => document.getElementById("p3")?.classList.add("is-in"), 6200);
   setTimeout(() => showcase.classList.add("is-done"), 9000);
 
-  // ===== 네이버 지도: 검색은 “공덕 아펠가모” =====
+  // ===== 네이버 지도: "공덕 아펠가모"로 =====
   const naverPlaceApp = `nmap://place?lat=${lat}&lng=${lng}&name=${encode(NAVER_QUERY)}&appname=com.example.weddinginvite`;
   const naverRouteApp = `nmap://route/car?dlat=${lat}&dlng=${lng}&dname=${encode(NAVER_QUERY)}&appname=com.example.weddinginvite`;
   const naverWeb = `https://map.naver.com/v5/search/${encode(NAVER_QUERY)}`;
 
-  const naverMap = document.getElementById("naverMap");
-  const naverRoute = document.getElementById("naverRoute");
-
-  naverMap.addEventListener("click", (e) => {
+  $("#naverMap").addEventListener("click", (e) => {
     e.preventDefault();
     const start = Date.now();
     window.location.href = naverPlaceApp;
@@ -248,7 +232,7 @@ function build() {
     }, 700);
   });
 
-  naverRoute.addEventListener("click", (e) => {
+  $("#naverRoute").addEventListener("click", (e) => {
     e.preventDefault();
     const start = Date.now();
     window.location.href = naverRouteApp;
@@ -257,17 +241,7 @@ function build() {
     }, 700);
   });
 
-  // ===== 갤러리 + 모달 =====
-  const g = $("#gallery");
-  d.gallery.forEach((src, i) => {
-    const img = document.createElement("img");
-    img.src = src;
-    img.alt = `gallery-${i + 1}`;
-    img.loading = "lazy";
-    img.addEventListener("click", () => openModal(src));
-    g.appendChild(img);
-  });
-
+  // ===== 모달 =====
   const modal = $("#modal");
   const modalImg = $("#modalImg");
   function openModal(src) {
@@ -282,6 +256,48 @@ function build() {
   }
   modal.addEventListener("click", closeModal);
 
+  // ===== 갤러리 렌더 =====
+  const weddingEl = $("#weddingGallery");
+  d.weddingGallery.forEach((src, i) => {
+    const img = document.createElement("img");
+    img.src = src;
+    img.alt = `wedding-${i + 1}`;
+    img.loading = "lazy";
+    img.addEventListener("click", () => openModal(src));
+    weddingEl.appendChild(img);
+  });
+
+  const dailyEl = $("#dailyGallery");
+  d.dailyGallery.forEach((src, i) => {
+    const img = document.createElement("img");
+    img.src = src;
+    img.alt = `daily-${i + 1}`;
+    img.loading = "lazy";
+    img.addEventListener("click", () => openModal(src));
+    dailyEl.appendChild(img);
+  });
+
+  // ===== 탭 전환 =====
+  const tabWedding = $("#tabWedding");
+  const tabDaily = $("#tabDaily");
+
+  function showWedding() {
+    tabWedding.classList.add("is-active");
+    tabDaily.classList.remove("is-active");
+    weddingEl.style.display = "grid";
+    dailyEl.style.display = "none";
+  }
+
+  function showDaily() {
+    tabDaily.classList.add("is-active");
+    tabWedding.classList.remove("is-active");
+    weddingEl.style.display = "none";
+    dailyEl.style.display = "grid";
+  }
+
+  tabWedding.addEventListener("click", showWedding);
+  tabDaily.addEventListener("click", showDaily);
+
   // ===== 계좌 =====
   const acc = $("#accounts");
   d.accounts.forEach((a) => {
@@ -291,7 +307,7 @@ function build() {
     el.innerHTML = `
       <div class="row" style="justify-content:space-between;">
         <span class="muted">${a.label}</span>
-        <button class="btn" style="width:auto; padding:6px 10px; font-size:12px;">계좌복사</button>
+        <button class="btn" style="width:auto; padding:6px 10px; font-size:12px;" type="button">계좌복사</button>
       </div>
       <b>${a.bank} ${a.number}</b>
       <div class="muted" style="margin-top:4px;">예금주: ${a.holder}</div>

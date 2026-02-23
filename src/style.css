@@ -62,3 +62,87 @@ button{ font: inherit; color: inherit; background: none; border: 0; padding: 0; 
 .modal.is-open{ display: grid; }
 .modal__backdrop{ position:absolute; inset:0; background: rgba(0,0,0,0.75); }
 .modal__img{ position: relative; max-width: min(92vw, 520px); max-height: 86vh; border-radius: 16px; border: 1px solid rgba(255,255,255,0.18); box-shadow: var(--shadow); }
+
+
+
+/* ===== Polaroid Hero ===== */
+.heroPolaroid {
+  position: relative;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  border: 1px solid var(--line);
+  padding: 18px 14px 16px;
+  background: rgba(255,255,255,0.03);
+}
+
+.polaroidStage {
+  position: relative;
+  height: 520px; /* 원하면 420~560 조절 */
+}
+
+.polaroid {
+  position: absolute;
+  left: 50%;
+  top: 18px;
+  width: min(360px, 86%);
+  transform: translateX(-50%);
+  background: rgba(255,255,255,0.92);
+  color: rgba(0,0,0,0.86);
+  border-radius: 18px;
+  box-shadow: 0 18px 50px rgba(0,0,0,0.55);
+  padding: 14px 14px 18px;
+  border: 1px solid rgba(0,0,0,0.06);
+
+  /* 등장 전 상태 */
+  opacity: 0;
+  filter: blur(1px);
+}
+
+/* 폴라로이드 사진 */
+.polaroid__img {
+  width: 100%;
+  height: 360px;
+  object-fit: cover;
+  border-radius: 14px;
+  display: block;
+}
+
+/* 폴라로이드 하단 캡션(선택) */
+.polaroid__cap {
+  margin-top: 10px;
+  font-size: 12px;
+  letter-spacing: 0.18em;
+  opacity: 0.75;
+}
+
+/* 1,2,3장 각 위치/각도(겹쳐 보이게) */
+.polaroid--1 { z-index: 3; transform: translateX(-50%) rotate(-2.5deg); }
+.polaroid--2 { z-index: 2; transform: translateX(-50%) rotate(2.2deg) translateY(8px); }
+.polaroid--3 { z-index: 1; transform: translateX(-50%) rotate(-1.2deg) translateY(16px); }
+
+/* “빡” 떨어지는 애니메이션 */
+@keyframes slamIn {
+  0%   { opacity: 0; transform: translateX(-50%) translateY(-26px) scale(1.06) rotate(var(--r)); }
+  55%  { opacity: 1; transform: translateX(-50%) translateY(8px)  scale(0.98) rotate(var(--r)); }
+  78%  { transform: translateX(-50%) translateY(-2px) scale(1.01) rotate(var(--r)); }
+  100% { opacity: 1; transform: translateX(-50%) translateY(0px)  scale(1.00) rotate(var(--r)); filter: blur(0); }
+}
+
+/* 순서대로 1→2→3 등장 */
+.heroPolaroid.is-animated .polaroid--1 { --r: -2.5deg; animation: slamIn 520ms cubic-bezier(.2,.9,.2,1) 0ms   forwards; }
+.heroPolaroid.is-animated .polaroid--2 { --r:  2.2deg; animation: slamIn 520ms cubic-bezier(.2,.9,.2,1) 180ms forwards; }
+.heroPolaroid.is-animated .polaroid--3 { --r: -1.2deg; animation: slamIn 520ms cubic-bezier(.2,.9,.2,1) 360ms forwards; }
+
+/* 폴라로이드 위에 텍스트(기존 hero overlay 느낌) */
+.heroPolaroid__overlay {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  padding: 18px 16px;
+  border-top: 1px solid rgba(255,255,255,0.10);
+  background: linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0.15));
+}
+
+.heroPolaroid__subtitle { margin:0; letter-spacing: 0.26em; font-size: 12px; color: var(--muted); }
+.heroPolaroid__title    { margin:6px 0 0; font-size: 24px; line-height: 1.15; }
+.heroPolaroid__date     { margin:6px 0 0; color: var(--muted); }

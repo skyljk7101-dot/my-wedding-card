@@ -1,4 +1,11 @@
 export const INVITE = {
+
+  heroPolaroids: [
+    "/assets/hero1.jpg",
+    "/assets/hero2.jpg",
+    "/assets/hero3.jpg",
+  ],
+
   heroImage: "/assets/hero.jpg",
 
   couple: {

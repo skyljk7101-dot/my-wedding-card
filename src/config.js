@@ -1,5 +1,4 @@
 export const INVITE = {
-
   heroPolaroids: [
     "/assets/hero1.jpg",
     "/assets/hero2.jpg",
@@ -13,8 +12,7 @@ export const INVITE = {
     bride: { name: "정다솜", phone: "010-2413-8360" },
   },
 
-  message:
-    "두 사람이 한 길을 걷는 날,\n귀한 걸음으로 축복해 주세요.",
+  message: "두 사람이 한 길을 걷는 날,\n귀한 걸음으로 축복해 주세요.",
 
   wedding: {
     dateTimeISO: "2026-05-31T14:00:00+09:00",

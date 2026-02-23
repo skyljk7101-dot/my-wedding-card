@@ -16,12 +16,11 @@ function toast(msg) {
     el.style.transform = "translateX(-50%)";
     el.style.padding = "10px 12px";
     el.style.borderRadius = "12px";
-    el.style.border = "1px solid rgba(255,255,255,0.18)";
-    el.style.background = "rgba(0,0,0,0.65)";
-    el.style.color = "rgba(255,255,255,0.92)";
+    el.style.border = "1px solid rgba(0,0,0,0.08)";
+    el.style.background = "rgba(0,0,0,0.72)";
+    el.style.color = "white";
     el.style.fontSize = "13px";
     el.style.zIndex = "999";
-    el.style.backdropFilter = "blur(6px)";
     document.body.appendChild(el);
   }
   el.textContent = msg;
@@ -51,106 +50,145 @@ function build() {
   const { lat, lng, venueName } = d.wedding;
 
   $("#app").innerHTML = `
-    <main class="wrap">
-      <header class="hero">
-        <img class="hero__img" src="${d.heroImage}" alt="메인 사진" />
-        <div class="hero__overlay">
-          <p class="hero__subtitle">WEDDING INVITATION</p>
-          <h1 class="hero__title">${groom.name} ♥ ${bride.name}</h1>
-          <p class="hero__date">${d.wedding.dateText}</p>
+  <main class="wrap">
+    <!-- 1) 첫 페이지: 인트로 -> 메인 사진 -->
+    <header class="heroShowcase" id="heroShowcase">
+      <div class="heroFinal">
+        <img class="heroFinal__img" src="${d.heroImage}" alt="메인 사진">
+        <div class="heroFinal__overlay">
+          <div style="font-weight:700; font-size:18px;">${groom.name} ♥ ${bride.name}</div>
+          <div style="margin-top:6px; font-size:14px;">${d.wedding.dateText}</div>
         </div>
-      </header>
+      </div>
 
-      <section class="card">
-        <h2 class="card__title">초대합니다</h2>
-        <p class="message">${d.message}</p>
-
-        <div style="margin-top:14px; display:flex; flex-direction:column; gap:10px;">
-          <div class="row">
-            <span class="muted" style="width:42px;">신랑</span>
-            <span style="flex:1;">${groom.name}</span>
-            <a class="btn" style="width:auto; padding:8px 10px;" href="tel:${groom.phone}">전화</a>
+      <div class="heroIntro" id="heroIntro">
+        <div class="polStack">
+          <div class="introPolaroid introPolaroid--1" id="p1">
+            <img class="introPolaroid__img" src="${d.heroPolaroids[0]}" alt="polaroid1">
           </div>
-          <div class="row">
-            <span class="muted" style="width:42px;">신부</span>
-            <span style="flex:1;">${bride.name}</span>
-            <a class="btn" style="width:auto; padding:8px 10px;" href="tel:${bride.phone}">전화</a>
+          <div class="introPolaroid introPolaroid--2" id="p2">
+            <img class="introPolaroid__img" src="${d.heroPolaroids[1]}" alt="polaroid2">
           </div>
-        </div>
-      </section>
-
-      <section class="card">
-        <h2 class="card__title">예식 안내</h2>
-        <div style="display:flex; flex-direction:column; gap:12px;">
-          <div class="row">
-            <div class="muted" style="width:54px;">일시</div>
-            <div><b>${d.wedding.dateText}</b></div>
-          </div>
-          <div class="row">
-            <div class="muted" style="width:54px;">장소</div>
-            <div>
-              <div><b>${d.wedding.venueName}</b></div>
-              <div class="muted" style="margin-top:4px; line-height:1.5;">${d.wedding.address}</div>
-            </div>
+          <div class="introPolaroid introPolaroid--3" id="p3">
+            <img class="introPolaroid__img" src="${d.heroPolaroids[2]}" alt="polaroid3">
           </div>
         </div>
 
-        <div style="margin-top:14px; padding:12px; border-radius:14px; border:1px dashed rgba(255,255,255,0.12); display:flex; justify-content:space-between; align-items:center;">
-          <div class="muted">D-Day</div>
-          <div id="countdown" style="font-weight:800; font-variant-numeric:tabular-nums;">계산 중…</div>
+        <div class="scribbleWrapper">
+          <div class="scribbleLeft scribbleLeft">
+            <span class="scribbleLine">Ad nuptias nostras</span><br>
+            <span class="scribbleLine">te invitamus</span>
+          </div>
+          <div class="scribbleRight scribbleRight">
+            <span class="scribbleLine">${d.wedding.dateText}</span>
+          </div>
         </div>
+      </div>
+    </header>
 
-        <div style="margin-top:12px;">
-          <button id="addCal" class="btn btn--primary">캘린더에 추가</button>
+    <!-- 2) 본문 -->
+    <section class="card">
+      <h2 class="card__title">초대합니다</h2>
+      <p class="message">${d.message}</p>
+
+      <div style="margin-top:14px; display:flex; flex-direction:column; gap:10px;">
+        <div class="row">
+          <span class="muted" style="width:42px;">신랑</span>
+          <span style="flex:1;">${groom.name}</span>
+          <a class="btn" style="width:auto; padding:8px 10px;" href="tel:${groom.phone}">전화</a>
         </div>
-      </section>
-
-      <section class="card">
-        <h2 class="card__title">오시는 길</h2>
-        <p class="muted" style="margin:0 0 12px; line-height:1.6;">버튼을 누르면 지도 앱/웹으로 이동합니다.</p>
-
-        <div class="grid2">
-          <a class="btn" target="_blank" rel="noopener"
-             href="https://map.kakao.com/link/map/${encode(venueName)},${lat},${lng}">카카오맵(위치)</a>
-          <a class="btn" target="_blank" rel="noopener"
-             href="https://map.kakao.com/link/to/${encode(venueName)},${lat},${lng}">카카오맵(길찾기)</a>
-
-          <button id="naverApp" class="btn">네이버지도(앱)</button>
-          <a class="btn" target="_blank" rel="noopener"
-             href="https://map.naver.com/v5/search/${encode(venueName)}">네이버지도(웹)</a>
+        <div class="row">
+          <span class="muted" style="width:42px;">신부</span>
+          <span style="flex:1;">${bride.name}</span>
+          <a class="btn" style="width:auto; padding:8px 10px;" href="tel:${bride.phone}">전화</a>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section class="card">
-        <h2 class="card__title">갤러리</h2>
-        <div class="gallery" id="gallery"></div>
-      </section>
+    <section class="card">
+      <h2 class="card__title">예식 안내</h2>
 
-      <section class="card">
-        <h2 class="card__title">마음 전하실 곳</h2>
-        <p class="muted" style="margin:0 0 6px;">카드를 누르면 복사됩니다.</p>
-        <div id="accounts"></div>
-      </section>
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <div class="row">
+          <div class="muted" style="width:54px;">일시</div>
+          <div><b>${d.wedding.dateText}</b></div>
+        </div>
+        <div class="row">
+          <div class="muted" style="width:54px;">장소</div>
+          <div>
+            <div><b>${d.wedding.venueName}</b></div>
+            <div class="muted" style="margin-top:4px; line-height:1.5;">${d.wedding.address}</div>
+          </div>
+        </div>
+      </div>
 
-      <section class="card">
-        <h2 class="card__title">참석 여부 (RSVP)</h2>
-        <p class="muted" style="margin:0 0 12px; line-height:1.6;">링크로 간단히 응답받는 방식이 가장 편합니다.</p>
-        <a class="btn btn--primary" target="_blank" rel="noopener" href="${d.rsvpUrl}">참석 여부 남기기</a>
-      </section>
+      <div style="margin-top:14px; padding:12px; border-radius:14px; border:1px dashed rgba(0,0,0,0.18); display:flex; justify-content:space-between; align-items:center;">
+        <div class="muted">D-Day</div>
+        <div id="countdown" style="font-weight:800; font-variant-numeric:tabular-nums;">계산 중…</div>
+      </div>
 
-      <footer class="footer">${d.footerText}</footer>
-    </main>
+      <div style="margin-top:12px;">
+        <button id="addCal" class="btn btn--primary">캘린더에 추가</button>
+      </div>
+    </section>
 
-    <div id="modal" class="modal" aria-hidden="true">
-      <div class="modal__backdrop"></div>
-      <img id="modalImg" class="modal__img" alt="확대 이미지" />
-    </div>
+    <section class="card">
+      <h2 class="card__title">오시는 길</h2>
+      <p class="muted" style="margin:0 0 12px; line-height:1.6;">버튼을 누르면 지도 앱/웹으로 이동합니다.</p>
+
+      <div class="grid2">
+        <a class="btn" target="_blank" rel="noopener"
+          href="https://map.kakao.com/link/map/${encode(venueName)},${lat},${lng}">카카오맵(위치)</a>
+        <a class="btn" target="_blank" rel="noopener"
+          href="https://map.kakao.com/link/to/${encode(venueName)},${lat},${lng}">카카오맵(길찾기)</a>
+
+        <button id="naverApp" class="btn">네이버지도(앱)</button>
+        <a class="btn" target="_blank" rel="noopener"
+          href="https://map.naver.com/v5/search/${encode(venueName)}">네이버지도(웹)</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="card__title">갤러리</h2>
+      <div class="gallery" id="gallery"></div>
+    </section>
+
+    <section class="card">
+      <h2 class="card__title">마음 전하실 곳</h2>
+      <p class="muted" style="margin:0 0 6px;">카드를 누르면 복사됩니다.</p>
+      <div id="accounts"></div>
+    </section>
+
+    <section class="card">
+      <h2 class="card__title">참석 여부 (RSVP)</h2>
+      <p class="muted" style="margin:0 0 12px; line-height:1.6;">링크로 간단히 응답받는 방식이 가장 편합니다.</p>
+      <a class="btn btn--primary" target="_blank" rel="noopener" href="${d.rsvpUrl}">참석 여부 남기기</a>
+    </section>
+
+    <footer class="footer">${d.footerText}</footer>
+  </main>
+
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="modal__backdrop"></div>
+    <img id="modalImg" class="modal__img" alt="확대 이미지" />
+  </div>
   `;
 
-  // 네이버 지도 앱 스킴 + 웹 폴백
+  // ===== 인트로 타이밍 =====
+  const intro = document.getElementById("heroIntro");
+  const showcase = document.getElementById("heroShowcase");
+
+  setTimeout(() => intro.classList.add("is-write"), 2000);
+  setTimeout(() => document.getElementById("p1")?.classList.add("is-in"), 200);
+  setTimeout(() => document.getElementById("p2")?.classList.add("is-in"), 3200);
+  setTimeout(() => document.getElementById("p3")?.classList.add("is-in"), 6200);
+
+  setTimeout(() => showcase.classList.add("is-done"), 9000);
+
+  // ===== 네이버 앱 스킴 =====
   $("#naverApp").addEventListener("click", () => {
-    const app = `nmap://place?lat=${lat}&lng=${lng}&name=${encode(venueName)}&appname=com.example.weddinginvite`;
-    const web = `https://map.naver.com/v5/search/${encode(venueName)}`;
+    const app = `nmap://place?lat=${d.wedding.lat}&lng=${d.wedding.lng}&name=${encode(d.wedding.venueName)}&appname=com.example.weddinginvite`;
+    const web = `https://map.naver.com/v5/search/${encode(d.wedding.venueName)}`;
     const start = Date.now();
     window.location.href = app;
     setTimeout(() => {
@@ -158,7 +196,7 @@ function build() {
     }, 700);
   });
 
-  // 갤러리
+  // ===== 갤러리 + 모달 =====
   const g = $("#gallery");
   d.gallery.forEach((src, i) => {
     const img = document.createElement("img");
@@ -183,9 +221,10 @@ function build() {
   }
   modal.addEventListener("click", closeModal);
 
-  // 계좌
+  // ===== 계좌 =====
   const acc = $("#accounts");
   d.accounts.forEach((a) => {
+    if (!a.number) return;
     const el = document.createElement("div");
     el.className = "account";
     el.innerHTML = `
@@ -201,7 +240,7 @@ function build() {
     acc.appendChild(el);
   });
 
-  // 카운트다운
+  // ===== 카운트다운 =====
   const target = new Date(d.wedding.dateTimeISO).getTime();
   const cd = $("#countdown");
   const timer = setInterval(() => {
@@ -220,7 +259,7 @@ function build() {
     cd.textContent = `${days}일 ${pad2(h)}:${pad2(m)}:${pad2(s)}`;
   }, 1000);
 
-  // 캘린더 추가(ics 다운로드)
+  // ===== 캘린더 ICS =====
   $("#addCal").addEventListener("click", () => {
     const start = new Date(d.wedding.dateTimeISO);
     const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);

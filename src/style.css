@@ -1,148 +1,163 @@
 :root{
-  --bg: #0f1115;
-  --card: rgba(255,255,255,0.06);
-  --text: rgba(255,255,255,0.92);
-  --muted: rgba(255,255,255,0.65);
-  --line: rgba(255,255,255,0.12);
-  --shadow: 0 12px 30px rgba(0,0,0,0.35);
+  --bg:#f6f3ee;
+  --card:#ffffff;
+  --text:#111;
+  --muted:#666;
+  --line:rgba(0,0,0,0.08);
 }
-*{ box-sizing: border-box; }
-html,body{ margin:0; padding:0; background: radial-gradient(1200px 900px at 20% 0%, #1b2030 0%, var(--bg) 50%, #0b0d12 100%); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Noto Sans KR", "Segoe UI", Roboto, Arial, sans-serif; }
-a{ color: inherit; text-decoration:none; }
-button{ font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
 
-.wrap{ max-width: 440px; margin: 0 auto; padding: 18px 14px 40px; }
-.hero{ position: relative; border-radius: 22px; overflow: hidden; box-shadow: var(--shadow); border: 1px solid var(--line); }
-.hero__img{ width: 100%; height: 520px; object-fit: cover; display:block; }
-.hero__overlay{
-  position:absolute; inset:0;
-  background: linear-gradient(to bottom, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.55) 70%, rgba(0,0,0,0.72) 100%);
-  display:flex; flex-direction: column; justify-content:flex-end;
-  padding: 22px 18px; gap: 8px;
+*{box-sizing:border-box;}
+
+html,body{
+  margin:0;
+  padding:0;
+  height:100%;
+  background:var(--bg);
+  color:var(--text);
+  font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
 }
-.hero__subtitle{ margin:0; letter-spacing: 0.26em; font-size: 12px; color: var(--muted); }
-.hero__title{ margin:0; font-size: 24px; line-height: 1.15; }
-.hero__date{ margin:0; color: var(--muted); }
 
-.card{ margin-top: 14px; padding: 18px 16px; background: var(--card); border: 1px solid var(--line); border-radius: 18px; box-shadow: 0 10px 24px rgba(0,0,0,0.22); }
-.card__title{ margin: 0 0 10px; font-size: 16px; }
-.message{ margin: 0; line-height: 1.85; color: rgba(255,255,255,0.86); white-space: pre-line; }
+/* 세로 스냅 */
+.wrap{
+  max-width:440px;
+  margin:0 auto;
+  padding:18px 14px 40px;
+  height:100svh;
+  overflow-y:auto;
+  scroll-snap-type:y mandatory;
+  -webkit-overflow-scrolling:touch;
+}
 
-.row{ display:flex; gap: 10px; align-items:center; }
-.muted{ color: var(--muted); font-size: 13px; }
+.heroShowcase,.card{
+  scroll-snap-align:start;
+  scroll-snap-stop:always;
+}
 
-.btn{
-  width: 100%;
+.card{
+  margin-top:14px;
+  padding:18px 16px;
+  background:var(--card);
+  border-radius:18px;
+  border:1px solid var(--line);
+}
+
+/* ===== HERO ===== */
+.heroShowcase{
+  position:relative;
+  height:100svh;
+  overflow:hidden;
+  border-radius:22px;
+}
+
+.heroFinal{
+  position:absolute;
+  inset:0;
+  opacity:0;
+  transition:opacity .8s ease;
+}
+
+.heroFinal__img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.heroFinal__overlay{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(to bottom,rgba(0,0,0,.1),rgba(0,0,0,.7));
   display:flex;
-  justify-content:center;
-  align-items:center;
-  padding: 11px 12px;
-  border-radius: 14px;
-  border: 1px solid var(--line);
-  background: rgba(255,255,255,0.02);
-}
-.btn--primary{
-  background: rgba(255,255,255,0.9);
-  color: rgba(0,0,0,0.88);
-  border-color: rgba(255,255,255,0.9);
-  font-weight: 700;
+  flex-direction:column;
+  justify-content:flex-end;
+  padding:24px;
+  color:white;
 }
 
-.grid2{ display:grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-
-.gallery{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.gallery img{ width: 100%; aspect-ratio: 1 / 1; object-fit: cover; border-radius: 14px; border: 1px solid var(--line); cursor: pointer; }
-
-.account{ padding: 12px; border-radius: 14px; border: 1px solid var(--line); background: rgba(0,0,0,0.12); margin-top: 10px; }
-.account b{ display:block; margin-top: 6px; }
-
-.footer{ margin-top: 18px; text-align:center; color: var(--muted); font-size: 12px; }
-
-.modal{ position: fixed; inset: 0; display: none; place-items: center; z-index: 50; }
-.modal.is-open{ display: grid; }
-.modal__backdrop{ position:absolute; inset:0; background: rgba(0,0,0,0.75); }
-.modal__img{ position: relative; max-width: min(92vw, 520px); max-height: 86vh; border-radius: 16px; border: 1px solid rgba(255,255,255,0.18); box-shadow: var(--shadow); }
-
-
-
-/* ===== Polaroid Hero ===== */
-.heroPolaroid {
-  position: relative;
-  border-radius: 22px;
-  overflow: hidden;
-  box-shadow: var(--shadow);
-  border: 1px solid var(--line);
-  padding: 18px 14px 16px;
-  background: rgba(255,255,255,0.03);
+/* ===== INTRO ===== */
+.heroIntro{
+  position:absolute;
+  inset:0;
+  background:#f6f3ee;
 }
 
-.polaroidStage {
-  position: relative;
-  height: 520px; /* 원하면 420~560 조절 */
+/* 필기 */
+.scribbleWrapper{
+  position:absolute;
+  bottom:40px;
+  width:100%;
+  text-align:center;
+  pointer-events:none;
 }
 
-.polaroid {
-  position: absolute;
-  left: 50%;
-  top: 18px;
-  width: min(360px, 86%);
-  transform: translateX(-50%);
-  background: rgba(255,255,255,0.92);
-  color: rgba(0,0,0,0.86);
-  border-radius: 18px;
-  box-shadow: 0 18px 50px rgba(0,0,0,0.55);
-  padding: 14px 14px 18px;
-  border: 1px solid rgba(0,0,0,0.06);
-
-  /* 등장 전 상태 */
-  opacity: 0;
-  filter: blur(1px);
+.scribbleLeft,
+.scribbleRight{
+  font-family:"Dancing Script",cursive;
+  font-size:28px;
+  color:#444;
 }
 
-/* 폴라로이드 사진 */
-.polaroid__img {
-  width: 100%;
-  height: 360px;
-  object-fit: cover;
-  border-radius: 14px;
-  display: block;
+.scribbleLine{
+  display:inline-block;
+  opacity:0;
+  clip-path:inset(0 100% 0 0);
 }
 
-/* 폴라로이드 하단 캡션(선택) */
-.polaroid__cap {
-  margin-top: 10px;
-  font-size: 12px;
-  letter-spacing: 0.18em;
-  opacity: 0.75;
+@keyframes write{
+  to{opacity:1;clip-path:inset(0 0 0 0);}
 }
 
-/* 1,2,3장 각 위치/각도(겹쳐 보이게) */
-.polaroid--1 { z-index: 3; transform: translateX(-50%) rotate(-2.5deg); }
-.polaroid--2 { z-index: 2; transform: translateX(-50%) rotate(2.2deg) translateY(8px); }
-.polaroid--3 { z-index: 1; transform: translateX(-50%) rotate(-1.2deg) translateY(16px); }
-
-/* “빡” 떨어지는 애니메이션 */
-@keyframes slamIn {
-  0%   { opacity: 0; transform: translateX(-50%) translateY(-26px) scale(1.06) rotate(var(--r)); }
-  55%  { opacity: 1; transform: translateX(-50%) translateY(8px)  scale(0.98) rotate(var(--r)); }
-  78%  { transform: translateX(-50%) translateY(-2px) scale(1.01) rotate(var(--r)); }
-  100% { opacity: 1; transform: translateX(-50%) translateY(0px)  scale(1.00) rotate(var(--r)); filter: blur(0); }
+.heroIntro.is-write .scribbleLine{
+  animation:write 1.2s ease forwards;
 }
 
-/* 순서대로 1→2→3 등장 */
-.heroPolaroid.is-animated .polaroid--1 { --r: -2.5deg; animation: slamIn 520ms cubic-bezier(.2,.9,.2,1) 0ms   forwards; }
-.heroPolaroid.is-animated .polaroid--2 { --r:  2.2deg; animation: slamIn 520ms cubic-bezier(.2,.9,.2,1) 180ms forwards; }
-.heroPolaroid.is-animated .polaroid--3 { --r: -1.2deg; animation: slamIn 520ms cubic-bezier(.2,.9,.2,1) 360ms forwards; }
-
-/* 폴라로이드 위에 텍스트(기존 hero overlay 느낌) */
-.heroPolaroid__overlay {
-  position: absolute;
-  left: 0; right: 0; bottom: 0;
-  padding: 18px 16px;
-  border-top: 1px solid rgba(255,255,255,0.10);
-  background: linear-gradient(to top, rgba(0,0,0,0.55), rgba(0,0,0,0.15));
+/* ===== POLAROIDS ===== */
+.polStack{
+  position:relative;
+  width:100%;
+  height:100%;
 }
 
-.heroPolaroid__subtitle { margin:0; letter-spacing: 0.26em; font-size: 12px; color: var(--muted); }
-.heroPolaroid__title    { margin:6px 0 0; font-size: 24px; line-height: 1.15; }
-.heroPolaroid__date     { margin:6px 0 0; color: var(--muted); }
+/* 카드 크기 안정 */
+.introPolaroid{
+  position:absolute;
+  width:220px;
+  background:white;
+  padding:14px 14px 44px;
+  border-radius:10px;
+  box-shadow:0 20px 40px rgba(0,0,0,.15);
+  opacity:0;
+  transition:opacity .4s ease;
+}
+
+.introPolaroid__img{
+  width:100%;
+  height:260px;
+  object-fit:cover;
+}
+
+/* 완전 분리 배치 */
+.introPolaroid--1{
+  left:5%;
+  top:8%;
+  transform:rotate(-10deg);
+  z-index:3;
+}
+
+.introPolaroid--2{
+  right:5%;
+  top:28%;
+  transform:rotate(8deg);
+  z-index:2;
+}
+
+.introPolaroid--3{
+  left:18%;
+  bottom:12%;
+  transform:rotate(-4deg);
+  z-index:1;
+}
+
+.introPolaroid.is-in{opacity:1;}
+
+.heroShowcase.is-done .heroIntro{opacity:0;}
+.heroShowcase.is-done .heroFinal{opacity:1;}

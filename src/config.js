@@ -22,7 +22,7 @@ export const INVITE = {
     lng: 126.9501,
   },
 
-  rsvpUrl: "https://forms.gle/XXXXXXXXXXXX",
+  rsvpUrl: "https://docs.google.com/forms/d/e/1FAIpQLSf67UUsUr8CFRS_vOb3YXY73HOYIUH4b485_oE2xrwM8HhXcg/viewform?usp=publish",
 
   accounts: [
     { label: "신랑 측", bank: "토스뱅크", number: "1000-0126-3854", holder: "이재기" },
@@ -43,5 +43,5 @@ export const INVITE = {
     "/assets/d17.jpg","/assets/d18.jpg"
   ],
 
-  footerText: "© 2026 Wedding Invitation",
+  footerText: "© 2026 DASOM · JAEGI Wedding",
 };

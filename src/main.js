@@ -48,18 +48,25 @@ function build() {
   const { groom, bride } = d.couple;
   const { lat, lng, venueName } = d.wedding;
 
+  // ✅ 네이버는 “공덕 아펠가모”로 검색/웹 폴백
+  const NAVER_QUERY = "공덕 아펠가모";
+
+  // 문자 버튼용 (하이픈 제거)
+  const brideSms = (bride.phone || "").replace(/[^0-9]/g, "");
+  const groomSms = (groom.phone || "").replace(/[^0-9]/g, "");
+
   $("#app").innerHTML = `
   <main class="wrap">
 
     <!-- HERO -->
     <header class="heroShowcase" id="heroShowcase">
 
-      <!-- 최종 메인(글씨 그대로 유지) -->
+      <!-- 최종 메인 -->
       <div class="heroFinal">
         <img class="heroFinal__img" src="${d.heroImage}" alt="메인 사진">
         <div class="heroFinal__overlay">
           <div style="font-weight:700; font-size:18px;">
-            ${bride.name} · ${groom.name}
+            DASOM · JAEGI
           </div>
           <div style="margin-top:6px; font-size:14px;">
             ${d.wedding.dateText}
@@ -67,7 +74,7 @@ function build() {
         </div>
       </div>
 
-      <!-- 인트로(라틴어 그대로) -->
+      <!-- 인트로 -->
       <div class="heroIntro" id="heroIntro">
         <div class="polStack">
           <div class="introPolaroid introPolaroid--1" id="p1">
@@ -81,6 +88,7 @@ function build() {
           </div>
         </div>
 
+        <!-- 라틴어 그대로 -->
         <div class="scribbleWrapper">
           <div class="scribbleLeft">
             <span class="scribbleLine">Ad nuptias nostras</span><br>
@@ -100,23 +108,28 @@ function build() {
 이제는 평생으로.
       </p>
 
-      <!-- 고급스럽게: 부모님표기/이름 정렬 + 신부이름 볼드 -->
       <div style="margin-top:16px; display:flex; flex-direction:column; gap:12px;">
+
+        <!-- 신부 -->
         <div class="row" style="align-items:flex-start;">
           <span class="muted" style="width:42px; padding-top:2px;">신부</span>
           <div style="flex:1; line-height:1.65;">
             <span style="color:#666;">정대연 · 장영화의 장녀</span>
             <b style="margin-left:6px;">${bride.name}</b>
           </div>
+          <a class="btn" style="width:auto; padding:8px 10px;" href="sms:${brideSms}">문자</a>
         </div>
 
+        <!-- 신랑 -->
         <div class="row" style="align-items:flex-start;">
           <span class="muted" style="width:42px; padding-top:2px;">신랑</span>
           <div style="flex:1; line-height:1.65;">
             <span style="color:#666;">유순덕의 장남</span>
             <b style="margin-left:6px;">${groom.name}</b>
           </div>
+          <a class="btn" style="width:auto; padding:8px 10px;" href="sms:${groomSms}">문자</a>
         </div>
+
       </div>
     </section>
 
@@ -139,7 +152,7 @@ function build() {
         </div>
       </div>
 
-      <!-- ✅ 캘린더에 추가(ICS) 복구 -->
+      <!-- 캘린더 -->
       <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap;">
         <button id="addCal" class="btn btn--primary" style="flex:1;">캘린더에 추가</button>
       </div>
@@ -160,12 +173,10 @@ function build() {
     <!-- 오시는 길 -->
     <section class="card">
       <h2 class="card__title">오시는 길</h2>
-      <p class="muted" style="margin:0 0 12px; line-height:1.6;">
-        버튼을 누르면 지도 앱/웹으로 이동합니다.
-      </p>
+      <p class="muted" style="margin:0 0 12px; line-height:1.6;">버튼을 누르면 지도 앱/웹으로 이동합니다.</p>
 
-      <!-- ✅ 카카오/네이버: 위치 + 길찾기 4버튼 -->
       <div class="grid2">
+        <!-- 카카오 -->
         <a class="btn" target="_blank" rel="noopener"
            href="https://map.kakao.com/link/map/${encode(venueName)},${lat},${lng}">
           카카오맵(위치)
@@ -175,6 +186,7 @@ function build() {
           카카오맵(길찾기)
         </a>
 
+        <!-- 네이버 -->
         <a class="btn" id="naverMap" href="#" rel="noopener">네이버지도(위치)</a>
         <a class="btn" id="naverRoute" href="#" rel="noopener">네이버지도(길찾기)</a>
       </div>
@@ -219,11 +231,10 @@ function build() {
   setTimeout(() => document.getElementById("p3")?.classList.add("is-in"), 6200);
   setTimeout(() => showcase.classList.add("is-done"), 9000);
 
-  // ===== 네이버 지도 (위치/길찾기) =====
-  // 앱 스킴(가능하면 앱으로), 실패하면 웹으로 폴백
-  const naverPlaceApp = `nmap://place?lat=${lat}&lng=${lng}&name=${encode(venueName)}&appname=com.example.weddinginvite`;
-  const naverRouteApp = `nmap://route/car?dlat=${lat}&dlng=${lng}&dname=${encode(venueName)}&appname=com.example.weddinginvite`;
-  const naverWeb = `https://map.naver.com/v5/search/${encode(venueName)}`;
+  // ===== 네이버 지도: 검색은 “공덕 아펠가모” =====
+  const naverPlaceApp = `nmap://place?lat=${lat}&lng=${lng}&name=${encode(NAVER_QUERY)}&appname=com.example.weddinginvite`;
+  const naverRouteApp = `nmap://route/car?dlat=${lat}&dlng=${lng}&dname=${encode(NAVER_QUERY)}&appname=com.example.weddinginvite`;
+  const naverWeb = `https://map.naver.com/v5/search/${encode(NAVER_QUERY)}`;
 
   const naverMap = document.getElementById("naverMap");
   const naverRoute = document.getElementById("naverRoute");
@@ -290,7 +301,7 @@ function build() {
     acc.appendChild(el);
   });
 
-  // ===== 캘린더(ICS 다운로드) =====
+  // ===== 캘린더(ICS) =====
   $("#addCal").addEventListener("click", () => {
     const start = new Date(d.wedding.dateTimeISO);
     const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
@@ -315,7 +326,7 @@ UID:wedding-${start.getTime()}@invite
 DTSTAMP:${toICS(new Date())}
 DTSTART:${toICS(start)}
 DTEND:${toICS(end)}
-SUMMARY:${bride.name} · ${groom.name} 결혼식
+SUMMARY:DASOM · JAEGI 결혼식
 LOCATION:${d.wedding.venueName} ${d.wedding.address}
 DESCRIPTION:모바일 청첩장
 END:VEVENT

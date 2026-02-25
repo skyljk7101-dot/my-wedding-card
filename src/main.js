@@ -343,7 +343,7 @@ END:VCALENDAR`;
   });
 
   if (window.Kakao && !window.Kakao.isInitialized()) {
-    window.Kakao.init('57d738d573589e31098735abbfb1dbf9'); 
+    window.Kakao.init('950d726b2979c7f8113c72f6fbfb8771'); 
   }
 
   const kakaoBtn = document.getElementById("kakaoShareBtn");

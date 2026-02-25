@@ -145,19 +145,29 @@ async function gbFetchList() {
 
 async function gbAddItem(name, msg) {
   if (!hasGuestbookEndpoint()) throw new Error("no endpoint");
+
+  const body = new URLSearchParams({
+    action: "add",
+    name,
+    msg,
+  });
+
   const res = await fetch(GUESTBOOK_ENDPOINT, {
     method: "POST",
-    mode: "cors",
+    // ✅ 프리플라이트 유발 안 하는 Content-Type
+    headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
+    body,
     cache: "no-store",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ action: "add", name, msg }),
   });
+
   if (!res.ok) {
-    const payload = await safeRead(res);
-    throw new Error(`add failed (${res.status}) ${payload.text}`.trim());
+    const txt = await res.text().catch(() => "");
+    throw new Error(`add failed (${res.status}) ${txt}`.trim());
   }
-  const payload = await safeRead(res);
-  return payload.json;
+
+  // Apps Script가 JSON을 주면 파싱, 아니면 통과
+  const txt = await res.text().catch(() => "");
+  try { return txt ? JSON.parse(txt) : {}; } catch { return {}; }
 }
 
 function build() {
@@ -184,12 +194,11 @@ function build() {
         <img class="pol__img" src="${d.heroPolaroids[2]}" alt="intro-3" />
       </div>
 
-      <div class="burst" id="burst">we getting married!!!</div>
-
-      <div class="handwrite" id="handwrite">
-        <span class="line">${groom.name}</span><br/>
-        <span class="line">&amp; ${bride.name}</span>
-      </div>
+<div class="writePhrase" id="writePhrase" aria-label="we're getting married">
+  <span class="w w1">we're</span>
+  <span class="w w2">getting</span>
+  <span class="w w3">married</span>
+</div>
 
       <div class="introMeta">
         <div class="date">${d.wedding.dateText}</div>
@@ -353,11 +362,22 @@ function build() {
   setTimeout(() => p3.classList.add("is-in"), 1200);
 
   // we getting married!!! 다다닥 느낌 (3번 점멸)
-  setTimeout(() => burst.classList.add("is-on"), 1600);
-  setTimeout(() => burst.classList.remove("is-on"), 1850);
-  setTimeout(() => burst.classList.add("is-on"), 2100);
-  setTimeout(() => burst.classList.remove("is-on"), 2350);
-  setTimeout(() => burst.classList.add("is-on"), 2600);
+const writePhrase = document.getElementById("writePhrase");
+
+setTimeout(() => p1.classList.add("is-in"), 200);
+setTimeout(() => p2.classList.add("is-in"), 700);
+setTimeout(() => p3.classList.add("is-in"), 1200);
+
+// ✅ 문구를 “한 단어씩” 천천히 써지듯
+setTimeout(() => writePhrase.classList.add("is-write"), 1900);
+
+// 인트로 종료 타이밍 조금 늦춤 (문구 애니메이션 보이게)
+setTimeout(() => {
+  intro.classList.add("is-hide");
+  intro.setAttribute("aria-hidden", "true");
+  main.style.transition = "opacity 450ms ease";
+  main.style.opacity = "1";
+}, 5600);
 
   setTimeout(() => hand.classList.add("is-write"), 3100);
 
@@ -693,6 +713,68 @@ END:VCALENDAR`;
            "방명록 저장 실패");
     }
   });
+}
+
+const SHEET_NAME = "guestbook";
+
+function ensureSheet_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sh = ss.getSheetByName(SHEET_NAME);
+  if (!sh) {
+    sh = ss.insertSheet(SHEET_NAME);
+    sh.appendRow(["ts", "name", "msg"]);
+  }
+  return sh;
+}
+
+function json_(obj) {
+  return ContentService
+    .createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function doGet(e) {
+  const action = (e && e.parameter && e.parameter.action) || "";
+  if (action !== "list") return json_({ ok:false, error:"invalid action" });
+
+  const sh = ensureSheet_();
+  const values = sh.getDataRange().getValues();
+  const rows = values.slice(1).map(r => ({
+    ts: Number(r[0]) || Date.now(),
+    name: String(r[1] || ""),
+    msg: String(r[2] || ""),
+  }));
+  return json_(rows);
+}
+
+function doPost(e) {
+  // ✅ 1) form-urlencoded로 들어온 값 우선 사용
+  const p = (e && e.parameter) ? e.parameter : {};
+  let action = p.action || "";
+  let name = p.name || "";
+  let msg  = p.msg  || "";
+
+  // ✅ 2) JSON으로 들어온 경우도 대비
+  if (!action && e && e.postData && e.postData.contents) {
+    try {
+      const body = JSON.parse(e.postData.contents);
+      action = body.action || action;
+      name = body.name || name;
+      msg = body.msg || msg;
+    } catch (_) {}
+  }
+
+  if (action !== "add") return json_({ ok:false, error:"invalid action" });
+
+  name = String(name || "").trim();
+  msg  = String(msg  || "").trim();
+  if (!name || !msg) return json_({ ok:false, error:"name/msg required" });
+
+  const sh = ensureSheet_();
+  const ts = Date.now();
+  sh.appendRow([ts, name, msg]);
+
+  return json_({ ok:true, ts });
 }
 
 build();

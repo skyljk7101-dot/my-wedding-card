@@ -84,7 +84,13 @@ button{ font:inherit; }
 
 /* ✅ 위치 재배치(아이폰 16 Pro에서 안 넘치게) */
 .pol--1{ left:4%;  top:8%;  --r:-6deg; z-index:10; }
-.pol--2{ left:18%; top:30%; --r: 5deg; z-index:20; }
+.pol--2{
+  left:auto;
+  right:2%;     /* ✅ 오른쪽 끝으로 */
+  top:30%;
+  --r: 6deg;
+  z-index:20;
+}
 .pol--3{ left:10%; top:50%; --r:-3deg; z-index:30; }
 
 /* we getting married!!! 다다닥 */
@@ -385,3 +391,35 @@ button{ font:inherit; }
 .gbName{ font-weight:800; }
 .gbTime{ font-size:12px; color: rgba(0,0,0,0.45); }
 .gbMsg{ margin-top:8px; white-space:pre-wrap; line-height:1.6; }
+
+/* ✅ 문구: 한 단어씩 천천히 써지는 필기 */
+.writePhrase{
+  position:absolute;
+  right:6%;
+  top:14%;
+  font-family:"Dancing Script", cursive;
+  font-size:34px;
+  color: rgba(0,0,0,0.86);
+  transform: rotate(-2deg);
+  z-index:55;
+  pointer-events:none;
+}
+
+.writePhrase .w{
+  display:inline-block;
+  margin-left:8px;
+  opacity:0;
+  clip-path: inset(0 100% 0 0); /* 오른쪽이 가려진 상태 */
+}
+
+/* 첫 단어는 왼쪽 여백 제거 */
+.writePhrase .w1{ margin-left:0; }
+
+/* “써지는” 애니메이션 */
+@keyframes writeWord {
+  to { opacity:1; clip-path: inset(0 0 0 0); }
+}
+
+.writePhrase.is-write .w1{ animation: writeWord 1.2s ease forwards; }
+.writePhrase.is-write .w2{ animation: writeWord 1.2s ease forwards; animation-delay: .75s; }
+.writePhrase.is-write .w3{ animation: writeWord 1.2s ease forwards; animation-delay: 1.5s; }

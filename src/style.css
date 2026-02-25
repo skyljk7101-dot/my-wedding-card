@@ -75,31 +75,25 @@ button{ font:inherit; }
 /* ✅ 사진: 더 “세로 폴라로이드” 비율 */
 .pol__img{
   width:100%;
-  aspect-ratio: 3 / 4;             /* ⬅️ 4/5 → 3/4 (정사각 느낌 제거) */
+  aspect-ratio: 3 / 4;             /* ⬅️ 4/5 → 3/4 */
   object-fit:cover;
   display:block;
   border-radius:10px;
   background:#f2f2f2;
 }
 
-/* ✅ 위치 재배치(아이폰 16 Pro에서 안 넘치게) */
+/* ✅ 위치 재배치 */
 .pol--1{ left:4%;  top:8%;  --r:-6deg; z-index:10; }
-.pol--2{
-  left:auto;
-  right:2%;     /* ✅ 오른쪽 끝으로 */
-  top:30%;
-  --r: 6deg;
-  z-index:20;
-}
+.pol--2{ right:2%; top:30%; --r: 6deg; z-index:20; }
 .pol--3{ left:10%; top:50%; --r:-3deg; z-index:30; }
 
-/* we getting married!!! 다다닥 */
+/* we getting married!!! */
 .burst{
   position:absolute;
   right:6%;
   top:14%;
   font-family:"Dancing Script",cursive;
-  font-size:34px;                   /* ⬅️ 44 → 34 */
+  font-size:34px;
   color: rgba(0,0,0,0.86);
   opacity:0;
   transform: translateY(8px) rotate(-2deg);
@@ -112,20 +106,20 @@ button{ font:inherit; }
   transition: opacity 220ms ease, transform 220ms ease;
 }
 
-/* ✅ 필기체(써지는 느낌) — 사진 위로 올라오게 */
+/* ✅ 필기체 */
 .handwrite{
   position:absolute;
   left:0; right:0;
-  bottom:18%;                       /* ⬅️ 12% → 18% (가려짐 해결) */
+  bottom:18%;
   text-align:center;
   pointer-events:none;
   font-family:"Dancing Script",cursive;
   color: rgba(0,0,0,0.62);
-  z-index:50;                       /* ⬅️ 폴라로이드보다 위 */
+  z-index:50;
 }
 .handwrite .line{
   display:inline-block;
-  font-size:30px;                   /* ⬅️ 34 → 30 (모바일 안정) */
+  font-size:30px;
   opacity:0;
   clip-path: inset(0 100% 0 0);
 }
@@ -145,7 +139,6 @@ button{ font:inherit; }
 .introMeta .date{ font-weight:800; font-size:17px; }
 .introMeta .place{ margin-top:8px; font-size:13px; color: rgba(0,0,0,0.65); line-height:1.5; }
 
-/* 작은 화면 추가 보정 */
 @media (max-height:760px){
   .pol{ width:min(220px, 62vw); padding:10px 10px 54px; }
   .pol--3{ top:48%; }
@@ -257,7 +250,7 @@ button{ font:inherit; }
   font-weight:700;
 }
 
-/* ✅ gallery */
+/* gallery */
 .gallery{ display:grid; gap:8px; }
 .gallery--wedding{ grid-template-columns: repeat(2, 1fr); }
 .gallery--wedding img{
@@ -307,8 +300,6 @@ button{ font:inherit; }
   user-select:none;
   -webkit-user-drag:none;
 }
-
-/* ✅ 모달 좌/우 버튼 */
 .modal__nav{
   position:absolute;
   top:50%;
@@ -404,22 +395,14 @@ button{ font:inherit; }
   z-index:55;
   pointer-events:none;
 }
-
 .writePhrase .w{
   display:inline-block;
   margin-left:8px;
   opacity:0;
-  clip-path: inset(0 100% 0 0); /* 오른쪽이 가려진 상태 */
+  clip-path: inset(0 100% 0 0);
 }
-
-/* 첫 단어는 왼쪽 여백 제거 */
 .writePhrase .w1{ margin-left:0; }
-
-/* “써지는” 애니메이션 */
-@keyframes writeWord {
-  to { opacity:1; clip-path: inset(0 0 0 0); }
-}
-
+@keyframes writeWord { to { opacity:1; clip-path: inset(0 0 0 0); } }
 .writePhrase.is-write .w1{ animation: writeWord 1.2s ease forwards; }
 .writePhrase.is-write .w2{ animation: writeWord 1.2s ease forwards; animation-delay: .75s; }
 .writePhrase.is-write .w3{ animation: writeWord 1.2s ease forwards; animation-delay: 1.5s; }

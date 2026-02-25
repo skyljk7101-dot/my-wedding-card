@@ -63,26 +63,29 @@ function ensureKakaoInit() {
   }
 }
 
-/* ===== scroll lock ===== */
-let __scrollY = 0;
-function lockScroll() {
-  __scrollY = window.scrollY || 0;
-  document.body.style.position = "fixed";
-  document.body.style.top = `-${__scrollY}px`;
-  document.body.style.left = "0";
-  document.body.style.right = "0";
-  document.body.style.width = "100%";
+/* =========================
+   Kakao Share (전체 복붙용)
+   ========================= */
+
+// ✅ 버튼 연결 함수 (#app HTML 만든 직후 호출)
+function bindKakaoShareButton() {
+  const kakaoBtn = document.getElementById("kakaoShareBtn");
+  if (!kakaoBtn) return;
+
+  kakaoBtn.addEventListener("click", async () => {
+    try {
+      const ok = ensureKakaoInit();
+      if (!ok) {
+        toast("카카오 SDK 로딩 실패 (콘솔 확인)");
+        return;
+      }
+      await window.Kakao.Share.sendCustom({ templateId: KAKAO_TEMPLATE_ID });
+    } catch (e) {
+      console.error(e);
+      toast("카카오 공유 오류 (콘솔 확인)");
+    }
+  });
 }
-function unlockScroll() {
-  const top = document.body.style.top;
-  document.body.style.position = "";
-  document.body.style.top = "";
-  document.body.style.left = "";
-  document.body.style.right = "";
-  document.body.style.width = "";
-  window.scrollTo(0, Math.abs(parseInt(top || "0", 10)));
-}
-function preventTouchMove(e) { e.preventDefault(); }
 
 /** ✅ 티맵: 절대 홈페이지로 이동 X (실패하면 토스트만) */
 function openTmap({ name, lat, lng }) {
@@ -105,6 +108,27 @@ function openTmap({ name, lat, lng }) {
     }
   })();
 }
+
+/* ===== scroll lock ===== */
+let __scrollY = 0;
+function lockScroll() {
+  __scrollY = window.scrollY || 0;
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${__scrollY}px`;
+  document.body.style.left = "0";
+  document.body.style.right = "0";
+  document.body.style.width = "100%";
+}
+function unlockScroll() {
+  const top = document.body.style.top;
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.left = "";
+  document.body.style.right = "";
+  document.body.style.width = "";
+  window.scrollTo(0, Math.abs(parseInt(top || "0", 10)));
+}
+function preventTouchMove(e) { e.preventDefault(); }
 
 function formatTime(ts) {
   const d = new Date(ts);
@@ -151,136 +175,137 @@ async function gbAddItem(name, msg) {
 function build() {
   const d = INVITE;
 
+  const phrase = `“이제 평생, 내 마음으로만 자동연장되는 사랑💗”`;
+
   $("#app").innerHTML = `
-    <div class="intro" id="intro" aria-hidden="false">
-      <div class="introStage">
-        <div class="pol pol--1" id="p1">
-          <img class="pol__img" src="${d.heroPolaroids[0]}" alt="intro-1" />
-        </div>
-        <div class="pol pol--2" id="p2">
-          <img class="pol__img" src="${d.heroPolaroids[1]}" alt="intro-2" />
-        </div>
-        <div class="pol pol--3" id="p3">
-          <img class="pol__img" src="${d.heroPolaroids[2]}" alt="intro-3" />
-        </div>
+  <!-- Intro -->
+  <div class="intro" id="intro" aria-hidden="false">
+    <div class="introStage">
+      <div class="pol pol--1" id="p1"><img class="pol__img" src="${d.heroPolaroids[0]}" alt="intro-1"></div>
+      <div class="pol pol--2" id="p2"><img class="pol__img" src="${d.heroPolaroids[1]}" alt="intro-2"></div>
+      <div class="pol pol--3" id="p3"><img class="pol__img" src="${d.heroPolaroids[2]}" alt="intro-3"></div>
 
-        <div class="writePhrase" id="writePhrase" aria-label="we're getting married">
-          <span class="w w1">we're</span>
-          <span class="w w2">getting</span>
-          <span class="w w3">married</span>
-        </div>
+      <div class="writePhrase" id="writePhrase" aria-label="we're getting married">
+        <span class="w w1">we're</span>
+        <span class="w w2">getting</span>
+        <span class="w w3">married</span>
+      </div>
 
-        <!-- ✅ 기존 오류 원인이었던 #handwrite 실제로 넣음 -->
-        <div class="handwrite" id="handwrite" aria-label="names handwriting">
-          <span class="line">DASOM · JAEGI</span>
-          <span class="line">2026.05.31</span>
-        </div>
+      <div class="handwrite" id="handwrite" aria-label="names handwriting">
+        <span class="line">DASOM · JAEGI</span>
+        <span class="line">2026.05.31</span>
+      </div>
 
-        <div class="introMeta">
-          <div class="date">${d.wedding.dateText}</div>
-          <div class="place">${d.wedding.venueName}<br/>${d.wedding.address}</div>
+      <div class="introMeta">
+        <div class="date">${d.wedding.dateText}</div>
+        <div class="place">${d.wedding.venueName}<br/>${d.wedding.address}</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <div class="wrap" id="main" style="opacity:0;">
+    <div class="heroCard">
+      <img class="heroImg" src="${d.heroImage}" alt="hero"/>
+      <div class="heroMeta">
+        <div class="heroMeta__names">${d.couple.groom.name} · ${d.couple.bride.name}</div>
+        <div class="heroMeta__info">
+          <b>${d.wedding.dateText}</b><br/>
+          ${d.wedding.venueName}<br/>
+          <span class="muted">${d.wedding.address}</span>
         </div>
       </div>
     </div>
 
-    <div class="wrap" id="main" style="opacity:0;">
-      <div class="heroCard">
-        <img class="heroImg" src="${d.heroImage}" alt="hero"/>
-        <div class="heroMeta">
-          <div class="heroMeta__names">${d.couple.groom.name} · ${d.couple.bride.name}</div>
-          <div class="heroMeta__info">
-            <b>${d.wedding.dateText}</b><br/>
-            ${d.wedding.venueName}<br/>
-            <span class="muted">${d.wedding.address}</span>
-          </div>
-          <div class="grid2" style="margin-top:14px;">
-            <button class="btn" id="kakaoShareBtn" type="button">카카오 공유</button>
-            <button class="btn btn--primary" id="addCal" type="button">캘린더 추가</button>
-          </div>
-        </div>
+    <section class="card">
+      <h2 class="card__title">초대합니다</h2>
+      <p class="message">${phrase}</p>
+    </section>
+
+    <section class="card">
+      <h2 class="card__title">연락하기</h2>
+      <div class="grid2" style="margin-top:12px;">
+        <a class="btn" href="tel:${d.couple.groom.phone}">신랑 전화</a>
+        <a class="btn" href="tel:${d.couple.bride.phone}">신부 전화</a>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="card__title">오시는 길</h2>
+      <p class="muted" style="margin:10px 0 12px; line-height:1.6;">
+        ${d.wedding.venueName}<br/>${d.wedding.address}
+      </p>
+      <div class="grid2">
+        <button class="btn" id="naverMap" type="button">네이버지도</button>
+        <button class="btn" id="tmapRoute" type="button">티맵 길찾기</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="card__title">갤러리</h2>
+      <div class="tabs">
+        <button class="tab is-active" id="tabWedding" type="button">웨딩</button>
+        <button class="tab" id="tabDaily" type="button">일상</button>
       </div>
 
-      <section class="card">
-        <h2 class="card__title">초대합니다</h2>
-        <p class="message">
-소중한 분들을 모시고
-두 사람이 사랑으로 하나 되는 날
-기쁨의 자리에 함께해 주시면 감사하겠습니다.
-        </p>
-      </section>
+      <div style="margin-top:12px;">
+        <div class="gallery gallery--wedding" id="weddingGallery"></div>
+        <div class="gallery gallery--daily" id="dailyGallery" style="display:none;"></div>
+      </div>
+    </section>
 
-      <section class="card">
-        <h2 class="card__title">연락하기</h2>
-        <div class="grid2" style="margin-top:12px;">
-          <a class="btn" href="tel:${d.couple.groom.phone}">신랑 전화</a>
-          <a class="btn" href="tel:${d.couple.bride.phone}">신부 전화</a>
-        </div>
-      </section>
+    <section class="card">
+      <h2 class="card__title">마음 전하실 곳</h2>
+      <p class="muted" style="margin:10px 0 6px;">카드를 누르면 복사됩니다.</p>
+      <div id="accounts"></div>
+    </section>
 
-      <section class="card">
-        <h2 class="card__title">오시는 길</h2>
-        <p class="muted" style="margin:10px 0 12px; line-height:1.6;">
-          ${d.wedding.venueName}<br/>${d.wedding.address}
-        </p>
-        <div class="grid2">
-          <button class="btn" id="naverMap" type="button">네이버지도</button>
-          <button class="btn" id="tmapRoute" type="button">티맵 길찾기</button>
-        </div>
-      </section>
+    <section class="card">
+      <h2 class="card__title">방명록</h2>
+      <p class="muted" style="margin:10px 0 6px;">작성자와 내용을 남겨주세요.</p>
 
-      <section class="card">
-        <h2 class="card__title">갤러리</h2>
-        <div class="tabs">
-          <button class="tab is-active" id="tabWedding" type="button">웨딩</button>
-          <button class="tab" id="tabDaily" type="button">일상</button>
-        </div>
+      <form id="gbForm" class="guestbookForm">
+        <input id="gbName" class="input" maxlength="20" placeholder="작성자" required />
+        <textarea id="gbMsg" class="textarea" maxlength="300" placeholder="내용" required></textarea>
+        <button class="btn btn--primary" type="submit" style="width:100%;">남기기</button>
+      </form>
 
-        <div style="margin-top:12px;">
-          <div class="gallery gallery--wedding" id="weddingGallery"></div>
-          <div class="gallery gallery--daily" id="dailyGallery" style="display:none;"></div>
-        </div>
-      </section>
+      <div id="gbList" class="gbList"></div>
+      <p class="muted" id="gbHint" style="margin-top:10px; font-size:12px; line-height:1.5;"></p>
+    </section>
 
-      <section class="card">
-        <h2 class="card__title">마음 전하실 곳</h2>
-        <p class="muted" style="margin:10px 0 6px;">카드를 누르면 복사됩니다.</p>
-        <div id="accounts"></div>
-      </section>
+    <section class="card">
+      <h2 class="card__title">RSVP</h2>
+      <p class="muted" style="margin:10px 0 12px; line-height:1.6;">구글폼으로 참석 여부를 남겨주세요.</p>
+      <a class="btn btn--primary" target="_blank" rel="noopener" href="${d.rsvpUrl}" style="width:100%;">참석 여부 남기기</a>
+    </section>
 
-      <section class="card">
-        <h2 class="card__title">방명록</h2>
-        <p class="muted" style="margin:10px 0 6px;">작성자와 내용을 남겨주세요.</p>
+    <section class="card">
+      <h2 class="card__title">청첩장 공유하기</h2>
+      <p class="muted" style="margin:10px 0 12px; line-height:1.6;">카카오톡으로 예쁜 청첩장을 전해보세요.</p>
+      <button id="kakaoShareBtn" class="btn"
+        style="background-color:#FEE500; color:#000; border:none; font-weight:bold; width:100%; border-radius:14px;">
+        카카오톡 공유하기
+      </button>
+    </section>
 
-        <form id="gbForm" class="guestbookForm">
-          <input id="gbName" class="input" maxlength="20" placeholder="작성자" required />
-          <textarea id="gbMsg" class="textarea" maxlength="300" placeholder="내용" required></textarea>
-          <button class="btn btn--primary" type="submit" style="width:100%;">남기기</button>
-        </form>
+    <footer class="footer">${d.footerText}</footer>
 
-        <div id="gbList" class="gbList"></div>
-        <p class="muted" id="gbHint" style="margin-top:10px; font-size:12px; line-height:1.5;"></p>
-      </section>
-
-      <section class="card">
-        <h2 class="card__title">RSVP</h2>
-        <p class="muted" style="margin:10px 0 12px; line-height:1.6;">구글폼으로 참석 여부를 남겨주세요.</p>
-        <a class="btn btn--primary" target="_blank" rel="noopener" href="${d.rsvpUrl}" style="width:100%; display:inline-flex; justify-content:center;">RSVP 작성하기</a>
-      </section>
-
-      <div class="footer">${d.footerText}</div>
-    </div>
-
-    <!-- modal -->
-    <div class="modal" id="modal" aria-hidden="true">
+    <!-- Modal (gallery slider) -->
+    <div id="modal" class="modal" aria-hidden="true">
       <div class="modal__backdrop"></div>
       <div class="modal__counter" id="modalCounter">1/1</div>
       <button class="modal__nav modal__nav--prev" id="modalPrev" type="button" aria-label="prev">‹</button>
       <button class="modal__nav modal__nav--next" id="modalNext" type="button" aria-label="next">›</button>
       <img class="modal__img" id="modalImg" alt="modal" />
     </div>
+  </div>
   `;
 
-  /* ===== Intro animation (✅ null-safe) ===== */
+  // ✅ “HTML 만든 직후” 버튼 바인딩 (너가 준 방식 그대로)
+  bindKakaoShareButton();
+
+  /* ===== Intro animation ===== */
   const intro = $("#intro");
   const main = $("#main");
   const p1 = $("#p1");
@@ -292,14 +317,9 @@ function build() {
   if (p1) setTimeout(() => p1.classList.add("is-in"), 200);
   if (p2) setTimeout(() => p2.classList.add("is-in"), 700);
   if (p3) setTimeout(() => p3.classList.add("is-in"), 1200);
-
-  // ✅ 문구를 “한 단어씩” 천천히 써지듯
   if (writePhrase) setTimeout(() => writePhrase.classList.add("is-write"), 1900);
-
-  // ✅ 필기체(없으면 그냥 스킵)
   if (hand) setTimeout(() => hand.classList.add("is-write"), 3100);
 
-  // 인트로 종료
   setTimeout(() => {
     if (intro) {
       intro.classList.add("is-hide");
@@ -350,7 +370,7 @@ function build() {
   tabWedding.addEventListener("click", showWedding);
   tabDaily.addEventListener("click", showDaily);
 
-  /* ===== Modal slider + Counter + Scroll lock ===== */
+  /* ===== Modal ===== */
   const modal = $("#modal");
   const modalImg = $("#modalImg");
   const modalPrev = $("#modalPrev");
@@ -427,7 +447,6 @@ function build() {
     if (e.key === "ArrowRight") next();
   });
 
-  // Swipe
   let touchStartX = 0;
   let touchStartY = 0;
   let touching = false;
@@ -455,7 +474,6 @@ function build() {
     else next();
   }, { passive: true });
 
-  // Render galleries
   d.weddingGallery.forEach((src, i) => {
     const img = document.createElement("img");
     img.src = src;
@@ -493,68 +511,7 @@ function build() {
     acc.appendChild(el);
   });
 
-  /* ===== Calendar (ics) ===== */
-  $("#addCal").addEventListener("click", () => {
-    const start = new Date(d.wedding.dateTimeISO);
-    const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
-
-    const toICS = (date) =>
-      date.getUTCFullYear() +
-      pad2(date.getUTCMonth() + 1) +
-      pad2(date.getUTCDate()) +
-      "T" +
-      pad2(date.getUTCHours()) +
-      pad2(date.getUTCMinutes()) +
-      "00Z";
-
-    const ics =
-`BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Wedding Invite//KO//EN
-CALSCALE:GREGORIAN
-METHOD:PUBLISH
-BEGIN:VEVENT
-UID:wedding-${start.getTime()}@invite
-DTSTAMP:${toICS(new Date())}
-DTSTART:${toICS(start)}
-DTEND:${toICS(end)}
-SUMMARY:DASOM · JAEGI 결혼식
-LOCATION:${d.wedding.venueName} ${d.wedding.address}
-DESCRIPTION:모바일 청첩장
-END:VEVENT
-END:VCALENDAR`;
-
-    const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "wedding.ics";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-    toast("캘린더 파일을 다운로드했어요!");
-  });
-
-  /* ===== Kakao share ===== */
-  const kakaoBtn = $("#kakaoShareBtn");
-  if (kakaoBtn) {
-    kakaoBtn.addEventListener("click", async () => {
-      try {
-        const ok = ensureKakaoInit();
-        if (!ok) {
-          toast("카카오 SDK 로딩 실패 (콘솔 확인)");
-          return;
-        }
-        await window.Kakao.Share.sendCustom({ templateId: KAKAO_TEMPLATE_ID });
-      } catch (e) {
-        console.error(e);
-        toast("카카오 공유 오류 (콘솔 확인)");
-      }
-    });
-  }
-
-  /* ===== Guestbook (shared) ===== */
+  /* ===== Guestbook ===== */
   const gbListEl = $("#gbList");
   const gbHint = $("#gbHint");
   const gbForm = $("#gbForm");
@@ -591,7 +548,7 @@ END:VCALENDAR`;
   }
 
   if (!hasGuestbookEndpoint()) {
-    gbHint.textContent = "⚠️ 방명록 서버(구글 Apps Script) URL이 설정되지 않았어요. config.js의 GUESTBOOK_ENDPOINT를 배포 URL로 바꿔주세요.";
+    gbHint.textContent = "⚠️ 방명록 서버 URL이 설정되지 않았어요. config.js의 GUESTBOOK_ENDPOINT를 배포 URL로 바꿔주세요.";
     renderGB([]);
   } else {
     gbHint.textContent = "하객 모두가 같은 방명록을 공유합니다.";

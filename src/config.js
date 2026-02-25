@@ -42,8 +42,8 @@ export const INVITE = {
     "/assets/d17.jpg","/assets/d18.jpg"
   ],
 
-  // ✅ 아래 URL은 “새 배포” 후 나온 Web App URL로 교체 추천
-  GUESTBOOK_ENDPOINT: "https://script.google.com/macros/s/AKfycbyOCgbblTDzo11Aus3u0Gj3kyaQt_tNbs2mAMUYYZZiavthOBNTc9i-5viko8OACxNx/exec",
+  // ✅ Apps Script Web App URL
+  GUESTBOOK_ENDPOINT: "https://script.google.com/macros/s/AKfycbyoiTXZkMShjPz8orFiUCcOiGsOabXujlTAGXvTKwc8wow5nLd25HgJHw6iUEXSUoZ9/exec",
 
   footerText: "© 2026 DASOM · JAEGI Wedding",
 };

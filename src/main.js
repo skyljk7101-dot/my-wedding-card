@@ -5,6 +5,12 @@ const $ = (sel) => document.querySelector(sel);
 const encode = (s) => encodeURIComponent(String(s ?? ""));
 const pad2 = (n) => String(n).padStart(2, "0");
 
+// ✅ 네가 JS SDK 도메인 등록한 JavaScript 키 (950d...)
+const KAKAO_JS_KEY = "950d726b2979c7f8113c72f6fbfb8771";
+
+// ✅ 카카오 커스텀 템플릿 ID
+const KAKAO_TEMPLATE_ID = 129829;
+
 function toast(msg) {
   let el = document.getElementById("__toast");
   if (!el) {
@@ -40,6 +46,19 @@ async function copyText(text) {
     document.execCommand("copy");
     ta.remove();
     toast("복사했어요!");
+  }
+}
+
+function ensureKakaoInit() {
+  if (!window.Kakao) return false;
+  try {
+    if (!window.Kakao.isInitialized()) {
+      window.Kakao.init(KAKAO_JS_KEY);
+    }
+    return true;
+  } catch (e) {
+    console.error(e);
+    return false;
   }
 }
 
@@ -342,17 +361,28 @@ END:VCALENDAR`;
     toast("캘린더 파일을 다운로드했어요!");
   });
 
-  if (window.Kakao && !window.Kakao.isInitialized()) {
-    window.Kakao.init('950d726b2979c7f8113c72f6fbfb8771'); 
-  }
-
+  // ✅ Kakao share
   const kakaoBtn = document.getElementById("kakaoShareBtn");
   if (kakaoBtn) {
-    kakaoBtn.addEventListener("click", () => {
-      if (window.Kakao) {
-        window.Kakao.Share.sendCustom({
-          templateId: 129829, 
+    kakaoBtn.addEventListener("click", async () => {
+      try {
+        const ok = ensureKakaoInit();
+        if (!ok) {
+          toast("카카오 SDK 로딩 실패");
+          return;
+        }
+
+        if (!window.Kakao.Share) {
+          toast("Kakao.Share 사용 불가");
+          return;
+        }
+
+        await window.Kakao.Share.sendCustom({
+          templateId: KAKAO_TEMPLATE_ID,
         });
+      } catch (e) {
+        console.error(e);
+        toast("카카오 공유 오류 (콘솔 확인)");
       }
     });
   }

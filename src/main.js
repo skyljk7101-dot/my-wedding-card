@@ -5,10 +5,8 @@ const $ = (sel) => document.querySelector(sel);
 const encode = (s) => encodeURIComponent(String(s ?? ""));
 const pad2 = (n) => String(n).padStart(2, "0");
 
-// ✅ 네가 JS SDK 도메인 등록한 JavaScript 키 (950d...)
+// ✅ 네가 JS SDK 도메인 등록한 JavaScript 키(스크린샷의 950d...)
 const KAKAO_JS_KEY = "950d726b2979c7f8113c72f6fbfb8771";
-
-// ✅ 카카오 커스텀 템플릿 ID
 const KAKAO_TEMPLATE_ID = 129829;
 
 function toast(msg) {
@@ -62,6 +60,25 @@ function ensureKakaoInit() {
   }
 }
 
+/**
+ * TMAP 앱 스킴 (기기별/버전별 차이가 있을 수 있어 가장 흔한 형태로)
+ * goalx=lng, goaly=lat
+ */
+function openTmap({ lat, lng, name }) {
+  const goalName = encode(name);
+  const scheme = `tmap://route?goalname=${goalName}&goalx=${lng}&goaly=${lat}`;
+
+  // fallback (웹 검색 정도만)
+  const fallback = `https://www.tmap.co.kr/`;
+
+  const start = Date.now();
+  window.location.href = scheme;
+  setTimeout(() => {
+    // 앱이 열리지 않으면 fallback
+    if (Date.now() - start < 1200) window.open(fallback, "_blank", "noopener");
+  }, 700);
+}
+
 function build() {
   const d = INVITE;
   const { groom, bride } = d.couple;
@@ -71,42 +88,49 @@ function build() {
   const groomSms = (groom.phone || "").replace(/[^0-9]/g, "");
 
   const NAVER_QUERY = "공덕 아펠가모";
-
   const inviteMessage = `“매일 네 하루에 조용히 구독했어.\n이제 평생, 내 마음으로만 자동연장되는 사랑💗”`;
 
   $("#app").innerHTML = `
-  <main class="wrap">
-
-    <header class="heroShowcase" id="heroShowcase">
-      <div class="heroFinal">
-        <img class="heroFinal__img" src="${d.heroImage}" alt="메인 사진">
-        <div class="heroFinal__overlay">
-          <div style="font-weight:700; font-size:18px;">DASOM · JAEGI</div>
-          <div style="margin-top:6px; font-size:14px;">${d.wedding.dateText}</div>
-        </div>
+  <!-- Intro -->
+  <section id="intro" class="intro" aria-hidden="false">
+    <div class="introStage">
+      <div class="introTopRight">
+        <div id="burst1" class="stampBurst">we getting</div>
+        <div id="burst2" class="stampBurst">married!!!</div>
       </div>
 
-      <div class="heroIntro" id="heroIntro">
-        <div class="polStack">
-          <div class="introPolaroid introPolaroid--1" id="p1">
-            <img class="introPolaroid__img" src="${d.heroPolaroids[0]}" alt="polaroid1">
-          </div>
-          <div class="introPolaroid introPolaroid--2" id="p2">
-            <img class="introPolaroid__img" src="${d.heroPolaroids[1]}" alt="polaroid2">
-          </div>
-          <div class="introPolaroid introPolaroid--3" id="p3">
-            <img class="introPolaroid__img" src="${d.heroPolaroids[2]}" alt="polaroid3">
-          </div>
-        </div>
+      <div class="introPol introPol--1" id="introP1" style="--rot:-7deg;">
+        <img src="${d.heroPolaroids[0]}" alt="intro-1" />
+        <div class="introPol__caption">Who : ${bride.name}</div>
+      </div>
 
-        <div class="scribbleWrapper">
-          <div class="scribbleLeft">
-            <span class="scribbleLine">Ad nuptias nostras</span><br>
-            <span class="scribbleLine">te invitamus</span>
-          </div>
+      <div class="introPol introPol--2" id="introP2" style="--rot:6deg;">
+        <img src="${d.heroPolaroids[1]}" alt="intro-2" />
+        <div class="introPol__caption">Where : ${NAVER_QUERY}</div>
+      </div>
+
+      <div class="introPol introPol--3" id="introP3" style="--rot:-2deg;">
+        <img src="${d.heroPolaroids[2]}" alt="intro-3" />
+        <div class="introPol__caption">When : ${d.wedding.dateText}</div>
+      </div>
+
+      <div id="handwrite" class="handwrite"><span>Ad nuptias nostras te invitamus</span></div>
+    </div>
+  </section>
+
+  <!-- Main -->
+  <main class="wrap" id="main" style="opacity:0;">
+    <section class="heroCard">
+      <img class="heroImg" src="${d.heroImage}" alt="메인 사진" />
+      <div class="heroMeta">
+        <div class="heroMeta__names">DASOM · JAEGI</div>
+        <div class="heroMeta__info">
+          <div><b>${d.wedding.dateText}</b></div>
+          <div style="margin-top:6px;">${d.wedding.venueName}</div>
+          <div class="muted" style="margin-top:6px;">${d.wedding.address}</div>
         </div>
       </div>
-    </header>
+    </section>
 
     <section class="card">
       <h2 class="card__title">초대합니다</h2>
@@ -146,7 +170,7 @@ function build() {
       </div>
 
       <div style="margin-top:14px;">
-        <button id="addCal" class="btn btn--primary" type="button">캘린더에 추가</button>
+        <button id="addCal" class="btn btn--primary" type="button" style="width:100%;">캘린더에 추가</button>
       </div>
 
       <p class="hr-dashed" style="font-size:12px; color:#777; line-height:1.6;">
@@ -167,6 +191,10 @@ function build() {
 
         <a class="btn" id="naverMap" href="#" rel="noopener">네이버지도(위치)</a>
         <a class="btn" id="naverRoute" href="#" rel="noopener">네이버지도(길찾기)</a>
+      </div>
+
+      <div style="margin-top:10px;">
+        <button class="btn" id="tmapRoute" type="button" style="width:100%;">티맵(길찾기)</button>
       </div>
     </section>
 
@@ -193,7 +221,7 @@ function build() {
     <section class="card">
       <h2 class="card__title">RSVP</h2>
       <p class="muted" style="margin:10px 0 12px; line-height:1.6;">구글폼으로 참석 여부를 남겨주세요.</p>
-      <a class="btn btn--primary" target="_blank" rel="noopener" href="${d.rsvpUrl}">참석 여부 남기기</a>
+      <a class="btn btn--primary" target="_blank" rel="noopener" href="${d.rsvpUrl}" style="width:100%;">참석 여부 남기기</a>
     </section>
 
     <section class="card">
@@ -205,24 +233,48 @@ function build() {
     </section>
 
     <footer class="footer">${d.footerText}</footer>
-  </main>
 
-  <div id="modal" class="modal" aria-hidden="true">
-    <div class="modal__backdrop"></div>
-    <img id="modalImg" class="modal__img" alt="확대 이미지" />
-  </div>
+    <!-- Modal (gallery slider) -->
+    <div id="modal" class="modal" aria-hidden="true">
+      <div class="modal__backdrop"></div>
+      <button id="modalPrev" class="modal__nav modal__nav--prev" type="button" aria-label="이전 사진">‹</button>
+      <img id="modalImg" class="modal__img" alt="확대 이미지" />
+      <button id="modalNext" class="modal__nav modal__nav--next" type="button" aria-label="다음 사진">›</button>
+    </div>
+  </main>
   `;
 
-  // intro timing
-  const intro = document.getElementById("heroIntro");
-  const showcase = document.getElementById("heroShowcase");
-  setTimeout(() => intro.classList.add("is-write"), 2000);
-  setTimeout(() => document.getElementById("p1")?.classList.add("is-in"), 200);
-  setTimeout(() => document.getElementById("p2")?.classList.add("is-in"), 3200);
-  setTimeout(() => document.getElementById("p3")?.classList.add("is-in"), 6200);
-  setTimeout(() => showcase.classList.add("is-done"), 9000);
+  // ---------- Intro animation ----------
+  const intro = $("#intro");
+  const main = $("#main");
+  const p1 = $("#introP1");
+  const p2 = $("#introP2");
+  const p3 = $("#introP3");
+  const burst1 = $("#burst1");
+  const burst2 = $("#burst2");
+  const hand = $("#handwrite");
 
-  // naver maps
+  // 폴라로이드 0.5초 간격
+  setTimeout(() => p1.classList.add("is-in"), 200);
+  setTimeout(() => p2.classList.add("is-in"), 700);
+  setTimeout(() => p3.classList.add("is-in"), 1200);
+
+  // we getting married!!! 다다닥
+  setTimeout(() => burst1.classList.add("is-on"), 1500);
+  setTimeout(() => burst2.classList.add("is-on"), 2000);
+
+  // 필기체 쓰기
+  setTimeout(() => hand.classList.add("is-write"), 2400);
+
+  // 인트로 종료 → 메인 노출
+  setTimeout(() => {
+    intro.classList.add("is-hide");
+    intro.setAttribute("aria-hidden", "true");
+    main.style.transition = "opacity 450ms ease";
+    main.style.opacity = "1";
+  }, 3800);
+
+  // ---------- Naver map deep link ----------
   const naverPlaceApp = `nmap://place?lat=${lat}&lng=${lng}&name=${encode(NAVER_QUERY)}&appname=com.example.weddinginvite`;
   const naverRouteApp = `nmap://route/car?dlat=${lat}&dlng=${lng}&dname=${encode(NAVER_QUERY)}&appname=com.example.weddinginvite`;
   const naverWeb = `https://map.naver.com/v5/search/${encode(NAVER_QUERY)}`;
@@ -245,45 +297,18 @@ function build() {
     }, 700);
   });
 
-  // modal
-  const modal = $("#modal");
-  const modalImg = $("#modalImg");
-  function openModal(src) {
-    modalImg.src = src;
-    modal.classList.add("is-open");
-    modal.setAttribute("aria-hidden", "false");
-  }
-  function closeModal() {
-    modal.classList.remove("is-open");
-    modal.setAttribute("aria-hidden", "true");
-    modalImg.src = "";
-  }
-  modal.addEventListener("click", closeModal);
+  // ---------- Tmap route ----------
+  $("#tmapRoute").addEventListener("click", () => {
+    openTmap({ lat, lng, name: NAVER_QUERY });
+  });
 
-  // render galleries
+  // ---------- Gallery tabs ----------
   const weddingEl = $("#weddingGallery");
-  d.weddingGallery.forEach((src, i) => {
-    const img = document.createElement("img");
-    img.src = src;
-    img.alt = `wedding-${i + 1}`;
-    img.loading = "lazy";
-    img.addEventListener("click", () => openModal(src));
-    weddingEl.appendChild(img);
-  });
-
   const dailyEl = $("#dailyGallery");
-  d.dailyGallery.forEach((src, i) => {
-    const img = document.createElement("img");
-    img.src = src;
-    img.alt = `daily-${i + 1}`;
-    img.loading = "lazy";
-    img.addEventListener("click", () => openModal(src));
-    dailyEl.appendChild(img);
-  });
 
-  // tabs
   const tabWedding = $("#tabWedding");
   const tabDaily = $("#tabDaily");
+
   function showWedding() {
     tabWedding.classList.add("is-active");
     tabDaily.classList.remove("is-active");
@@ -299,7 +324,119 @@ function build() {
   tabWedding.addEventListener("click", showWedding);
   tabDaily.addEventListener("click", showDaily);
 
-  // accounts
+  // ---------- Modal slider ----------
+  const modal = $("#modal");
+  const modalImg = $("#modalImg");
+  const modalPrev = $("#modalPrev");
+  const modalNext = $("#modalNext");
+
+  let currentList = [];
+  let currentIndex = 0;
+
+  function renderModal() {
+    const src = currentList[currentIndex];
+    modalImg.src = src;
+
+    modalPrev.disabled = currentIndex <= 0;
+    modalNext.disabled = currentIndex >= currentList.length - 1;
+
+    modalPrev.style.opacity = modalPrev.disabled ? "0.35" : "1";
+    modalNext.style.opacity = modalNext.disabled ? "0.35" : "1";
+    modalPrev.style.pointerEvents = modalPrev.disabled ? "none" : "auto";
+    modalNext.style.pointerEvents = modalNext.disabled ? "none" : "auto";
+  }
+
+  function openModal(list, index) {
+    currentList = list;
+    currentIndex = index;
+    modal.classList.add("is-open");
+    modal.setAttribute("aria-hidden", "false");
+    renderModal();
+  }
+
+  function closeModal() {
+    modal.classList.remove("is-open");
+    modal.setAttribute("aria-hidden", "true");
+    modalImg.src = "";
+  }
+
+  function prev() {
+    if (currentIndex > 0) {
+      currentIndex -= 1;
+      renderModal();
+    }
+  }
+
+  function next() {
+    if (currentIndex < currentList.length - 1) {
+      currentIndex += 1;
+      renderModal();
+    }
+  }
+
+  modal.addEventListener("click", (e) => {
+    const isBackdrop = e.target.classList.contains("modal__backdrop") || e.target === modal;
+    if (isBackdrop) closeModal();
+  });
+  modalPrev.addEventListener("click", (e) => { e.stopPropagation(); prev(); });
+  modalNext.addEventListener("click", (e) => { e.stopPropagation(); next(); });
+  modalImg.addEventListener("click", (e) => e.stopPropagation());
+
+  window.addEventListener("keydown", (e) => {
+    if (!modal.classList.contains("is-open")) return;
+    if (e.key === "Escape") closeModal();
+    if (e.key === "ArrowLeft") prev();
+    if (e.key === "ArrowRight") next();
+  });
+
+  // Swipe
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touching = false;
+
+  modalImg.addEventListener("touchstart", (e) => {
+    if (!modal.classList.contains("is-open")) return;
+    const t = e.touches[0];
+    touchStartX = t.clientX;
+    touchStartY = t.clientY;
+    touching = true;
+  }, { passive: true });
+
+  modalImg.addEventListener("touchend", (e) => {
+    if (!touching) return;
+    touching = false;
+
+    const t = e.changedTouches[0];
+    const dx = t.clientX - touchStartX;
+    const dy = t.clientY - touchStartY;
+
+    if (Math.abs(dx) < 40) return;
+    if (Math.abs(dx) < Math.abs(dy)) return;
+
+    if (dx > 0) prev();
+    else next();
+  }, { passive: true });
+
+  // ---------- Render galleries ----------
+  d.weddingGallery.forEach((src, i) => {
+    const img = document.createElement("img");
+    img.src = src;
+    img.alt = `wedding-${i + 1}`;
+    img.loading = "lazy";
+    img.addEventListener("click", () => openModal(d.weddingGallery, i));
+    weddingEl.appendChild(img);
+  });
+
+  d.dailyGallery.forEach((src, i) => {
+    const img = document.createElement("img");
+    img.src = src;
+    img.alt = `daily-${i + 1}`;
+    img.loading = "lazy";
+    img.addEventListener("click", () => openModal(d.dailyGallery, i));
+    dailyEl.appendChild(img);
+  });
+
+  // ---------- Accounts ----------
   const acc = $("#accounts");
   d.accounts.forEach((a) => {
     if (!a.number) return;
@@ -318,7 +455,7 @@ function build() {
     acc.appendChild(el);
   });
 
-  // calendar (ics)
+  // ---------- Calendar (ics) ----------
   $("#addCal").addEventListener("click", () => {
     const start = new Date(d.wedding.dateTimeISO);
     const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
@@ -361,8 +498,8 @@ END:VCALENDAR`;
     toast("캘린더 파일을 다운로드했어요!");
   });
 
-  // ✅ Kakao share
-  const kakaoBtn = document.getElementById("kakaoShareBtn");
+  // ---------- Kakao share ----------
+  const kakaoBtn = $("#kakaoShareBtn");
   if (kakaoBtn) {
     kakaoBtn.addEventListener("click", async () => {
       try {
@@ -371,15 +508,11 @@ END:VCALENDAR`;
           toast("카카오 SDK 로딩 실패");
           return;
         }
-
         if (!window.Kakao.Share) {
           toast("Kakao.Share 사용 불가");
           return;
         }
-
-        await window.Kakao.Share.sendCustom({
-          templateId: KAKAO_TEMPLATE_ID,
-        });
+        await window.Kakao.Share.sendCustom({ templateId: KAKAO_TEMPLATE_ID });
       } catch (e) {
         console.error(e);
         toast("카카오 공유 오류 (콘솔 확인)");

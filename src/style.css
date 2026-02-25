@@ -1,5 +1,5 @@
 :root{
-  --bg:#ffffff;              /* ✅ 전체 화이트 느낌 */
+  --bg:#ffffff;
   --card:#ffffff;
   --text:#111;
   --muted:#6b6b6b;
@@ -12,7 +12,6 @@
 
 html,body{
   margin:0; padding:0;
-  height:100%;
   background: var(--bg);
   color: var(--text);
   font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;
@@ -26,118 +25,116 @@ button{ font:inherit; }
   padding:18px 14px 40px;
 }
 
-/* ---------- Intro (화이트 + 폴라로이드 스캔 느낌) ---------- */
+/* ===== Intro (샘플 같은 폴라로이드 콜라주 느낌) ===== */
 .intro{
-  position: fixed;
-  inset: 0;
-  background: #fff;
-  z-index: 100;
-  display: grid;
-  place-items: center;
-  overflow: hidden;
+  position:fixed;
+  inset:0;
+  background:#fff;
+  z-index:100;
+  display:grid;
+  place-items:center;
+  overflow:hidden;
 }
-
 .intro.is-hide{
   opacity:0;
   pointer-events:none;
-  transition: opacity 550ms ease;
+  transition: opacity 600ms ease;
 }
-
 .introStage{
-  position: relative;
-  width: min(520px, 92vw);
-  height: min(820px, 92vh);
+  position:relative;
+  width:min(520px, 92vw);
+  height:min(820px, 92vh);
 }
 
-.introPol{
+/* 폴라로이드 프레임(종이) */
+.pol{
   position:absolute;
-  width: min(260px, 64vw);
-  background: #fdfdfd;
-  padding: 14px 14px 48px;
-  border-radius: 8px;                 /* 폴라로이드 종이 모서리 */
-  box-shadow: 0 24px 60px rgba(0,0,0,0.18);
-  border: 1px solid rgba(0,0,0,0.08);
+  width:min(320px, 78vw);
+  background:#fff;
+  border:1px solid rgba(0,0,0,0.08);
+  border-radius:10px;
+  box-shadow:0 22px 60px rgba(0,0,0,0.18);
+  padding:14px 14px 52px; /* 하단 여백(폴라로이드 하얀 부분) */
   opacity:0;
-  transform: translateY(14px) scale(0.98);
+  transform: translateY(14px) scale(0.98) rotate(var(--r,0deg));
+}
+.pol.is-in{
+  opacity:1;
+  transform: translateY(0) scale(1) rotate(var(--r,0deg));
+  transition: opacity 450ms ease, transform 520ms ease;
 }
 
-.introPol img{
+.pol__img{
   width:100%;
-  height: min(300px, 46vw);
-  object-fit: cover;
+  height:min(320px, 52vw);
+  object-fit:cover;
   display:block;
-  border-radius: 2px;
+  border-radius:6px;
+  background:#f2f2f2;
 }
-
-.introPol__caption{
-  margin-top: 12px;
-  font-family:"Dancing Script",cursive;
-  font-size: 22px;
-  color: rgba(0,0,0,0.70);
-}
-
-.introPol--1{ left: 2%; top: 6%;  transform: rotate(-7deg) translateY(14px) scale(0.98); }
-.introPol--2{ left: 26%; top: 26%; transform: rotate(6deg) translateY(14px) scale(0.98); }
-.introPol--3{ left: 12%; top: 52%; transform: rotate(-2deg) translateY(14px) scale(0.98); }
-
-@keyframes polIn {
-  to { opacity:1; transform: translateY(0) scale(1) rotate(var(--rot, 0deg)); }
-}
-.introPol.is-in{ animation: polIn 520ms ease forwards; }
-
-.introTopRight{
+.pol__cap{
   position:absolute;
-  right: 6px;
-  top: 8px;
-  text-align: right;
+  left:18px;
+  bottom:16px;
+  font-family:"Dancing Script",cursive;
+  font-size:26px;
+  color: rgba(0,0,0,0.65);
+}
+
+.pol--1{ left:8%; top:8%;  --r:-8deg; z-index:10; }
+.pol--2{ left:22%; top:32%; --r: 6deg; z-index:20; }
+.pol--3{ left:14%; top:58%; --r:-3deg; z-index:30; }
+
+/* we getting married!!! 다다닥 */
+.burst{
+  position:absolute;
+  right:6%;
+  top:16%;
+  font-family:"Dancing Script",cursive;
+  font-size:44px;
+  color: rgba(0,0,0,0.86);
+  opacity:0;
+  transform: translateY(8px) rotate(-2deg);
   pointer-events:none;
 }
-
-.stampBurst{
-  font-family: "Dancing Script", cursive;
-  font-size: 40px;
-  color: rgba(0,0,0,0.85);
-  opacity:0;
-  transform: translateY(6px) rotate(-2deg);
-  line-height: 1.05;
-  white-space: pre-line;
+.burst.is-on{
+  opacity:1;
+  transform: translateY(0) rotate(-2deg);
+  transition: opacity 220ms ease, transform 220ms ease;
 }
 
-.stampBurst.is-on{
-  animation: pop 220ms ease forwards;
-}
-
-@keyframes pop{
-  to{ opacity:1; transform: translateY(0) rotate(-2deg); }
-}
-
-/* 펜글씨 “써지는” 효과 */
+/* 펜글씨(써지는 느낌) */
 .handwrite{
   position:absolute;
-  left: 10px;
-  right: 10px;
-  bottom: 18px;
+  left:0; right:0;
+  bottom:8%;
   text-align:center;
   pointer-events:none;
   font-family:"Dancing Script",cursive;
-  font-size: 34px;
-  color: rgba(0,0,0,0.55);
+  color: rgba(0,0,0,0.62);
 }
-
-.handwrite span{
+.handwrite .line{
   display:inline-block;
+  font-size:34px;
   opacity:0;
   clip-path: inset(0 100% 0 0);
 }
+@keyframes write { to{ opacity:1; clip-path: inset(0 0 0 0);} }
+.handwrite.is-write .line{ animation: write 1.15s ease forwards; }
+.handwrite.is-write .line:nth-child(2){ animation-delay: .2s; }
 
-@keyframes write {
-  to{ opacity:1; clip-path: inset(0 0 0 0); }
+/* 인트로 하단에 날짜/장소 한 화면 */
+.introMeta{
+  position:absolute;
+  left:0; right:0;
+  bottom:3%;
+  text-align:center;
+  padding:0 18px;
 }
-.handwrite.is-write span{
-  animation: write 1.1s ease forwards;
-}
+.introMeta .date{ font-weight:800; font-size:18px; }
+.introMeta .place{ margin-top:8px; font-size:14px; color: rgba(0,0,0,0.65); line-height:1.5; }
 
-/* ---------- Main cards ---------- */
+/* ===== Main ===== */
 .card{
   margin-top:14px;
   padding:18px 16px;
@@ -146,11 +143,8 @@ button{ font:inherit; }
   border-radius: var(--radius);
   box-shadow: 0 10px 22px rgba(0,0,0,0.06);
 }
-
 .card__title{
-  display:flex;
-  align-items:center;
-  gap:10px;
+  display:flex; align-items:center; gap:10px;
   margin:0;
   font-size:16px;
   letter-spacing:0.01em;
@@ -161,17 +155,14 @@ button{ font:inherit; }
   background: rgba(0,0,0,0.10);
   flex:1;
 }
-
 .message{
   margin:12px 0 0;
   line-height:1.85;
   color: rgba(0,0,0,0.78);
   white-space: pre-line;
 }
-
 .row{ display:flex; align-items:center; gap:10px; }
 .muted{ color: var(--muted); font-size:13px; }
-
 .hr-dashed{
   margin-top:18px;
   padding-top:14px;
@@ -193,12 +184,7 @@ button{ font:inherit; }
   -webkit-tap-highlight-color:transparent;
 }
 .btn:hover{ background: rgba(0,0,0,0.06); }
-
-.btn--primary{
-  background:#111;
-  color:#fff;
-  border-color:#111;
-}
+.btn--primary{ background:#111; color:#fff; border-color:#111; }
 .btn--mini{
   padding:8px 10px;
   border-radius:12px;
@@ -206,35 +192,24 @@ button{ font:inherit; }
   background: rgba(0,0,0,0.03);
 }
 .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
-.grid3{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
 
 .heroCard{
-  margin-top: 14px;
-  border-radius: 22px;
+  margin-top:14px;
+  border-radius:22px;
   overflow:hidden;
   border:1px solid rgba(0,0,0,0.10);
   box-shadow: var(--shadow);
-  background: #fff;
+  background:#fff;
 }
 .heroImg{
   width:100%;
-  height: 420px;
-  object-fit: cover;
+  height:420px;
+  object-fit:cover;
   display:block;
 }
-.heroMeta{
-  padding: 16px 16px 18px;
-  text-align:center;
-}
-.heroMeta__names{
-  font-weight:800;
-  letter-spacing:0.12em;
-}
-.heroMeta__info{
-  margin-top: 10px;
-  color: rgba(0,0,0,0.72);
-  line-height: 1.7;
-}
+.heroMeta{ padding:16px 16px 18px; text-align:center; }
+.heroMeta__names{ font-weight:800; letter-spacing:0.12em; }
+.heroMeta__info{ margin-top:10px; color: rgba(0,0,0,0.72); line-height:1.7; }
 .heroMeta__info b{ color:#111; }
 
 /* tabs */
@@ -270,7 +245,7 @@ button{ font:inherit; }
   width:100%;
   aspect-ratio: 4 / 5;
   object-fit:cover;
-  border-radius: 0;     /* ✅ 라운드 제거 */
+  border-radius:0; /* ✅ 라운드 제거 */
   border:1px solid rgba(0,0,0,0.10);
   display:block;
   cursor:pointer;
@@ -280,7 +255,7 @@ button{ font:inherit; }
   width:100%;
   aspect-ratio: 1 / 1;
   object-fit:cover;
-  border-radius: 0;     /* ✅ 라운드 제거 */
+  border-radius:0; /* ✅ 라운드 제거 */
   border:1px solid rgba(0,0,0,0.10);
   display:block;
   cursor:pointer;
@@ -296,6 +271,7 @@ button{ font:inherit; }
   display: none;
   place-items: center;
   z-index: 50;
+  touch-action: none; /* ✅ 모달에서 스크롤/바운스 줄임 */
 }
 .modal.is-open{ display:grid; }
 .modal__backdrop{
@@ -306,7 +282,7 @@ button{ font:inherit; }
   position: relative;
   max-width: min(92vw, 520px);
   max-height: 86vh;
-  border-radius: 0; /* ✅ 라운드 제거 */
+  border-radius:0; /* ✅ 라운드 제거 */
   border:1px solid rgba(255,255,255,0.18);
   box-shadow: 0 18px 60px rgba(0,0,0,0.35);
   user-select:none;
@@ -353,3 +329,31 @@ button{ font:inherit; }
   color: var(--muted);
   font-size:12px;
 }
+
+/* 방명록 */
+.guestbookForm{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  margin-top:12px;
+}
+.input, .textarea{
+  width:100%;
+  border:1px solid rgba(0,0,0,0.14);
+  border-radius:12px;
+  padding:10px 12px;
+  font:inherit;
+  background:#fff;
+}
+.textarea{ min-height:96px; resize: vertical; }
+.gbList{ margin-top:12px; display:flex; flex-direction:column; gap:10px; }
+.gbItem{
+  border:1px solid rgba(0,0,0,0.12);
+  background: rgba(0,0,0,0.03);
+  border-radius:14px;
+  padding:12px;
+}
+.gbMeta{ display:flex; justify-content:space-between; gap:10px; }
+.gbName{ font-weight:800; }
+.gbTime{ font-size:12px; color: rgba(0,0,0,0.45); }
+.gbMsg{ margin-top:8px; white-space:pre-wrap; line-height:1.6; }

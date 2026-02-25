@@ -5,7 +5,7 @@ const $ = (sel) => document.querySelector(sel);
 const encode = (s) => encodeURIComponent(String(s ?? ""));
 const pad2 = (n) => String(n).padStart(2, "0");
 
-// ✅ 네가 JS SDK 도메인 등록한 JavaScript 키(스크린샷의 950d...)
+// ✅ 네가 JS SDK 도메인 등록한 JavaScript 키
 const KAKAO_JS_KEY = "950d726b2979c7f8113c72f6fbfb8771";
 const KAKAO_TEMPLATE_ID = 129829;
 
@@ -29,7 +29,7 @@ function toast(msg) {
   el.textContent = msg;
   el.style.display = "block";
   clearTimeout(window.__toastTimer);
-  window.__toastTimer = setTimeout(() => (el.style.display = "none"), 1400);
+  window.__toastTimer = setTimeout(() => (el.style.display = "none"), 1600);
 }
 
 async function copyText(text) {
@@ -60,23 +60,70 @@ function ensureKakaoInit() {
   }
 }
 
-/**
- * TMAP 앱 스킴 (기기별/버전별 차이가 있을 수 있어 가장 흔한 형태로)
- * goalx=lng, goaly=lat
+/** ✅ 티맵: iOS에서 잘 쓰는 rGoName/rGoX/rGoY 1순위, 실패 시 goalname/goalx/goaly 시도
+ *  - 절대 티맵 홈페이지로 이동시키지 않음(튕김 방지)
  */
-function openTmap({ lat, lng, name }) {
-  const goalName = encode(name);
-  const scheme = `tmap://route?goalname=${goalName}&goalx=${lng}&goaly=${lat}`;
+function openTmap({ name, lat, lng }) {
+  const nameEnc = encode(name);
 
-  // fallback (웹 검색 정도만)
-  const fallback = `https://www.tmap.co.kr/`;
+  // iOS에서 많이 쓰는 파라미터
+  const url1 = `tmap://route?rGoName=${nameEnc}&rGoX=${lng}&rGoY=${lat}`;
+  // 안드/일부 환경
+  const url2 = `tmap://route?goalname=${nameEnc}&goalx=${lng}&goaly=${lat}`;
 
-  const start = Date.now();
-  window.location.href = scheme;
-  setTimeout(() => {
-    // 앱이 열리지 않으면 fallback
-    if (Date.now() - start < 1200) window.open(fallback, "_blank", "noopener");
-  }, 700);
+  const tryOpen = (url) =>
+    new Promise((resolve) => {
+      const start = Date.now();
+      window.location.href = url;
+      setTimeout(() => resolve(Date.now() - start), 650);
+    });
+
+  (async () => {
+    const t1 = await tryOpen(url1);
+    // 앱이 실제로 열리면 브라우저가 백그라운드로 가서 여기 로직이 의미 없어지는 경우가 많음.
+    // "너무 빨리" 돌아오면 실패로 간주하고 2번째 스킴 시도
+    if (t1 < 1100) {
+      const t2 = await tryOpen(url2);
+      if (t2 < 1100) {
+        toast("티맵 앱이 설치되어 있지 않거나, 호출이 차단됐어요.");
+      }
+    }
+  })();
+}
+
+/* ===== 모달 열릴 때 뒤 스크롤 완전 잠금 ===== */
+let __scrollY = 0;
+function lockScroll() {
+  __scrollY = window.scrollY || 0;
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${__scrollY}px`;
+  document.body.style.left = "0";
+  document.body.style.right = "0";
+  document.body.style.width = "100%";
+}
+function unlockScroll() {
+  const top = document.body.style.top;
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.left = "";
+  document.body.style.right = "";
+  document.body.style.width = "";
+  window.scrollTo(0, Math.abs(parseInt(top || "0", 10)));
+}
+
+// iOS에서 모달 오픈 중 touchmove로 바디가 움직이는 것 방지
+function preventTouchMove(e) {
+  e.preventDefault();
+}
+
+function formatTime(ts) {
+  const d = new Date(ts);
+  const yy = String(d.getFullYear()).slice(2);
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  const hh = String(d.getHours()).padStart(2, "0");
+  const mi = String(d.getMinutes()).padStart(2, "0");
+  return `${yy}.${mm}.${dd} ${hh}:${mi}`;
 }
 
 function build() {
@@ -94,27 +141,30 @@ function build() {
   <!-- Intro -->
   <section id="intro" class="intro" aria-hidden="false">
     <div class="introStage">
-      <div class="introTopRight">
-        <div id="burst1" class="stampBurst">we getting</div>
-        <div id="burst2" class="stampBurst">married!!!</div>
+      <div class="pol pol--1" id="p1">
+        <img class="pol__img" src="${d.heroPolaroids[0]}" alt="intro-1" />
+        <div class="pol__cap">${bride.name}</div>
+      </div>
+      <div class="pol pol--2" id="p2">
+        <img class="pol__img" src="${d.heroPolaroids[1]}" alt="intro-2" />
+        <div class="pol__cap">${groom.name}</div>
+      </div>
+      <div class="pol pol--3" id="p3">
+        <img class="pol__img" src="${d.heroPolaroids[2]}" alt="intro-3" />
+        <div class="pol__cap">${d.wedding.dateText}</div>
       </div>
 
-      <div class="introPol introPol--1" id="introP1" style="--rot:-7deg;">
-        <img src="${d.heroPolaroids[0]}" alt="intro-1" />
-        <div class="introPol__caption">Who : ${bride.name}</div>
+      <div class="burst" id="burst">we getting married!!!</div>
+
+      <div class="handwrite" id="handwrite">
+        <span class="line">${groom.name}</span><br/>
+        <span class="line">&amp; ${bride.name}</span>
       </div>
 
-      <div class="introPol introPol--2" id="introP2" style="--rot:6deg;">
-        <img src="${d.heroPolaroids[1]}" alt="intro-2" />
-        <div class="introPol__caption">Where : ${NAVER_QUERY}</div>
+      <div class="introMeta">
+        <div class="date">${d.wedding.dateText}</div>
+        <div class="place">${d.wedding.venueName}<br/>${d.wedding.address}</div>
       </div>
-
-      <div class="introPol introPol--3" id="introP3" style="--rot:-2deg;">
-        <img src="${d.heroPolaroids[2]}" alt="intro-3" />
-        <div class="introPol__caption">When : ${d.wedding.dateText}</div>
-      </div>
-
-      <div id="handwrite" class="handwrite"><span>Ad nuptias nostras te invitamus</span></div>
     </div>
   </section>
 
@@ -219,6 +269,22 @@ function build() {
     </section>
 
     <section class="card">
+      <h2 class="card__title">방명록</h2>
+      <p class="muted" style="margin:10px 0 6px;">작성자와 내용을 남겨주세요.</p>
+
+      <form id="gbForm" class="guestbookForm">
+        <input id="gbName" class="input" maxlength="20" placeholder="작성자" required />
+        <textarea id="gbMsg" class="textarea" maxlength="300" placeholder="내용" required></textarea>
+        <button class="btn btn--primary" type="submit" style="width:100%;">남기기</button>
+      </form>
+
+      <div id="gbList" class="gbList"></div>
+      <p class="muted" style="margin-top:10px; font-size:12px; line-height:1.5;">
+        ※ 현재는 ‘내 기기’에만 저장되는 간단 방명록이에요. (원하면 하객 모두가 공유하는 방명록으로 바꿔드릴게요)
+      </p>
+    </section>
+
+    <section class="card">
       <h2 class="card__title">RSVP</h2>
       <p class="muted" style="margin:10px 0 12px; line-height:1.6;">구글폼으로 참석 여부를 남겨주세요.</p>
       <a class="btn btn--primary" target="_blank" rel="noopener" href="${d.rsvpUrl}" style="width:100%;">참석 여부 남기기</a>
@@ -244,37 +310,36 @@ function build() {
   </main>
   `;
 
-  // ---------- Intro animation ----------
+  // ===== Intro timing =====
   const intro = $("#intro");
   const main = $("#main");
-  const p1 = $("#introP1");
-  const p2 = $("#introP2");
-  const p3 = $("#introP3");
-  const burst1 = $("#burst1");
-  const burst2 = $("#burst2");
+  const p1 = $("#p1");
+  const p2 = $("#p2");
+  const p3 = $("#p3");
+  const burst = $("#burst");
   const hand = $("#handwrite");
 
-  // 폴라로이드 0.5초 간격
   setTimeout(() => p1.classList.add("is-in"), 200);
   setTimeout(() => p2.classList.add("is-in"), 700);
   setTimeout(() => p3.classList.add("is-in"), 1200);
 
-  // we getting married!!! 다다닥
-  setTimeout(() => burst1.classList.add("is-on"), 1500);
-  setTimeout(() => burst2.classList.add("is-on"), 2000);
+  // “we getting married!!!” 0.5초 간격으로 3번 튀기기(다다닥 느낌)
+  setTimeout(() => burst.classList.add("is-on"), 1600);
+  setTimeout(() => { burst.classList.remove("is-on"); }, 1850);
+  setTimeout(() => burst.classList.add("is-on"), 2100);
+  setTimeout(() => { burst.classList.remove("is-on"); }, 2350);
+  setTimeout(() => burst.classList.add("is-on"), 2600);
 
-  // 필기체 쓰기
-  setTimeout(() => hand.classList.add("is-write"), 2400);
+  setTimeout(() => hand.classList.add("is-write"), 3100);
 
-  // 인트로 종료 → 메인 노출
   setTimeout(() => {
     intro.classList.add("is-hide");
     intro.setAttribute("aria-hidden", "true");
     main.style.transition = "opacity 450ms ease";
     main.style.opacity = "1";
-  }, 3800);
+  }, 4600);
 
-  // ---------- Naver map deep link ----------
+  // ===== Naver maps =====
   const naverPlaceApp = `nmap://place?lat=${lat}&lng=${lng}&name=${encode(NAVER_QUERY)}&appname=com.example.weddinginvite`;
   const naverRouteApp = `nmap://route/car?dlat=${lat}&dlng=${lng}&dname=${encode(NAVER_QUERY)}&appname=com.example.weddinginvite`;
   const naverWeb = `https://map.naver.com/v5/search/${encode(NAVER_QUERY)}`;
@@ -297,15 +362,14 @@ function build() {
     }, 700);
   });
 
-  // ---------- Tmap route ----------
+  // ===== Tmap =====
   $("#tmapRoute").addEventListener("click", () => {
-    openTmap({ lat, lng, name: NAVER_QUERY });
+    openTmap({ name: NAVER_QUERY, lat, lng });
   });
 
-  // ---------- Gallery tabs ----------
+  // ===== Tabs =====
   const weddingEl = $("#weddingGallery");
   const dailyEl = $("#dailyGallery");
-
   const tabWedding = $("#tabWedding");
   const tabDaily = $("#tabDaily");
 
@@ -324,7 +388,7 @@ function build() {
   tabWedding.addEventListener("click", showWedding);
   tabDaily.addEventListener("click", showDaily);
 
-  // ---------- Modal slider ----------
+  // ===== Modal slider (스크롤 잠금 포함) =====
   const modal = $("#modal");
   const modalImg = $("#modalImg");
   const modalPrev = $("#modalPrev");
@@ -334,23 +398,31 @@ function build() {
   let currentIndex = 0;
 
   function renderModal() {
-    const src = currentList[currentIndex];
-    modalImg.src = src;
+    modalImg.src = currentList[currentIndex];
 
-    modalPrev.disabled = currentIndex <= 0;
-    modalNext.disabled = currentIndex >= currentList.length - 1;
+    const prevDisabled = currentIndex <= 0;
+    const nextDisabled = currentIndex >= currentList.length - 1;
 
-    modalPrev.style.opacity = modalPrev.disabled ? "0.35" : "1";
-    modalNext.style.opacity = modalNext.disabled ? "0.35" : "1";
-    modalPrev.style.pointerEvents = modalPrev.disabled ? "none" : "auto";
-    modalNext.style.pointerEvents = modalNext.disabled ? "none" : "auto";
+    modalPrev.disabled = prevDisabled;
+    modalNext.disabled = nextDisabled;
+
+    modalPrev.style.opacity = prevDisabled ? "0.35" : "1";
+    modalNext.style.opacity = nextDisabled ? "0.35" : "1";
+    modalPrev.style.pointerEvents = prevDisabled ? "none" : "auto";
+    modalNext.style.pointerEvents = nextDisabled ? "none" : "auto";
   }
 
   function openModal(list, index) {
     currentList = list;
     currentIndex = index;
+
     modal.classList.add("is-open");
     modal.setAttribute("aria-hidden", "false");
+
+    // ✅ 뒤 스크롤 완전 잠금
+    lockScroll();
+    document.addEventListener("touchmove", preventTouchMove, { passive: false });
+
     renderModal();
   }
 
@@ -358,6 +430,10 @@ function build() {
     modal.classList.remove("is-open");
     modal.setAttribute("aria-hidden", "true");
     modalImg.src = "";
+
+    // ✅ 잠금 해제
+    document.removeEventListener("touchmove", preventTouchMove);
+    unlockScroll();
   }
 
   function prev() {
@@ -366,7 +442,6 @@ function build() {
       renderModal();
     }
   }
-
   function next() {
     if (currentIndex < currentList.length - 1) {
       currentIndex += 1;
@@ -378,6 +453,7 @@ function build() {
     const isBackdrop = e.target.classList.contains("modal__backdrop") || e.target === modal;
     if (isBackdrop) closeModal();
   });
+
   modalPrev.addEventListener("click", (e) => { e.stopPropagation(); prev(); });
   modalNext.addEventListener("click", (e) => { e.stopPropagation(); next(); });
   modalImg.addEventListener("click", (e) => e.stopPropagation());
@@ -389,7 +465,7 @@ function build() {
     if (e.key === "ArrowRight") next();
   });
 
-  // Swipe
+  // Swipe (사진만 이동)
   let touchStartX = 0;
   let touchStartY = 0;
   let touching = false;
@@ -417,7 +493,7 @@ function build() {
     else next();
   }, { passive: true });
 
-  // ---------- Render galleries ----------
+  // Render galleries
   d.weddingGallery.forEach((src, i) => {
     const img = document.createElement("img");
     img.src = src;
@@ -436,7 +512,7 @@ function build() {
     dailyEl.appendChild(img);
   });
 
-  // ---------- Accounts ----------
+  // Accounts
   const acc = $("#accounts");
   d.accounts.forEach((a) => {
     if (!a.number) return;
@@ -455,7 +531,7 @@ function build() {
     acc.appendChild(el);
   });
 
-  // ---------- Calendar (ics) ----------
+  // Calendar (ics)
   $("#addCal").addEventListener("click", () => {
     const start = new Date(d.wedding.dateTimeISO);
     const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
@@ -498,18 +574,14 @@ END:VCALENDAR`;
     toast("캘린더 파일을 다운로드했어요!");
   });
 
-  // ---------- Kakao share ----------
+  // Kakao share
   const kakaoBtn = $("#kakaoShareBtn");
   if (kakaoBtn) {
     kakaoBtn.addEventListener("click", async () => {
       try {
         const ok = ensureKakaoInit();
         if (!ok) {
-          toast("카카오 SDK 로딩 실패");
-          return;
-        }
-        if (!window.Kakao.Share) {
-          toast("Kakao.Share 사용 불가");
+          toast("카카오 SDK 로딩 실패 (콘솔 확인)");
           return;
         }
         await window.Kakao.Share.sendCustom({ templateId: KAKAO_TEMPLATE_ID });
@@ -519,6 +591,61 @@ END:VCALENDAR`;
       }
     });
   }
+
+  // ===== 방명록 (로컬 저장) =====
+  const KEY = "wedding_guestbook_v1";
+  const gbListEl = $("#gbList");
+  const gbForm = $("#gbForm");
+  const gbName = $("#gbName");
+  const gbMsg = $("#gbMsg");
+
+  const load = () => {
+    try {
+      return JSON.parse(localStorage.getItem(KEY) || "[]");
+    } catch {
+      return [];
+    }
+  };
+  const save = (items) => localStorage.setItem(KEY, JSON.stringify(items));
+
+  function renderGB() {
+    const items = load();
+    gbListEl.innerHTML = "";
+    if (!items.length) {
+      gbListEl.innerHTML = `<div class="muted" style="padding:10px 2px;">아직 방명록이 없어요 🙂</div>`;
+      return;
+    }
+    items.slice().reverse().forEach((it) => {
+      const div = document.createElement("div");
+      div.className = "gbItem";
+      div.innerHTML = `
+        <div class="gbMeta">
+          <div class="gbName">${it.name}</div>
+          <div class="gbTime">${formatTime(it.ts)}</div>
+        </div>
+        <div class="gbMsg">${it.msg}</div>
+      `;
+      gbListEl.appendChild(div);
+    });
+  }
+
+  renderGB();
+
+  gbForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const name = (gbName.value || "").trim();
+    const msg = (gbMsg.value || "").trim();
+    if (!name || !msg) return;
+
+    const items = load();
+    items.push({ name, msg, ts: Date.now() });
+    save(items);
+
+    gbName.value = "";
+    gbMsg.value = "";
+    toast("방명록을 남겼어요!");
+    renderGB();
+  });
 }
 
 build();

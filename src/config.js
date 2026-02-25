@@ -42,7 +42,7 @@ export const INVITE = {
     "/assets/d17.jpg","/assets/d18.jpg"
   ],
 
-  // ✅ Apps Script Web App URL
+  // Apps Script Web App URL
   GUESTBOOK_ENDPOINT: "https://script.google.com/macros/s/AKfycbyoiTXZkMShjPz8orFiUCcOiGsOabXujlTAGXvTKwc8wow5nLd25HgJHw6iUEXSUoZ9/exec",
 
   footerText: "© 2026 DASOM · JAEGI Wedding",

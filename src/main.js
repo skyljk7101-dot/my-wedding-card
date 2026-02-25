@@ -63,31 +63,7 @@ function ensureKakaoInit() {
   }
 }
 
-/* =========================
-   Kakao Share (전체 복붙용)
-   ========================= */
-
-// ✅ 버튼 연결 함수 (#app HTML 만든 직후 호출)
-function bindKakaoShareButton() {
-  const kakaoBtn = document.getElementById("kakaoShareBtn");
-  if (!kakaoBtn) return;
-
-  kakaoBtn.addEventListener("click", async () => {
-    try {
-      const ok = ensureKakaoInit();
-      if (!ok) {
-        toast("카카오 SDK 로딩 실패 (콘솔 확인)");
-        return;
-      }
-      await window.Kakao.Share.sendCustom({ templateId: KAKAO_TEMPLATE_ID });
-    } catch (e) {
-      console.error(e);
-      toast("카카오 공유 오류 (콘솔 확인)");
-    }
-  });
-}
-
-/** ✅ 티맵: 절대 홈페이지로 이동 X (실패하면 토스트만) */
+/** ✅ 티맵: 앱 호출(실패하면 토스트) */
 function openTmap({ name, lat, lng }) {
   const nameEnc = encode(name);
   const url1 = `tmap://route?rGoName=${nameEnc}&rGoX=${lng}&rGoY=${lat}`;
@@ -109,7 +85,7 @@ function openTmap({ name, lat, lng }) {
   })();
 }
 
-/* ===== scroll lock ===== */
+/* ===== 모달 열릴 때 뒤 스크롤 잠금 ===== */
 let __scrollY = 0;
 function lockScroll() {
   __scrollY = window.scrollY || 0;
@@ -142,10 +118,7 @@ function formatTime(ts) {
 
 /* ===== Guestbook ===== */
 function hasGuestbookEndpoint() {
-  return Boolean(
-    GUESTBOOK_ENDPOINT &&
-    String(GUESTBOOK_ENDPOINT).includes("script.google.com/macros/s/")
-  );
+  return typeof GUESTBOOK_ENDPOINT === "string" && GUESTBOOK_ENDPOINT.includes("script.google.com/macros/s/");
 }
 
 async function gbFetchList() {
@@ -172,13 +145,37 @@ async function gbAddItem(name, msg) {
   return json;
 }
 
+function escapeHtml(s) {
+  return String(s ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 function build() {
   const d = INVITE;
 
-  const phrase = `“이제 평생, 내 마음으로만 자동연장되는 사랑💗”`;
+  // ✅ 원래 문구/구성 복원
+  const inviteMessage = `“매일 네 하루에 조용히 구독했어.\n이제 평생, 내 마음으로만 자동연장되는 사랑💗”`;
+
+  // ✅ 원래 부모님/문자 기능 복원
+  const bride = d.couple.bride;
+  const groom = d.couple.groom;
+
+  const brideSms = `${bride.phone}?&body=${encode(`${bride.name}에게 축하 메시지를 남겨주세요 🙂`)}`;
+  const groomSms = `${groom.phone}?&body=${encode(`${groom.name}에게 축하 메시지를 남겨주세요 🙂`)}`;
+
+  // 지도 목적지
+  const { lat, lng } = d.wedding;
+
+  // ✅ 네이버/카카오 지도 링크(원래대로)
+  const naverSearchUrl = `https://map.naver.com/v5/search/${encode(d.wedding.venueName)}?c=${lng},${lat},15,0,0,0,dh`;
+  const kakaoPlaceUrl = `https://map.kakao.com/link/map/${encode(d.wedding.venueName)},${lat},${lng}`;
+  const kakaoRouteUrl = `https://map.kakao.com/link/to/${encode(d.wedding.venueName)},${lat},${lng}`;
 
   $("#app").innerHTML = `
-  <!-- Intro -->
   <div class="intro" id="intro" aria-hidden="false">
     <div class="introStage">
       <div class="pol pol--1" id="p1"><img class="pol__img" src="${d.heroPolaroids[0]}" alt="intro-1"></div>
@@ -191,11 +188,6 @@ function build() {
         <span class="w w3">married</span>
       </div>
 
-      <div class="handwrite" id="handwrite" aria-label="names handwriting">
-        <span class="line">DASOM · JAEGI</span>
-        <span class="line">2026.05.31</span>
-      </div>
-
       <div class="introMeta">
         <div class="date">${d.wedding.dateText}</div>
         <div class="place">${d.wedding.venueName}<br/>${d.wedding.address}</div>
@@ -203,41 +195,67 @@ function build() {
     </div>
   </div>
 
-  <!-- Main -->
-  <div class="wrap" id="main" style="opacity:0;">
+  <main class="wrap" id="main" style="opacity:0;">
     <div class="heroCard">
       <img class="heroImg" src="${d.heroImage}" alt="hero"/>
       <div class="heroMeta">
-        <div class="heroMeta__names">${d.couple.groom.name} · ${d.couple.bride.name}</div>
+        <div class="heroMeta__names">${groom.name} · ${bride.name}</div>
         <div class="heroMeta__info">
           <b>${d.wedding.dateText}</b><br/>
-          ${d.wedding.venueName}<br/>
-          <span class="muted">${d.wedding.address}</span>
+          ${d.wedding.venueName}
+          <div class="muted" style="margin-top:6px;">${d.wedding.address}</div>
         </div>
       </div>
     </div>
 
     <section class="card">
       <h2 class="card__title">초대합니다</h2>
-      <p class="message">${phrase}</p>
+      <p class="message">${inviteMessage}</p>
+
+      <div style="margin-top:16px; display:flex; flex-direction:column; gap:10px;">
+        <div class="row">
+          <span class="muted" style="width:42px;">신부</span>
+          <span style="flex:1;">정대연 · 장영화의 장녀 <b>${bride.name}</b></span>
+          <a class="btn btn--mini" href="sms:${brideSms}">문자</a>
+        </div>
+
+        <div class="row">
+          <span class="muted" style="width:42px;">신랑</span>
+          <span style="flex:1;">유순덕의 장남 <b>${groom.name}</b></span>
+          <a class="btn btn--mini" href="sms:${groomSms}">문자</a>
+        </div>
+      </div>
     </section>
 
     <section class="card">
-      <h2 class="card__title">연락하기</h2>
-      <div class="grid2" style="margin-top:12px;">
-        <a class="btn" href="tel:${d.couple.groom.phone}">신랑 전화</a>
-        <a class="btn" href="tel:${d.couple.bride.phone}">신부 전화</a>
+      <h2 class="card__title">예식 안내</h2>
+      <div style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">
+        <div class="row">
+          <div class="muted" style="width:54px;">일시</div>
+          <div><b>${d.wedding.dateText}</b></div>
+        </div>
+        <div class="row">
+          <div class="muted" style="width:54px;">장소</div>
+          <div><b>${d.wedding.venueName}</b><div class="muted" style="margin-top:4px;">${d.wedding.address}</div></div>
+        </div>
       </div>
     </section>
 
     <section class="card">
       <h2 class="card__title">오시는 길</h2>
-      <p class="muted" style="margin:10px 0 12px; line-height:1.6;">
-        ${d.wedding.venueName}<br/>${d.wedding.address}
-      </p>
-      <div class="grid2">
-        <button class="btn" id="naverMap" type="button">네이버지도</button>
-        <button class="btn" id="tmapRoute" type="button">티맵 길찾기</button>
+
+      <div class="grid2" style="margin-top:12px;">
+        <a class="btn" href="${naverSearchUrl}" target="_blank" rel="noopener">네이버지도 위치</a>
+        <button class="btn" id="naverRouteBtn" type="button">네이버지도 길찾기</button>
+      </div>
+
+      <div class="grid2" style="margin-top:10px;">
+        <a class="btn" href="${kakaoPlaceUrl}" target="_blank" rel="noopener">카카오맵 위치</a>
+        <a class="btn" href="${kakaoRouteUrl}" target="_blank" rel="noopener">카카오맵 길찾기</a>
+      </div>
+
+      <div style="margin-top:10px;">
+        <button class="btn" id="tmapBtn" type="button" style="width:100%;">티맵 길찾기</button>
       </div>
     </section>
 
@@ -247,7 +265,6 @@ function build() {
         <button class="tab is-active" id="tabWedding" type="button">웨딩</button>
         <button class="tab" id="tabDaily" type="button">일상</button>
       </div>
-
       <div style="margin-top:12px;">
         <div class="gallery gallery--wedding" id="weddingGallery"></div>
         <div class="gallery gallery--daily" id="dailyGallery" style="display:none;"></div>
@@ -263,13 +280,11 @@ function build() {
     <section class="card">
       <h2 class="card__title">방명록</h2>
       <p class="muted" style="margin:10px 0 6px;">작성자와 내용을 남겨주세요.</p>
-
       <form id="gbForm" class="guestbookForm">
         <input id="gbName" class="input" maxlength="20" placeholder="작성자" required />
         <textarea id="gbMsg" class="textarea" maxlength="300" placeholder="내용" required></textarea>
         <button class="btn btn--primary" type="submit" style="width:100%;">남기기</button>
       </form>
-
       <div id="gbList" class="gbList"></div>
       <p class="muted" id="gbHint" style="margin-top:10px; font-size:12px; line-height:1.5;"></p>
     </section>
@@ -283,40 +298,36 @@ function build() {
     <section class="card">
       <h2 class="card__title">청첩장 공유하기</h2>
       <p class="muted" style="margin:10px 0 12px; line-height:1.6;">카카오톡으로 예쁜 청첩장을 전해보세요.</p>
-      <button id="kakaoShareBtn" class="btn"
-        style="background-color:#FEE500; color:#000; border:none; font-weight:bold; width:100%; border-radius:14px;">
+      <button id="kakaoShareBtn" class="btn" style="background-color:#FEE500; color:#000; border:none; font-weight:bold; width:100%; border-radius:14px;">
         카카오톡 공유하기
       </button>
     </section>
 
     <footer class="footer">${d.footerText}</footer>
 
-    <!-- Modal (gallery slider) -->
     <div id="modal" class="modal" aria-hidden="true">
       <div class="modal__backdrop"></div>
       <div class="modal__counter" id="modalCounter">1/1</div>
-      <button class="modal__nav modal__nav--prev" id="modalPrev" type="button" aria-label="prev">‹</button>
-      <button class="modal__nav modal__nav--next" id="modalNext" type="button" aria-label="next">›</button>
+      <button class="modal__nav modal__nav--prev" id="modalPrev" type="button" aria-label="이전 사진">‹</button>
       <img class="modal__img" id="modalImg" alt="modal" />
+      <button class="modal__nav modal__nav--next" id="modalNext" type="button" aria-label="다음 사진">›</button>
     </div>
-  </div>
+  </main>
   `;
 
-  // ✅ “HTML 만든 직후” 버튼 바인딩 (너가 준 방식 그대로)
-  bindKakaoShareButton();
-
-  /* ===== Intro animation ===== */
+  /* ===== INTRO timing (✅ null-safe) ===== */
   const intro = $("#intro");
   const main = $("#main");
   const p1 = $("#p1");
   const p2 = $("#p2");
   const p3 = $("#p3");
-  const hand = $("#handwrite");
   const writePhrase = document.getElementById("writePhrase");
+  const hand = $("#handwrite"); // 있으면 애니메이션, 없으면 스킵
 
   if (p1) setTimeout(() => p1.classList.add("is-in"), 200);
   if (p2) setTimeout(() => p2.classList.add("is-in"), 700);
   if (p3) setTimeout(() => p3.classList.add("is-in"), 1200);
+
   if (writePhrase) setTimeout(() => writePhrase.classList.add("is-write"), 1900);
   if (hand) setTimeout(() => hand.classList.add("is-write"), 3100);
 
@@ -330,24 +341,6 @@ function build() {
       main.style.opacity = "1";
     }
   }, 5600);
-
-  /* ===== Map buttons ===== */
-  const { lat, lng } = d.wedding;
-
-  $("#naverMap").addEventListener("click", () => {
-    const naverApp = `nmap://route/public?dlat=${lat}&dlng=${lng}&dname=${encode(d.wedding.venueName)}&appname=invite`;
-    const naverWeb = `https://map.naver.com/v5/search/${encode(d.wedding.venueName)}?c=${lng},${lat},15,0,0,0,dh`;
-
-    const start = Date.now();
-    window.location.href = naverApp;
-    setTimeout(() => {
-      if (Date.now() - start < 1200) window.open(naverWeb, "_blank", "noopener");
-    }, 700);
-  });
-
-  $("#tmapRoute").addEventListener("click", () => {
-    openTmap({ name: d.wedding.venueName, lat, lng });
-  });
 
   /* ===== Tabs ===== */
   const weddingEl = $("#weddingGallery");
@@ -370,7 +363,7 @@ function build() {
   tabWedding.addEventListener("click", showWedding);
   tabDaily.addEventListener("click", showDaily);
 
-  /* ===== Modal ===== */
+  /* ===== Modal slider ===== */
   const modal = $("#modal");
   const modalImg = $("#modalImg");
   const modalPrev = $("#modalPrev");
@@ -447,33 +440,7 @@ function build() {
     if (e.key === "ArrowRight") next();
   });
 
-  let touchStartX = 0;
-  let touchStartY = 0;
-  let touching = false;
-
-  modalImg.addEventListener("touchstart", (e) => {
-    if (!modal.classList.contains("is-open")) return;
-    const t = e.touches[0];
-    touchStartX = t.clientX;
-    touchStartY = t.clientY;
-    touching = true;
-  }, { passive: true });
-
-  modalImg.addEventListener("touchend", (e) => {
-    if (!touching) return;
-    touching = false;
-
-    const t = e.changedTouches[0];
-    const dx = t.clientX - touchStartX;
-    const dy = t.clientY - touchStartY;
-
-    if (Math.abs(dx) < 40) return;
-    if (Math.abs(dx) < Math.abs(dy)) return;
-
-    if (dx > 0) prev();
-    else next();
-  }, { passive: true });
-
+  // render galleries
   d.weddingGallery.forEach((src, i) => {
     const img = document.createElement("img");
     img.src = src;
@@ -511,21 +478,48 @@ function build() {
     acc.appendChild(el);
   });
 
+  /* ===== 지도 버튼 동작 ===== */
+  const naverRouteBtn = $("#naverRouteBtn");
+  if (naverRouteBtn) {
+    naverRouteBtn.addEventListener("click", () => {
+      const naverApp = `nmap://route/public?dlat=${lat}&dlng=${lng}&dname=${encode(d.wedding.venueName)}&appname=invite`;
+      const start = Date.now();
+      window.location.href = naverApp;
+      setTimeout(() => {
+        if (Date.now() - start < 1200) window.open(naverSearchUrl, "_blank", "noopener");
+      }, 700);
+    });
+  }
+
+  const tmapBtn = $("#tmapBtn");
+  if (tmapBtn) {
+    tmapBtn.addEventListener("click", () => openTmap({ name: d.wedding.venueName, lat, lng }));
+  }
+
+  /* ===== Kakao share ===== */
+  const kakaoBtn = $("#kakaoShareBtn");
+  if (kakaoBtn) {
+    kakaoBtn.addEventListener("click", async () => {
+      try {
+        const ok = ensureKakaoInit();
+        if (!ok) {
+          toast("카카오 SDK 로딩 실패 (콘솔 확인)");
+          return;
+        }
+        await window.Kakao.Share.sendCustom({ templateId: KAKAO_TEMPLATE_ID });
+      } catch (e) {
+        console.error(e);
+        toast("카카오 공유 오류 (콘솔 확인)");
+      }
+    });
+  }
+
   /* ===== Guestbook ===== */
   const gbListEl = $("#gbList");
   const gbHint = $("#gbHint");
   const gbForm = $("#gbForm");
   const gbName = $("#gbName");
   const gbMsg = $("#gbMsg");
-
-  function escapeHtml(s) {
-    return String(s ?? "")
-      .replaceAll("&", "&amp;")
-      .replaceAll("<", "&lt;")
-      .replaceAll(">", "&gt;")
-      .replaceAll('"', "&quot;")
-      .replaceAll("'", "&#039;");
-  }
 
   function renderGB(items) {
     gbListEl.innerHTML = "";

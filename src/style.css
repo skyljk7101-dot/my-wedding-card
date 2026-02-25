@@ -41,7 +41,7 @@ button{ font:inherit; }
   transition: opacity 600ms ease;
 }
 
-/* ✅ iPhone safe-area + 16 Pro 화면 최적화 */
+/* iPhone safe-area */
 .introStage{
   position:relative;
   width:100%;
@@ -54,15 +54,14 @@ button{ font:inherit; }
     calc(env(safe-area-inset-bottom, 0px) + 16px);
 }
 
-/* ✅ “진짜 세로 폴라로이드 프레임” + 크기 DOWN */
 .pol{
   position:absolute;
-  width:min(240px, 64vw);          /* ⬅️ 320 → 240 */
+  width:min(240px, 64vw);
   background:#fff;
   border:1px solid rgba(0,0,0,0.10);
   border-radius:14px;
   box-shadow:0 22px 70px rgba(0,0,0,0.20);
-  padding:12px 12px 60px;          /* ⬅️ 아래 흰여백 폴라로이드 느낌 */
+  padding:12px 12px 60px;
   opacity:0;
   transform: translateY(14px) scale(0.98) rotate(var(--r,0deg));
 }
@@ -71,42 +70,42 @@ button{ font:inherit; }
   transform: translateY(0) scale(1) rotate(var(--r,0deg));
   transition: opacity 450ms ease, transform 520ms ease;
 }
-
-/* ✅ 사진: 더 “세로 폴라로이드” 비율 */
 .pol__img{
   width:100%;
-  aspect-ratio: 3 / 4;             /* ⬅️ 4/5 → 3/4 */
+  aspect-ratio: 3 / 4;
   object-fit:cover;
   display:block;
   border-radius:10px;
   background:#f2f2f2;
 }
-
-/* ✅ 위치 재배치 */
 .pol--1{ left:4%;  top:8%;  --r:-6deg; z-index:10; }
 .pol--2{ right:2%; top:30%; --r: 6deg; z-index:20; }
 .pol--3{ left:10%; top:50%; --r:-3deg; z-index:30; }
 
-/* we getting married!!! */
-.burst{
+/* phrase */
+.writePhrase{
   position:absolute;
   right:6%;
   top:14%;
-  font-family:"Dancing Script",cursive;
+  font-family:"Dancing Script", cursive;
   font-size:34px;
   color: rgba(0,0,0,0.86);
-  opacity:0;
-  transform: translateY(8px) rotate(-2deg);
+  transform: rotate(-2deg);
+  z-index:55;
   pointer-events:none;
-  z-index:45;
 }
-.burst.is-on{
-  opacity:1;
-  transform: translateY(0) rotate(-2deg);
-  transition: opacity 220ms ease, transform 220ms ease;
+.writePhrase .w{
+  display:inline-block;
+  margin-left:8px;
+  opacity:0;
+  clip-path: inset(0 100% 0 0);
 }
+.writePhrase .w1{ margin-left:0; }
+@keyframes writeWord { to { opacity:1; clip-path: inset(0 0 0 0); } }
+.writePhrase.is-write .w1{ animation: writeWord 1.2s ease forwards; }
+.writePhrase.is-write .w2{ animation: writeWord 1.2s ease forwards; animation-delay: .75s; }
+.writePhrase.is-write .w3{ animation: writeWord 1.2s ease forwards; animation-delay: 1.5s; }
 
-/* ✅ 필기체 */
 .handwrite{
   position:absolute;
   left:0; right:0;
@@ -127,7 +126,6 @@ button{ font:inherit; }
 .handwrite.is-write .line{ animation: write 1.15s ease forwards; }
 .handwrite.is-write .line:nth-child(2){ animation-delay: .2s; }
 
-/* 인트로 하단 날짜/장소 */
 .introMeta{
   position:absolute;
   left:0; right:0;
@@ -143,7 +141,6 @@ button{ font:inherit; }
   .pol{ width:min(220px, 62vw); padding:10px 10px 54px; }
   .pol--3{ top:48%; }
   .handwrite{ bottom:20%; }
-  .burst{ font-size:32px; }
 }
 
 /* ===== MAIN ===== */
@@ -175,13 +172,7 @@ button{ font:inherit; }
 }
 .row{ display:flex; align-items:center; gap:10px; }
 .muted{ color: var(--muted); font-size:13px; }
-.hr-dashed{
-  margin-top:18px;
-  padding-top:14px;
-  border-top:1px dashed rgba(0,0,0,0.12);
-}
 
-/* buttons */
 .btn{
   display:inline-flex;
   align-items:center;
@@ -272,9 +263,6 @@ button{ font:inherit; }
   display:block;
   cursor:pointer;
 }
-@media (max-width:360px){
-  .gallery--daily{ grid-template-columns: repeat(2, 1fr); }
-}
 
 /* modal */
 .modal{
@@ -315,12 +303,9 @@ button{ font:inherit; }
   justify-content:center;
   cursor:pointer;
   z-index: 60;
-  -webkit-tap-highlight-color:transparent;
 }
-.modal__nav:hover{ background: rgba(0,0,0,0.45); }
 .modal__nav--prev{ left: 14px; }
 .modal__nav--next{ right: 14px; }
-
 .modal__counter{
   position:absolute;
   top: 16px;
@@ -333,10 +318,6 @@ button{ font:inherit; }
   background: rgba(0,0,0,0.35);
   border: 1px solid rgba(255,255,255,0.18);
   z-index: 60;
-}
-
-@media (max-width:420px){
-  .modal__nav{ width:40px; height:40px; }
 }
 
 .account{
@@ -355,7 +336,7 @@ button{ font:inherit; }
   font-size:12px;
 }
 
-/* 방명록 */
+/* guestbook */
 .guestbookForm{
   display:flex;
   flex-direction:column;
@@ -382,27 +363,3 @@ button{ font:inherit; }
 .gbName{ font-weight:800; }
 .gbTime{ font-size:12px; color: rgba(0,0,0,0.45); }
 .gbMsg{ margin-top:8px; white-space:pre-wrap; line-height:1.6; }
-
-/* ✅ 문구: 한 단어씩 천천히 써지는 필기 */
-.writePhrase{
-  position:absolute;
-  right:6%;
-  top:14%;
-  font-family:"Dancing Script", cursive;
-  font-size:34px;
-  color: rgba(0,0,0,0.86);
-  transform: rotate(-2deg);
-  z-index:55;
-  pointer-events:none;
-}
-.writePhrase .w{
-  display:inline-block;
-  margin-left:8px;
-  opacity:0;
-  clip-path: inset(0 100% 0 0);
-}
-.writePhrase .w1{ margin-left:0; }
-@keyframes writeWord { to { opacity:1; clip-path: inset(0 0 0 0); } }
-.writePhrase.is-write .w1{ animation: writeWord 1.2s ease forwards; }
-.writePhrase.is-write .w2{ animation: writeWord 1.2s ease forwards; animation-delay: .75s; }
-.writePhrase.is-write .w3{ animation: writeWord 1.2s ease forwards; animation-delay: 1.5s; }

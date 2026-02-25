@@ -40,21 +40,29 @@ button{ font:inherit; }
   pointer-events:none;
   transition: opacity 600ms ease;
 }
+
+/* ✅ iPhone safe-area + 16 Pro 화면 최적화 */
 .introStage{
   position:relative;
-  width:min(520px, 92vw);
-  height:min(820px, 92vh);
+  width:100%;
+  max-width:420px;
+  height:100vh;
+  margin:0 auto;
+  padding:
+    calc(env(safe-area-inset-top, 0px) + 10px)
+    14px
+    calc(env(safe-area-inset-bottom, 0px) + 16px);
 }
 
-/* ✅ “진짜 세로 폴라로이드 프레임” */
+/* ✅ “진짜 세로 폴라로이드 프레임” + 크기 DOWN */
 .pol{
   position:absolute;
-  width:min(320px, 78vw);
+  width:min(240px, 64vw);          /* ⬅️ 320 → 240 */
   background:#fff;
   border:1px solid rgba(0,0,0,0.10);
-  border-radius:12px;
-  box-shadow:0 26px 80px rgba(0,0,0,0.22);
-  padding:14px 14px 82px; /* ✅ 아래 흰 여백 크게! */
+  border-radius:14px;
+  box-shadow:0 22px 70px rgba(0,0,0,0.20);
+  padding:12px 12px 60px;          /* ⬅️ 아래 흰여백 폴라로이드 느낌 */
   opacity:0;
   transform: translateY(14px) scale(0.98) rotate(var(--r,0deg));
 }
@@ -64,33 +72,33 @@ button{ font:inherit; }
   transition: opacity 450ms ease, transform 520ms ease;
 }
 
-/* ✅ 사진: 정사각 금지 -> 4:5 세로 비율 */
+/* ✅ 사진: 더 “세로 폴라로이드” 비율 */
 .pol__img{
   width:100%;
-  aspect-ratio: 4 / 5;
+  aspect-ratio: 3 / 4;             /* ⬅️ 4/5 → 3/4 (정사각 느낌 제거) */
   object-fit:cover;
   display:block;
-  border-radius:8px;
+  border-radius:10px;
   background:#f2f2f2;
 }
 
-/* ✅ 폴라로이드 아래 글자 없음 -> (캡션 자체를 사용 안 함) */
-
-.pol--1{ left:8%;  top:7%;  --r:-8deg; z-index:10; }
-.pol--2{ left:22%; top:32%; --r: 6deg; z-index:20; }
-.pol--3{ left:14%; top:58%; --r:-3deg; z-index:30; }
+/* ✅ 위치 재배치(아이폰 16 Pro에서 안 넘치게) */
+.pol--1{ left:4%;  top:8%;  --r:-6deg; z-index:10; }
+.pol--2{ left:18%; top:30%; --r: 5deg; z-index:20; }
+.pol--3{ left:10%; top:50%; --r:-3deg; z-index:30; }
 
 /* we getting married!!! 다다닥 */
 .burst{
   position:absolute;
-  right:7%;
+  right:6%;
   top:14%;
   font-family:"Dancing Script",cursive;
-  font-size:44px;
+  font-size:34px;                   /* ⬅️ 44 → 34 */
   color: rgba(0,0,0,0.86);
   opacity:0;
   transform: translateY(8px) rotate(-2deg);
   pointer-events:none;
+  z-index:45;
 }
 .burst.is-on{
   opacity:1;
@@ -98,19 +106,20 @@ button{ font:inherit; }
   transition: opacity 220ms ease, transform 220ms ease;
 }
 
-/* 펜글씨(써지는 느낌) */
+/* ✅ 필기체(써지는 느낌) — 사진 위로 올라오게 */
 .handwrite{
   position:absolute;
   left:0; right:0;
-  bottom:12%;
+  bottom:18%;                       /* ⬅️ 12% → 18% (가려짐 해결) */
   text-align:center;
   pointer-events:none;
   font-family:"Dancing Script",cursive;
   color: rgba(0,0,0,0.62);
+  z-index:50;                       /* ⬅️ 폴라로이드보다 위 */
 }
 .handwrite .line{
   display:inline-block;
-  font-size:34px;
+  font-size:30px;                   /* ⬅️ 34 → 30 (모바일 안정) */
   opacity:0;
   clip-path: inset(0 100% 0 0);
 }
@@ -122,12 +131,21 @@ button{ font:inherit; }
 .introMeta{
   position:absolute;
   left:0; right:0;
-  bottom:4%;
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 10px);
   text-align:center;
   padding:0 18px;
+  z-index:55;
 }
-.introMeta .date{ font-weight:800; font-size:18px; }
-.introMeta .place{ margin-top:8px; font-size:14px; color: rgba(0,0,0,0.65); line-height:1.5; }
+.introMeta .date{ font-weight:800; font-size:17px; }
+.introMeta .place{ margin-top:8px; font-size:13px; color: rgba(0,0,0,0.65); line-height:1.5; }
+
+/* 작은 화면 추가 보정 */
+@media (max-height:760px){
+  .pol{ width:min(220px, 62vw); padding:10px 10px 54px; }
+  .pol--3{ top:48%; }
+  .handwrite{ bottom:20%; }
+  .burst{ font-size:32px; }
+}
 
 /* ===== MAIN ===== */
 .card{
@@ -233,7 +251,7 @@ button{ font:inherit; }
   font-weight:700;
 }
 
-/* ✅ gallery (네모) */
+/* ✅ gallery */
 .gallery{ display:grid; gap:8px; }
 .gallery--wedding{ grid-template-columns: repeat(2, 1fr); }
 .gallery--wedding img{

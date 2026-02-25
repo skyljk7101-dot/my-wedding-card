@@ -32,7 +32,7 @@ function toast(msg) {
   el.textContent = msg;
   el.style.display = "block";
   clearTimeout(window.__toastTimer);
-  window.__toastTimer = setTimeout(() => (el.style.display = "none"), 1600);
+  window.__toastTimer = setTimeout(() => (el.style.display = "none"), 1700);
 }
 
 async function copyText(text) {
@@ -121,22 +121,43 @@ function hasGuestbookEndpoint() {
   return typeof GUESTBOOK_ENDPOINT === "string" && GUESTBOOK_ENDPOINT.startsWith("http");
 }
 
+async function safeRead(res) {
+  const txt = await res.text().catch(() => "");
+  // json일 수도, 아닐 수도 있어서 안전하게 처리
+  try { return { text: txt, json: txt ? JSON.parse(txt) : null }; }
+  catch { return { text: txt, json: null }; }
+}
+
 async function gbFetchList() {
   if (!hasGuestbookEndpoint()) return [];
-  const res = await fetch(`${GUESTBOOK_ENDPOINT}?action=list`, { method: "GET" });
-  if (!res.ok) throw new Error("guestbook list failed");
-  return await res.json();
+  const res = await fetch(`${GUESTBOOK_ENDPOINT}?action=list`, {
+    method: "GET",
+    mode: "cors",
+    cache: "no-store",
+  });
+  if (!res.ok) {
+    const payload = await safeRead(res);
+    throw new Error(`list failed (${res.status}) ${payload.text}`.trim());
+  }
+  const payload = await safeRead(res);
+  return payload.json || [];
 }
 
 async function gbAddItem(name, msg) {
   if (!hasGuestbookEndpoint()) throw new Error("no endpoint");
   const res = await fetch(GUESTBOOK_ENDPOINT, {
     method: "POST",
+    mode: "cors",
+    cache: "no-store",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ action: "add", name, msg }),
   });
-  if (!res.ok) throw new Error("guestbook add failed");
-  return await res.json();
+  if (!res.ok) {
+    const payload = await safeRead(res);
+    throw new Error(`add failed (${res.status}) ${payload.text}`.trim());
+  }
+  const payload = await safeRead(res);
+  return payload.json;
 }
 
 function build() {
@@ -147,7 +168,6 @@ function build() {
   const brideSms = (bride.phone || "").replace(/[^0-9]/g, "");
   const groomSms = (groom.phone || "").replace(/[^0-9]/g, "");
 
-  const NAVER_QUERY = "공덕 아펠가모";
   const inviteMessage = `“매일 네 하루에 조용히 구독했어.\n이제 평생, 내 마음으로만 자동연장되는 사랑💗”`;
 
   $("#app").innerHTML = `
@@ -629,7 +649,7 @@ END:VCALENDAR`;
   }
 
   if (!hasGuestbookEndpoint()) {
-    gbHint.textContent = "⚠️ 아직 공유 방명록 서버(구글 Apps Script) URL이 설정되지 않았어요. config.js의 GUESTBOOK_ENDPOINT를 배포 URL로 바꿔주세요.";
+    gbHint.textContent = "⚠️ 방명록 서버(구글 Apps Script) URL이 설정되지 않았어요. config.js의 GUESTBOOK_ENDPOINT를 배포 URL로 바꿔주세요.";
     renderGB([]);
   } else {
     gbHint.textContent = "하객 모두가 같은 방명록을 공유합니다.";
@@ -640,6 +660,7 @@ END:VCALENDAR`;
       } catch (e) {
         console.error(e);
         toast("방명록 불러오기 실패");
+        gbHint.textContent = "⚠️ 방명록 서버 연결 실패: Apps Script 배포 권한(익명 접근) 확인 필요";
       }
     })();
   }
@@ -664,7 +685,12 @@ END:VCALENDAR`;
       renderGB(items);
     } catch (err) {
       console.error(err);
-      toast("방명록 저장 실패");
+      // ✅ 실패 원인을 사용자에게 더 명확히 보여줌
+      const msg = String(err?.message || err);
+      toast(msg.includes("403") ? "방명록 저장 실패 (권한/배포 설정 403)" :
+           msg.includes("500") ? "방명록 저장 실패 (서버 오류 500)" :
+           msg.includes("Failed to fetch") ? "방명록 저장 실패 (CORS/배포 권한/URL 확인)" :
+           "방명록 저장 실패");
     }
   });
 }

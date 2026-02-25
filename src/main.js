@@ -63,6 +63,27 @@ function ensureKakaoInit() {
   }
 }
 
+/* ===== scroll lock ===== */
+let __scrollY = 0;
+function lockScroll() {
+  __scrollY = window.scrollY || 0;
+  document.body.style.position = "fixed";
+  document.body.style.top = `-${__scrollY}px`;
+  document.body.style.left = "0";
+  document.body.style.right = "0";
+  document.body.style.width = "100%";
+}
+function unlockScroll() {
+  const top = document.body.style.top;
+  document.body.style.position = "";
+  document.body.style.top = "";
+  document.body.style.left = "";
+  document.body.style.right = "";
+  document.body.style.width = "";
+  window.scrollTo(0, Math.abs(parseInt(top || "0", 10)));
+}
+function preventTouchMove(e) { e.preventDefault(); }
+
 /** ✅ 티맵: 절대 홈페이지로 이동 X (실패하면 토스트만) */
 function openTmap({ name, lat, lng }) {
   const nameEnc = encode(name);
@@ -85,27 +106,6 @@ function openTmap({ name, lat, lng }) {
   })();
 }
 
-/* ===== 모달 열릴 때 뒤 스크롤 잠금 ===== */
-let __scrollY = 0;
-function lockScroll() {
-  __scrollY = window.scrollY || 0;
-  document.body.style.position = "fixed";
-  document.body.style.top = `-${__scrollY}px`;
-  document.body.style.left = "0";
-  document.body.style.right = "0";
-  document.body.style.width = "100%";
-}
-function unlockScroll() {
-  const top = document.body.style.top;
-  document.body.style.position = "";
-  document.body.style.top = "";
-  document.body.style.left = "";
-  document.body.style.right = "";
-  document.body.style.width = "";
-  window.scrollTo(0, Math.abs(parseInt(top || "0", 10)));
-}
-function preventTouchMove(e) { e.preventDefault(); }
-
 function formatTime(ts) {
   const d = new Date(ts);
   const yy = String(d.getFullYear()).slice(2);
@@ -116,304 +116,217 @@ function formatTime(ts) {
   return `${yy}.${mm}.${dd} ${hh}:${mi}`;
 }
 
-/* ===== Guestbook (shared) ===== */
+/* ===== Guestbook ===== */
 function hasGuestbookEndpoint() {
-  return typeof GUESTBOOK_ENDPOINT === "string" && GUESTBOOK_ENDPOINT.startsWith("http");
-}
-
-async function safeRead(res) {
-  const txt = await res.text().catch(() => "");
-  // json일 수도, 아닐 수도 있어서 안전하게 처리
-  try { return { text: txt, json: txt ? JSON.parse(txt) : null }; }
-  catch { return { text: txt, json: null }; }
+  return Boolean(
+    GUESTBOOK_ENDPOINT &&
+    String(GUESTBOOK_ENDPOINT).includes("script.google.com/macros/s/")
+  );
 }
 
 async function gbFetchList() {
-  if (!hasGuestbookEndpoint()) return [];
-  const res = await fetch(`${GUESTBOOK_ENDPOINT}?action=list`, {
-    method: "GET",
-    mode: "cors",
-    cache: "no-store",
-  });
-  if (!res.ok) {
-    const payload = await safeRead(res);
-    throw new Error(`list failed (${res.status}) ${payload.text}`.trim());
-  }
-  const payload = await safeRead(res);
-  return payload.json || [];
+  const url = `${GUESTBOOK_ENDPOINT}?action=list&_=${Date.now()}`;
+  const res = await fetch(url, { method: "GET" });
+  if (!res.ok) throw new Error(`Guestbook list failed: ${res.status}`);
+  return await res.json();
 }
 
 async function gbAddItem(name, msg) {
-  if (!hasGuestbookEndpoint()) throw new Error("no endpoint");
-
-  const body = new URLSearchParams({
-    action: "add",
-    name,
-    msg,
-  });
+  const body = new URLSearchParams();
+  body.set("action", "add");
+  body.set("name", name);
+  body.set("msg", msg);
 
   const res = await fetch(GUESTBOOK_ENDPOINT, {
     method: "POST",
-    // ✅ 프리플라이트 유발 안 하는 Content-Type
     headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
     body,
-    cache: "no-store",
   });
-
-  if (!res.ok) {
-    const txt = await res.text().catch(() => "");
-    throw new Error(`add failed (${res.status}) ${txt}`.trim());
-  }
-
-  // Apps Script가 JSON을 주면 파싱, 아니면 통과
-  const txt = await res.text().catch(() => "");
-  try { return txt ? JSON.parse(txt) : {}; } catch { return {}; }
+  if (!res.ok) throw new Error(`Guestbook add failed: ${res.status}`);
+  const json = await res.json();
+  if (!json?.ok) throw new Error(`Guestbook add failed: ${json?.error || "unknown"}`);
+  return json;
 }
 
 function build() {
   const d = INVITE;
-  const { groom, bride } = d.couple;
-  const { lat, lng, venueName } = d.wedding;
-
-  const brideSms = (bride.phone || "").replace(/[^0-9]/g, "");
-  const groomSms = (groom.phone || "").replace(/[^0-9]/g, "");
-
-  const inviteMessage = `“매일 네 하루에 조용히 구독했어.\n이제 평생, 내 마음으로만 자동연장되는 사랑💗”`;
 
   $("#app").innerHTML = `
-  <!-- Intro -->
-  <section id="intro" class="intro" aria-hidden="false">
-    <div class="introStage">
-      <div class="pol pol--1" id="p1">
-        <img class="pol__img" src="${d.heroPolaroids[0]}" alt="intro-1" />
-      </div>
-      <div class="pol pol--2" id="p2">
-        <img class="pol__img" src="${d.heroPolaroids[1]}" alt="intro-2" />
-      </div>
-      <div class="pol pol--3" id="p3">
-        <img class="pol__img" src="${d.heroPolaroids[2]}" alt="intro-3" />
-      </div>
+    <div class="intro" id="intro" aria-hidden="false">
+      <div class="introStage">
+        <div class="pol pol--1" id="p1">
+          <img class="pol__img" src="${d.heroPolaroids[0]}" alt="intro-1" />
+        </div>
+        <div class="pol pol--2" id="p2">
+          <img class="pol__img" src="${d.heroPolaroids[1]}" alt="intro-2" />
+        </div>
+        <div class="pol pol--3" id="p3">
+          <img class="pol__img" src="${d.heroPolaroids[2]}" alt="intro-3" />
+        </div>
 
-<div class="writePhrase" id="writePhrase" aria-label="we're getting married">
-  <span class="w w1">we're</span>
-  <span class="w w2">getting</span>
-  <span class="w w3">married</span>
-</div>
+        <div class="writePhrase" id="writePhrase" aria-label="we're getting married">
+          <span class="w w1">we're</span>
+          <span class="w w2">getting</span>
+          <span class="w w3">married</span>
+        </div>
 
-      <div class="introMeta">
-        <div class="date">${d.wedding.dateText}</div>
-        <div class="place">${d.wedding.venueName}<br/>${d.wedding.address}</div>
+        <!-- ✅ 기존 오류 원인이었던 #handwrite 실제로 넣음 -->
+        <div class="handwrite" id="handwrite" aria-label="names handwriting">
+          <span class="line">DASOM · JAEGI</span>
+          <span class="line">2026.05.31</span>
+        </div>
+
+        <div class="introMeta">
+          <div class="date">${d.wedding.dateText}</div>
+          <div class="place">${d.wedding.venueName}<br/>${d.wedding.address}</div>
+        </div>
       </div>
     </div>
-  </section>
 
-  <!-- Main -->
-  <main class="wrap" id="main" style="opacity:0;">
-    <section class="heroCard">
-      <img class="heroImg" src="${d.heroImage}" alt="메인 사진" />
-      <div class="heroMeta">
-        <div class="heroMeta__names">DASOM · JAEGI</div>
-        <div class="heroMeta__info">
-          <div><b>${d.wedding.dateText}</b></div>
-          <div style="margin-top:6px;">${d.wedding.venueName}</div>
-          <div class="muted" style="margin-top:6px;">${d.wedding.address}</div>
-        </div>
-      </div>
-    </section>
-
-    <section class="card">
-      <h2 class="card__title">초대합니다</h2>
-      <p class="message">${inviteMessage}</p>
-
-      <div style="margin-top:16px; display:flex; flex-direction:column; gap:10px;">
-        <div class="row">
-          <span class="muted" style="width:42px;">신부</span>
-          <span style="flex:1;">정대연 · 장영화의 장녀 <b>${bride.name}</b></span>
-          <a class="btn btn--mini" href="sms:${brideSms}">문자</a>
-        </div>
-
-        <div class="row">
-          <span class="muted" style="width:42px;">신랑</span>
-          <span style="flex:1;">유순덕의 장남 <b>${groom.name}</b></span>
-          <a class="btn btn--mini" href="sms:${groomSms}">문자</a>
-        </div>
-      </div>
-    </section>
-
-    <section class="card">
-      <h2 class="card__title">예식 안내</h2>
-
-      <div style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">
-        <div class="row">
-          <div class="muted" style="width:54px;">일시</div>
-          <div><b>${d.wedding.dateText}</b></div>
-        </div>
-
-        <div class="row">
-          <div class="muted" style="width:54px;">장소</div>
-          <div>
-            <div><b>${d.wedding.venueName}</b></div>
-            <div class="muted" style="margin-top:4px; line-height:1.5;">${d.wedding.address}</div>
+    <div class="wrap" id="main" style="opacity:0;">
+      <div class="heroCard">
+        <img class="heroImg" src="${d.heroImage}" alt="hero"/>
+        <div class="heroMeta">
+          <div class="heroMeta__names">${d.couple.groom.name} · ${d.couple.bride.name}</div>
+          <div class="heroMeta__info">
+            <b>${d.wedding.dateText}</b><br/>
+            ${d.wedding.venueName}<br/>
+            <span class="muted">${d.wedding.address}</span>
+          </div>
+          <div class="grid2" style="margin-top:14px;">
+            <button class="btn" id="kakaoShareBtn" type="button">카카오 공유</button>
+            <button class="btn btn--primary" id="addCal" type="button">캘린더 추가</button>
           </div>
         </div>
       </div>
 
-      <div style="margin-top:14px;">
-        <button id="addCal" class="btn btn--primary" type="button" style="width:100%;">캘린더에 추가</button>
-      </div>
+      <section class="card">
+        <h2 class="card__title">초대합니다</h2>
+        <p class="message">
+소중한 분들을 모시고
+두 사람이 사랑으로 하나 되는 날
+기쁨의 자리에 함께해 주시면 감사하겠습니다.
+        </p>
+      </section>
 
-      <p class="hr-dashed" style="font-size:12px; color:#777; line-height:1.6;">
-        예식장 규정에 따라 화환 반입이 불가하여 마음만 감사히 받겠습니다.<br>
-        (리본띠만 받습니다.)
-      </p>
-    </section>
+      <section class="card">
+        <h2 class="card__title">연락하기</h2>
+        <div class="grid2" style="margin-top:12px;">
+          <a class="btn" href="tel:${d.couple.groom.phone}">신랑 전화</a>
+          <a class="btn" href="tel:${d.couple.bride.phone}">신부 전화</a>
+        </div>
+      </section>
 
-    <section class="card">
-      <h2 class="card__title">오시는 길</h2>
-      <p class="muted" style="margin:10px 0 12px; line-height:1.6;">버튼을 누르면 지도 앱/웹으로 이동합니다.</p>
+      <section class="card">
+        <h2 class="card__title">오시는 길</h2>
+        <p class="muted" style="margin:10px 0 12px; line-height:1.6;">
+          ${d.wedding.venueName}<br/>${d.wedding.address}
+        </p>
+        <div class="grid2">
+          <button class="btn" id="naverMap" type="button">네이버지도</button>
+          <button class="btn" id="tmapRoute" type="button">티맵 길찾기</button>
+        </div>
+      </section>
 
-      <div class="grid2">
-        <a class="btn" target="_blank" rel="noopener"
-           href="https://map.kakao.com/link/map/${encode(venueName)},${lat},${lng}">카카오맵(위치)</a>
-        <a class="btn" target="_blank" rel="noopener"
-           href="https://map.kakao.com/link/to/${encode(venueName)},${lat},${lng}">카카오맵(길찾기)</a>
+      <section class="card">
+        <h2 class="card__title">갤러리</h2>
+        <div class="tabs">
+          <button class="tab is-active" id="tabWedding" type="button">웨딩</button>
+          <button class="tab" id="tabDaily" type="button">일상</button>
+        </div>
 
-        <a class="btn" id="naverMap" href="#" rel="noopener">네이버지도(위치)</a>
-        <a class="btn" id="naverRoute" href="#" rel="noopener">네이버지도(길찾기)</a>
-      </div>
+        <div style="margin-top:12px;">
+          <div class="gallery gallery--wedding" id="weddingGallery"></div>
+          <div class="gallery gallery--daily" id="dailyGallery" style="display:none;"></div>
+        </div>
+      </section>
 
-      <div style="margin-top:10px;">
-        <button class="btn" id="tmapRoute" type="button" style="width:100%;">티맵(길찾기)</button>
-      </div>
-    </section>
+      <section class="card">
+        <h2 class="card__title">마음 전하실 곳</h2>
+        <p class="muted" style="margin:10px 0 6px;">카드를 누르면 복사됩니다.</p>
+        <div id="accounts"></div>
+      </section>
 
-    <section class="card">
-      <h2 class="card__title">Gallery</h2>
+      <section class="card">
+        <h2 class="card__title">방명록</h2>
+        <p class="muted" style="margin:10px 0 6px;">작성자와 내용을 남겨주세요.</p>
 
-      <div class="tabs">
-        <button class="tab is-active" id="tabWedding" type="button">Wedding</button>
-        <button class="tab" id="tabDaily" type="button">Daily</button>
-      </div>
+        <form id="gbForm" class="guestbookForm">
+          <input id="gbName" class="input" maxlength="20" placeholder="작성자" required />
+          <textarea id="gbMsg" class="textarea" maxlength="300" placeholder="내용" required></textarea>
+          <button class="btn btn--primary" type="submit" style="width:100%;">남기기</button>
+        </form>
 
-      <div style="margin-top:12px;">
-        <div class="gallery gallery--wedding" id="weddingGallery"></div>
-        <div class="gallery gallery--daily" id="dailyGallery" style="display:none;"></div>
-      </div>
-    </section>
+        <div id="gbList" class="gbList"></div>
+        <p class="muted" id="gbHint" style="margin-top:10px; font-size:12px; line-height:1.5;"></p>
+      </section>
 
-    <section class="card">
-      <h2 class="card__title">마음 전하실 곳</h2>
-      <p class="muted" style="margin:10px 0 6px;">카드를 누르면 복사됩니다.</p>
-      <div id="accounts"></div>
-    </section>
+      <section class="card">
+        <h2 class="card__title">RSVP</h2>
+        <p class="muted" style="margin:10px 0 12px; line-height:1.6;">구글폼으로 참석 여부를 남겨주세요.</p>
+        <a class="btn btn--primary" target="_blank" rel="noopener" href="${d.rsvpUrl}" style="width:100%; display:inline-flex; justify-content:center;">RSVP 작성하기</a>
+      </section>
 
-    <section class="card">
-      <h2 class="card__title">방명록</h2>
-      <p class="muted" style="margin:10px 0 6px;">작성자와 내용을 남겨주세요.</p>
-
-      <form id="gbForm" class="guestbookForm">
-        <input id="gbName" class="input" maxlength="20" placeholder="작성자" required />
-        <textarea id="gbMsg" class="textarea" maxlength="300" placeholder="내용" required></textarea>
-        <button class="btn btn--primary" type="submit" style="width:100%;">남기기</button>
-      </form>
-
-      <div id="gbList" class="gbList"></div>
-      <p class="muted" id="gbHint" style="margin-top:10px; font-size:12px; line-height:1.5;"></p>
-    </section>
-
-    <section class="card">
-      <h2 class="card__title">RSVP</h2>
-      <p class="muted" style="margin:10px 0 12px; line-height:1.6;">구글폼으로 참석 여부를 남겨주세요.</p>
-      <a class="btn btn--primary" target="_blank" rel="noopener" href="${d.rsvpUrl}" style="width:100%;">참석 여부 남기기</a>
-    </section>
-
-    <section class="card">
-      <h2 class="card__title">청첩장 공유하기</h2>
-      <p class="muted" style="margin:10px 0 12px; line-height:1.6;">카카오톡으로 예쁜 청첩장을 전해보세요.</p>
-      <button id="kakaoShareBtn" class="btn" style="background-color:#FEE500; color:#000; border:none; font-weight:bold; width: 100%; border-radius: 14px;">
-        카카오톡 공유하기
-      </button>
-    </section>
-
-    <footer class="footer">${d.footerText}</footer>
-
-    <!-- Modal (gallery slider) -->
-    <div id="modal" class="modal" aria-hidden="true">
-      <div class="modal__backdrop"></div>
-      <div id="modalCounter" class="modal__counter">1/1</div>
-      <button id="modalPrev" class="modal__nav modal__nav--prev" type="button" aria-label="이전 사진">‹</button>
-      <img id="modalImg" class="modal__img" alt="확대 이미지" />
-      <button id="modalNext" class="modal__nav modal__nav--next" type="button" aria-label="다음 사진">›</button>
+      <div class="footer">${d.footerText}</div>
     </div>
-  </main>
+
+    <!-- modal -->
+    <div class="modal" id="modal" aria-hidden="true">
+      <div class="modal__backdrop"></div>
+      <div class="modal__counter" id="modalCounter">1/1</div>
+      <button class="modal__nav modal__nav--prev" id="modalPrev" type="button" aria-label="prev">‹</button>
+      <button class="modal__nav modal__nav--next" id="modalNext" type="button" aria-label="next">›</button>
+      <img class="modal__img" id="modalImg" alt="modal" />
+    </div>
   `;
 
-  /* ===== INTRO timing ===== */
+  /* ===== Intro animation (✅ null-safe) ===== */
   const intro = $("#intro");
   const main = $("#main");
   const p1 = $("#p1");
   const p2 = $("#p2");
   const p3 = $("#p3");
-  const burst = $("#burst");
   const hand = $("#handwrite");
+  const writePhrase = document.getElementById("writePhrase");
 
-  setTimeout(() => p1.classList.add("is-in"), 200);
-  setTimeout(() => p2.classList.add("is-in"), 700);
-  setTimeout(() => p3.classList.add("is-in"), 1200);
+  if (p1) setTimeout(() => p1.classList.add("is-in"), 200);
+  if (p2) setTimeout(() => p2.classList.add("is-in"), 700);
+  if (p3) setTimeout(() => p3.classList.add("is-in"), 1200);
 
-  // we getting married!!! 다다닥 느낌 (3번 점멸)
-const writePhrase = document.getElementById("writePhrase");
+  // ✅ 문구를 “한 단어씩” 천천히 써지듯
+  if (writePhrase) setTimeout(() => writePhrase.classList.add("is-write"), 1900);
 
-setTimeout(() => p1.classList.add("is-in"), 200);
-setTimeout(() => p2.classList.add("is-in"), 700);
-setTimeout(() => p3.classList.add("is-in"), 1200);
+  // ✅ 필기체(없으면 그냥 스킵)
+  if (hand) setTimeout(() => hand.classList.add("is-write"), 3100);
 
-// ✅ 문구를 “한 단어씩” 천천히 써지듯
-setTimeout(() => writePhrase.classList.add("is-write"), 1900);
-
-// 인트로 종료 타이밍 조금 늦춤 (문구 애니메이션 보이게)
-setTimeout(() => {
-  intro.classList.add("is-hide");
-  intro.setAttribute("aria-hidden", "true");
-  main.style.transition = "opacity 450ms ease";
-  main.style.opacity = "1";
-}, 5600);
-
-  setTimeout(() => hand.classList.add("is-write"), 3100);
-
+  // 인트로 종료
   setTimeout(() => {
-    intro.classList.add("is-hide");
-    intro.setAttribute("aria-hidden", "true");
-    main.style.transition = "opacity 450ms ease";
-    main.style.opacity = "1";
-  }, 4600);
+    if (intro) {
+      intro.classList.add("is-hide");
+      intro.setAttribute("aria-hidden", "true");
+    }
+    if (main) {
+      main.style.transition = "opacity 450ms ease";
+      main.style.opacity = "1";
+    }
+  }, 5600);
 
-  /* ===== Naver maps ===== */
-  const naverPlaceApp = `nmap://place?lat=${lat}&lng=${lng}&name=${encode("공덕 아펠가모")}&appname=com.example.weddinginvite`;
-  const naverRouteApp = `nmap://route/car?dlat=${lat}&dlng=${lng}&dname=${encode("공덕 아펠가모")}&appname=com.example.weddinginvite`;
-  const naverWeb = `https://map.naver.com/v5/search/${encode("공덕 아펠가모")}`;
+  /* ===== Map buttons ===== */
+  const { lat, lng } = d.wedding;
 
-  $("#naverMap").addEventListener("click", (e) => {
-    e.preventDefault();
+  $("#naverMap").addEventListener("click", () => {
+    const naverApp = `nmap://route/public?dlat=${lat}&dlng=${lng}&dname=${encode(d.wedding.venueName)}&appname=invite`;
+    const naverWeb = `https://map.naver.com/v5/search/${encode(d.wedding.venueName)}?c=${lng},${lat},15,0,0,0,dh`;
+
     const start = Date.now();
-    window.location.href = naverPlaceApp;
+    window.location.href = naverApp;
     setTimeout(() => {
       if (Date.now() - start < 1200) window.open(naverWeb, "_blank", "noopener");
     }, 700);
   });
 
-  $("#naverRoute").addEventListener("click", (e) => {
-    e.preventDefault();
-    const start = Date.now();
-    window.location.href = naverRouteApp;
-    setTimeout(() => {
-      if (Date.now() - start < 1200) window.open(naverWeb, "_blank", "noopener");
-    }, 700);
-  });
-
-  /* ===== Tmap ===== */
   $("#tmapRoute").addEventListener("click", () => {
-    openTmap({ name: "공덕 아펠가모", lat, lng });
+    openTmap({ name: d.wedding.venueName, lat, lng });
   });
 
   /* ===== Tabs ===== */
@@ -648,6 +561,15 @@ END:VCALENDAR`;
   const gbName = $("#gbName");
   const gbMsg = $("#gbMsg");
 
+  function escapeHtml(s) {
+    return String(s ?? "")
+      .replaceAll("&", "&amp;")
+      .replaceAll("<", "&lt;")
+      .replaceAll(">", "&gt;")
+      .replaceAll('"', "&quot;")
+      .replaceAll("'", "&#039;");
+  }
+
   function renderGB(items) {
     gbListEl.innerHTML = "";
     if (!items || !items.length) {
@@ -659,10 +581,10 @@ END:VCALENDAR`;
       div.className = "gbItem";
       div.innerHTML = `
         <div class="gbMeta">
-          <div class="gbName">${it.name}</div>
+          <div class="gbName">${escapeHtml(it.name)}</div>
           <div class="gbTime">${formatTime(it.ts)}</div>
         </div>
-        <div class="gbMsg">${it.msg}</div>
+        <div class="gbMsg">${escapeHtml(it.msg)}</div>
       `;
       gbListEl.appendChild(div);
     });
@@ -705,76 +627,15 @@ END:VCALENDAR`;
       renderGB(items);
     } catch (err) {
       console.error(err);
-      // ✅ 실패 원인을 사용자에게 더 명확히 보여줌
-      const msg = String(err?.message || err);
-      toast(msg.includes("403") ? "방명록 저장 실패 (권한/배포 설정 403)" :
-           msg.includes("500") ? "방명록 저장 실패 (서버 오류 500)" :
-           msg.includes("Failed to fetch") ? "방명록 저장 실패 (CORS/배포 권한/URL 확인)" :
-           "방명록 저장 실패");
+      const m = String(err?.message || err);
+      toast(
+        m.includes("403") ? "방명록 저장 실패 (권한/배포 설정 403)" :
+        m.includes("500") ? "방명록 저장 실패 (서버 오류 500)" :
+        m.includes("Failed to fetch") ? "방명록 저장 실패 (CORS/배포 권한/URL 확인)" :
+        "방명록 저장 실패"
+      );
     }
   });
-}
-
-const SHEET_NAME = "guestbook";
-
-function ensureSheet_() {
-  const ss = SpreadsheetApp.getActiveSpreadsheet();
-  let sh = ss.getSheetByName(SHEET_NAME);
-  if (!sh) {
-    sh = ss.insertSheet(SHEET_NAME);
-    sh.appendRow(["ts", "name", "msg"]);
-  }
-  return sh;
-}
-
-function json_(obj) {
-  return ContentService
-    .createTextOutput(JSON.stringify(obj))
-    .setMimeType(ContentService.MimeType.JSON);
-}
-
-function doGet(e) {
-  const action = (e && e.parameter && e.parameter.action) || "";
-  if (action !== "list") return json_({ ok:false, error:"invalid action" });
-
-  const sh = ensureSheet_();
-  const values = sh.getDataRange().getValues();
-  const rows = values.slice(1).map(r => ({
-    ts: Number(r[0]) || Date.now(),
-    name: String(r[1] || ""),
-    msg: String(r[2] || ""),
-  }));
-  return json_(rows);
-}
-
-function doPost(e) {
-  // ✅ 1) form-urlencoded로 들어온 값 우선 사용
-  const p = (e && e.parameter) ? e.parameter : {};
-  let action = p.action || "";
-  let name = p.name || "";
-  let msg  = p.msg  || "";
-
-  // ✅ 2) JSON으로 들어온 경우도 대비
-  if (!action && e && e.postData && e.postData.contents) {
-    try {
-      const body = JSON.parse(e.postData.contents);
-      action = body.action || action;
-      name = body.name || name;
-      msg = body.msg || msg;
-    } catch (_) {}
-  }
-
-  if (action !== "add") return json_({ ok:false, error:"invalid action" });
-
-  name = String(name || "").trim();
-  msg  = String(msg  || "").trim();
-  if (!name || !msg) return json_({ ok:false, error:"name/msg required" });
-
-  const sh = ensureSheet_();
-  const ts = Date.now();
-  sh.appendRow([ts, name, msg]);
-
-  return json_({ ok:true, ts });
 }
 
 build();

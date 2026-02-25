@@ -96,7 +96,7 @@ function build() {
       <div style="margin-top:16px; display:flex; flex-direction:column; gap:10px;">
         <div class="row">
           <span class="muted" style="width:42px;">신부</span>
-          <span style="flex:1;">정대연 · 자영화의 장녀 <b>${bride.name}</b></span>
+          <span style="flex:1;">정대연 · 장영화의 장녀 <b>${bride.name}</b></span>
           <a class="btn btn--mini" href="sms:${brideSms}">문자</a>
         </div>
 
@@ -162,3 +162,200 @@ function build() {
       <div style="margin-top:12px;">
         <div class="gallery gallery--wedding" id="weddingGallery"></div>
         <div class="gallery gallery--daily" id="dailyGallery" style="display:none;"></div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="card__title">마음 전하실 곳</h2>
+      <p class="muted" style="margin:10px 0 6px;">카드를 누르면 복사됩니다.</p>
+      <div id="accounts"></div>
+    </section>
+
+    <section class="card">
+      <h2 class="card__title">RSVP</h2>
+      <p class="muted" style="margin:10px 0 12px; line-height:1.6;">구글폼으로 참석 여부를 남겨주세요.</p>
+      <a class="btn btn--primary" target="_blank" rel="noopener" href="${d.rsvpUrl}">참석 여부 남기기</a>
+    </section>
+
+    <section class="card">
+      <h2 class="card__title">청첩장 공유하기</h2>
+      <p class="muted" style="margin:10px 0 12px; line-height:1.6;">카카오톡으로 예쁜 청첩장을 전해보세요.</p>
+      <button id="kakaoShareBtn" class="btn" style="background-color:#FEE500; color:#000; border:none; font-weight:bold; width: 100%; border-radius: 14px;">
+        카카오톡 공유하기
+      </button>
+    </section>
+
+    <footer class="footer">${d.footerText}</footer>
+  </main>
+
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="modal__backdrop"></div>
+    <img id="modalImg" class="modal__img" alt="확대 이미지" />
+  </div>
+  `;
+
+  // intro timing
+  const intro = document.getElementById("heroIntro");
+  const showcase = document.getElementById("heroShowcase");
+  setTimeout(() => intro.classList.add("is-write"), 2000);
+  setTimeout(() => document.getElementById("p1")?.classList.add("is-in"), 200);
+  setTimeout(() => document.getElementById("p2")?.classList.add("is-in"), 3200);
+  setTimeout(() => document.getElementById("p3")?.classList.add("is-in"), 6200);
+  setTimeout(() => showcase.classList.add("is-done"), 9000);
+
+  // naver maps
+  const naverPlaceApp = `nmap://place?lat=${lat}&lng=${lng}&name=${encode(NAVER_QUERY)}&appname=com.example.weddinginvite`;
+  const naverRouteApp = `nmap://route/car?dlat=${lat}&dlng=${lng}&dname=${encode(NAVER_QUERY)}&appname=com.example.weddinginvite`;
+  const naverWeb = `https://map.naver.com/v5/search/${encode(NAVER_QUERY)}`;
+
+  $("#naverMap").addEventListener("click", (e) => {
+    e.preventDefault();
+    const start = Date.now();
+    window.location.href = naverPlaceApp;
+    setTimeout(() => {
+      if (Date.now() - start < 1200) window.open(naverWeb, "_blank", "noopener");
+    }, 700);
+  });
+
+  $("#naverRoute").addEventListener("click", (e) => {
+    e.preventDefault();
+    const start = Date.now();
+    window.location.href = naverRouteApp;
+    setTimeout(() => {
+      if (Date.now() - start < 1200) window.open(naverWeb, "_blank", "noopener");
+    }, 700);
+  });
+
+  // modal
+  const modal = $("#modal");
+  const modalImg = $("#modalImg");
+  function openModal(src) {
+    modalImg.src = src;
+    modal.classList.add("is-open");
+    modal.setAttribute("aria-hidden", "false");
+  }
+  function closeModal() {
+    modal.classList.remove("is-open");
+    modal.setAttribute("aria-hidden", "true");
+    modalImg.src = "";
+  }
+  modal.addEventListener("click", closeModal);
+
+  // render galleries
+  const weddingEl = $("#weddingGallery");
+  d.weddingGallery.forEach((src, i) => {
+    const img = document.createElement("img");
+    img.src = src;
+    img.alt = `wedding-${i + 1}`;
+    img.loading = "lazy";
+    img.addEventListener("click", () => openModal(src));
+    weddingEl.appendChild(img);
+  });
+
+  const dailyEl = $("#dailyGallery");
+  d.dailyGallery.forEach((src, i) => {
+    const img = document.createElement("img");
+    img.src = src;
+    img.alt = `daily-${i + 1}`;
+    img.loading = "lazy";
+    img.addEventListener("click", () => openModal(src));
+    dailyEl.appendChild(img);
+  });
+
+  // tabs
+  const tabWedding = $("#tabWedding");
+  const tabDaily = $("#tabDaily");
+  function showWedding() {
+    tabWedding.classList.add("is-active");
+    tabDaily.classList.remove("is-active");
+    weddingEl.style.display = "grid";
+    dailyEl.style.display = "none";
+  }
+  function showDaily() {
+    tabDaily.classList.add("is-active");
+    tabWedding.classList.remove("is-active");
+    weddingEl.style.display = "none";
+    dailyEl.style.display = "grid";
+  }
+  tabWedding.addEventListener("click", showWedding);
+  tabDaily.addEventListener("click", showDaily);
+
+  // accounts
+  const acc = $("#accounts");
+  d.accounts.forEach((a) => {
+    if (!a.number) return;
+    const el = document.createElement("div");
+    el.className = "account";
+    el.innerHTML = `
+      <div class="row" style="justify-content:space-between;">
+        <span class="muted">${a.label}</span>
+        <button class="btn btn--mini" type="button">계좌복사</button>
+      </div>
+      <b>${a.bank} ${a.number}</b>
+      <div class="muted" style="margin-top:4px;">예금주: ${a.holder}</div>
+    `;
+    const txt = `${a.bank} ${a.number} (${a.holder})`;
+    el.addEventListener("click", () => copyText(txt));
+    acc.appendChild(el);
+  });
+
+  // calendar (ics)
+  $("#addCal").addEventListener("click", () => {
+    const start = new Date(d.wedding.dateTimeISO);
+    const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
+
+    const toICS = (date) =>
+      date.getUTCFullYear() +
+      pad2(date.getUTCMonth() + 1) +
+      pad2(date.getUTCDate()) +
+      "T" +
+      pad2(date.getUTCHours()) +
+      pad2(date.getUTCMinutes()) +
+      "00Z";
+
+    const ics =
+`BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Wedding Invite//KO//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VEVENT
+UID:wedding-${start.getTime()}@invite
+DTSTAMP:${toICS(new Date())}
+DTSTART:${toICS(start)}
+DTEND:${toICS(end)}
+SUMMARY:DASOM · JAEGI 결혼식
+LOCATION:${d.wedding.venueName} ${d.wedding.address}
+DESCRIPTION:모바일 청첩장
+END:VEVENT
+END:VCALENDAR`;
+
+    const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "wedding.ics";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+    toast("캘린더 파일을 다운로드했어요!");
+  });
+
+  if (window.Kakao && !window.Kakao.isInitialized()) {
+    window.Kakao.init('57d738d573589e31098735abbfb1dbf9); 
+  }
+
+  const kakaoBtn = document.getElementById("kakaoShareBtn");
+  if (kakaoBtn) {
+    kakaoBtn.addEventListener("click", () => {
+      if (window.Kakao) {
+        window.Kakao.Share.sendCustom({
+          templateId: 129829, 
+        });
+      }
+    });
+  }
+}
+
+build();

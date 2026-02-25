@@ -5,9 +5,12 @@ const $ = (sel) => document.querySelector(sel);
 const encode = (s) => encodeURIComponent(String(s ?? ""));
 const pad2 = (n) => String(n).padStart(2, "0");
 
-// ✅ 네가 JS SDK 도메인 등록한 JavaScript 키
+// ✅ Kakao
 const KAKAO_JS_KEY = "950d726b2979c7f8113c72f6fbfb8771";
 const KAKAO_TEMPLATE_ID = 129829;
+
+// ✅ Guestbook endpoint (Apps Script Web App URL)
+const GUESTBOOK_ENDPOINT = INVITE.GUESTBOOK_ENDPOINT;
 
 function toast(msg) {
   let el = document.getElementById("__toast");
@@ -60,15 +63,10 @@ function ensureKakaoInit() {
   }
 }
 
-/** ✅ 티맵: iOS에서 잘 쓰는 rGoName/rGoX/rGoY 1순위, 실패 시 goalname/goalx/goaly 시도
- *  - 절대 티맵 홈페이지로 이동시키지 않음(튕김 방지)
- */
+/** ✅ 티맵: 절대 홈페이지로 이동 X (실패하면 토스트만) */
 function openTmap({ name, lat, lng }) {
   const nameEnc = encode(name);
-
-  // iOS에서 많이 쓰는 파라미터
   const url1 = `tmap://route?rGoName=${nameEnc}&rGoX=${lng}&rGoY=${lat}`;
-  // 안드/일부 환경
   const url2 = `tmap://route?goalname=${nameEnc}&goalx=${lng}&goaly=${lat}`;
 
   const tryOpen = (url) =>
@@ -80,18 +78,14 @@ function openTmap({ name, lat, lng }) {
 
   (async () => {
     const t1 = await tryOpen(url1);
-    // 앱이 실제로 열리면 브라우저가 백그라운드로 가서 여기 로직이 의미 없어지는 경우가 많음.
-    // "너무 빨리" 돌아오면 실패로 간주하고 2번째 스킴 시도
     if (t1 < 1100) {
       const t2 = await tryOpen(url2);
-      if (t2 < 1100) {
-        toast("티맵 앱이 설치되어 있지 않거나, 호출이 차단됐어요.");
-      }
+      if (t2 < 1100) toast("티맵 앱이 설치되어 있지 않거나, 호출이 차단됐어요.");
     }
   })();
 }
 
-/* ===== 모달 열릴 때 뒤 스크롤 완전 잠금 ===== */
+/* ===== 모달 열릴 때 뒤 스크롤 잠금 ===== */
 let __scrollY = 0;
 function lockScroll() {
   __scrollY = window.scrollY || 0;
@@ -110,11 +104,7 @@ function unlockScroll() {
   document.body.style.width = "";
   window.scrollTo(0, Math.abs(parseInt(top || "0", 10)));
 }
-
-// iOS에서 모달 오픈 중 touchmove로 바디가 움직이는 것 방지
-function preventTouchMove(e) {
-  e.preventDefault();
-}
+function preventTouchMove(e) { e.preventDefault(); }
 
 function formatTime(ts) {
   const d = new Date(ts);
@@ -124,6 +114,29 @@ function formatTime(ts) {
   const hh = String(d.getHours()).padStart(2, "0");
   const mi = String(d.getMinutes()).padStart(2, "0");
   return `${yy}.${mm}.${dd} ${hh}:${mi}`;
+}
+
+/* ===== Guestbook (shared) ===== */
+function hasGuestbookEndpoint() {
+  return typeof GUESTBOOK_ENDPOINT === "string" && GUESTBOOK_ENDPOINT.startsWith("http");
+}
+
+async function gbFetchList() {
+  if (!hasGuestbookEndpoint()) return [];
+  const res = await fetch(`${GUESTBOOK_ENDPOINT}?action=list`, { method: "GET" });
+  if (!res.ok) throw new Error("guestbook list failed");
+  return await res.json();
+}
+
+async function gbAddItem(name, msg) {
+  if (!hasGuestbookEndpoint()) throw new Error("no endpoint");
+  const res = await fetch(GUESTBOOK_ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "add", name, msg }),
+  });
+  if (!res.ok) throw new Error("guestbook add failed");
+  return await res.json();
 }
 
 function build() {
@@ -143,15 +156,12 @@ function build() {
     <div class="introStage">
       <div class="pol pol--1" id="p1">
         <img class="pol__img" src="${d.heroPolaroids[0]}" alt="intro-1" />
-        <div class="pol__cap">${bride.name}</div>
       </div>
       <div class="pol pol--2" id="p2">
         <img class="pol__img" src="${d.heroPolaroids[1]}" alt="intro-2" />
-        <div class="pol__cap">${groom.name}</div>
       </div>
       <div class="pol pol--3" id="p3">
         <img class="pol__img" src="${d.heroPolaroids[2]}" alt="intro-3" />
-        <div class="pol__cap">${d.wedding.dateText}</div>
       </div>
 
       <div class="burst" id="burst">we getting married!!!</div>
@@ -279,9 +289,7 @@ function build() {
       </form>
 
       <div id="gbList" class="gbList"></div>
-      <p class="muted" style="margin-top:10px; font-size:12px; line-height:1.5;">
-        ※ 현재는 ‘내 기기’에만 저장되는 간단 방명록이에요. (원하면 하객 모두가 공유하는 방명록으로 바꿔드릴게요)
-      </p>
+      <p class="muted" id="gbHint" style="margin-top:10px; font-size:12px; line-height:1.5;"></p>
     </section>
 
     <section class="card">
@@ -303,6 +311,7 @@ function build() {
     <!-- Modal (gallery slider) -->
     <div id="modal" class="modal" aria-hidden="true">
       <div class="modal__backdrop"></div>
+      <div id="modalCounter" class="modal__counter">1/1</div>
       <button id="modalPrev" class="modal__nav modal__nav--prev" type="button" aria-label="이전 사진">‹</button>
       <img id="modalImg" class="modal__img" alt="확대 이미지" />
       <button id="modalNext" class="modal__nav modal__nav--next" type="button" aria-label="다음 사진">›</button>
@@ -310,7 +319,7 @@ function build() {
   </main>
   `;
 
-  // ===== Intro timing =====
+  /* ===== INTRO timing ===== */
   const intro = $("#intro");
   const main = $("#main");
   const p1 = $("#p1");
@@ -323,11 +332,11 @@ function build() {
   setTimeout(() => p2.classList.add("is-in"), 700);
   setTimeout(() => p3.classList.add("is-in"), 1200);
 
-  // “we getting married!!!” 0.5초 간격으로 3번 튀기기(다다닥 느낌)
+  // we getting married!!! 다다닥 느낌 (3번 점멸)
   setTimeout(() => burst.classList.add("is-on"), 1600);
-  setTimeout(() => { burst.classList.remove("is-on"); }, 1850);
+  setTimeout(() => burst.classList.remove("is-on"), 1850);
   setTimeout(() => burst.classList.add("is-on"), 2100);
-  setTimeout(() => { burst.classList.remove("is-on"); }, 2350);
+  setTimeout(() => burst.classList.remove("is-on"), 2350);
   setTimeout(() => burst.classList.add("is-on"), 2600);
 
   setTimeout(() => hand.classList.add("is-write"), 3100);
@@ -339,10 +348,10 @@ function build() {
     main.style.opacity = "1";
   }, 4600);
 
-  // ===== Naver maps =====
-  const naverPlaceApp = `nmap://place?lat=${lat}&lng=${lng}&name=${encode(NAVER_QUERY)}&appname=com.example.weddinginvite`;
-  const naverRouteApp = `nmap://route/car?dlat=${lat}&dlng=${lng}&dname=${encode(NAVER_QUERY)}&appname=com.example.weddinginvite`;
-  const naverWeb = `https://map.naver.com/v5/search/${encode(NAVER_QUERY)}`;
+  /* ===== Naver maps ===== */
+  const naverPlaceApp = `nmap://place?lat=${lat}&lng=${lng}&name=${encode("공덕 아펠가모")}&appname=com.example.weddinginvite`;
+  const naverRouteApp = `nmap://route/car?dlat=${lat}&dlng=${lng}&dname=${encode("공덕 아펠가모")}&appname=com.example.weddinginvite`;
+  const naverWeb = `https://map.naver.com/v5/search/${encode("공덕 아펠가모")}`;
 
   $("#naverMap").addEventListener("click", (e) => {
     e.preventDefault();
@@ -362,12 +371,12 @@ function build() {
     }, 700);
   });
 
-  // ===== Tmap =====
+  /* ===== Tmap ===== */
   $("#tmapRoute").addEventListener("click", () => {
-    openTmap({ name: NAVER_QUERY, lat, lng });
+    openTmap({ name: "공덕 아펠가모", lat, lng });
   });
 
-  // ===== Tabs =====
+  /* ===== Tabs ===== */
   const weddingEl = $("#weddingGallery");
   const dailyEl = $("#dailyGallery");
   const tabWedding = $("#tabWedding");
@@ -388,17 +397,19 @@ function build() {
   tabWedding.addEventListener("click", showWedding);
   tabDaily.addEventListener("click", showDaily);
 
-  // ===== Modal slider (스크롤 잠금 포함) =====
+  /* ===== Modal slider + Counter + Scroll lock ===== */
   const modal = $("#modal");
   const modalImg = $("#modalImg");
   const modalPrev = $("#modalPrev");
   const modalNext = $("#modalNext");
+  const modalCounter = $("#modalCounter");
 
   let currentList = [];
   let currentIndex = 0;
 
   function renderModal() {
     modalImg.src = currentList[currentIndex];
+    modalCounter.textContent = `${currentIndex + 1}/${currentList.length}`;
 
     const prevDisabled = currentIndex <= 0;
     const nextDisabled = currentIndex >= currentList.length - 1;
@@ -419,7 +430,6 @@ function build() {
     modal.classList.add("is-open");
     modal.setAttribute("aria-hidden", "false");
 
-    // ✅ 뒤 스크롤 완전 잠금
     lockScroll();
     document.addEventListener("touchmove", preventTouchMove, { passive: false });
 
@@ -431,7 +441,6 @@ function build() {
     modal.setAttribute("aria-hidden", "true");
     modalImg.src = "";
 
-    // ✅ 잠금 해제
     document.removeEventListener("touchmove", preventTouchMove);
     unlockScroll();
   }
@@ -465,7 +474,7 @@ function build() {
     if (e.key === "ArrowRight") next();
   });
 
-  // Swipe (사진만 이동)
+  // Swipe
   let touchStartX = 0;
   let touchStartY = 0;
   let touching = false;
@@ -512,7 +521,7 @@ function build() {
     dailyEl.appendChild(img);
   });
 
-  // Accounts
+  /* ===== Accounts ===== */
   const acc = $("#accounts");
   d.accounts.forEach((a) => {
     if (!a.number) return;
@@ -531,7 +540,7 @@ function build() {
     acc.appendChild(el);
   });
 
-  // Calendar (ics)
+  /* ===== Calendar (ics) ===== */
   $("#addCal").addEventListener("click", () => {
     const start = new Date(d.wedding.dateTimeISO);
     const end = new Date(start.getTime() + 2 * 60 * 60 * 1000);
@@ -574,7 +583,7 @@ END:VCALENDAR`;
     toast("캘린더 파일을 다운로드했어요!");
   });
 
-  // Kakao share
+  /* ===== Kakao share ===== */
   const kakaoBtn = $("#kakaoShareBtn");
   if (kakaoBtn) {
     kakaoBtn.addEventListener("click", async () => {
@@ -592,26 +601,16 @@ END:VCALENDAR`;
     });
   }
 
-  // ===== 방명록 (로컬 저장) =====
-  const KEY = "wedding_guestbook_v1";
+  /* ===== Guestbook (shared) ===== */
   const gbListEl = $("#gbList");
+  const gbHint = $("#gbHint");
   const gbForm = $("#gbForm");
   const gbName = $("#gbName");
   const gbMsg = $("#gbMsg");
 
-  const load = () => {
-    try {
-      return JSON.parse(localStorage.getItem(KEY) || "[]");
-    } catch {
-      return [];
-    }
-  };
-  const save = (items) => localStorage.setItem(KEY, JSON.stringify(items));
-
-  function renderGB() {
-    const items = load();
+  function renderGB(items) {
     gbListEl.innerHTML = "";
-    if (!items.length) {
+    if (!items || !items.length) {
       gbListEl.innerHTML = `<div class="muted" style="padding:10px 2px;">아직 방명록이 없어요 🙂</div>`;
       return;
     }
@@ -629,22 +628,44 @@ END:VCALENDAR`;
     });
   }
 
-  renderGB();
+  if (!hasGuestbookEndpoint()) {
+    gbHint.textContent = "⚠️ 아직 공유 방명록 서버(구글 Apps Script) URL이 설정되지 않았어요. config.js의 GUESTBOOK_ENDPOINT를 배포 URL로 바꿔주세요.";
+    renderGB([]);
+  } else {
+    gbHint.textContent = "하객 모두가 같은 방명록을 공유합니다.";
+    (async () => {
+      try {
+        const items = await gbFetchList();
+        renderGB(items);
+      } catch (e) {
+        console.error(e);
+        toast("방명록 불러오기 실패");
+      }
+    })();
+  }
 
-  gbForm.addEventListener("submit", (e) => {
+  gbForm.addEventListener("submit", async (e) => {
     e.preventDefault();
     const name = (gbName.value || "").trim();
     const msg = (gbMsg.value || "").trim();
     if (!name || !msg) return;
 
-    const items = load();
-    items.push({ name, msg, ts: Date.now() });
-    save(items);
+    if (!hasGuestbookEndpoint()) {
+      toast("방명록 서버 URL이 아직 없어요 (config.js 확인)");
+      return;
+    }
 
-    gbName.value = "";
-    gbMsg.value = "";
-    toast("방명록을 남겼어요!");
-    renderGB();
+    try {
+      await gbAddItem(name, msg);
+      gbName.value = "";
+      gbMsg.value = "";
+      toast("방명록을 남겼어요!");
+      const items = await gbFetchList();
+      renderGB(items);
+    } catch (err) {
+      console.error(err);
+      toast("방명록 저장 실패");
+    }
   });
 }
 

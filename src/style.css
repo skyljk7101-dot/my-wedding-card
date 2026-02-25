@@ -25,7 +25,7 @@ button{ font:inherit; }
   padding:18px 14px 40px;
 }
 
-/* ===== Intro (샘플 같은 폴라로이드 콜라주 느낌) ===== */
+/* ===== INTRO ===== */
 .intro{
   position:fixed;
   inset:0;
@@ -46,15 +46,15 @@ button{ font:inherit; }
   height:min(820px, 92vh);
 }
 
-/* 폴라로이드 프레임(종이) */
+/* ✅ “진짜 세로 폴라로이드 프레임” */
 .pol{
   position:absolute;
   width:min(320px, 78vw);
   background:#fff;
-  border:1px solid rgba(0,0,0,0.08);
-  border-radius:10px;
-  box-shadow:0 22px 60px rgba(0,0,0,0.18);
-  padding:14px 14px 52px; /* 하단 여백(폴라로이드 하얀 부분) */
+  border:1px solid rgba(0,0,0,0.10);
+  border-radius:12px;
+  box-shadow:0 26px 80px rgba(0,0,0,0.22);
+  padding:14px 14px 82px; /* ✅ 아래 흰 여백 크게! */
   opacity:0;
   transform: translateY(14px) scale(0.98) rotate(var(--r,0deg));
 }
@@ -64,32 +64,27 @@ button{ font:inherit; }
   transition: opacity 450ms ease, transform 520ms ease;
 }
 
+/* ✅ 사진: 정사각 금지 -> 4:5 세로 비율 */
 .pol__img{
   width:100%;
-  height:min(320px, 52vw);
+  aspect-ratio: 4 / 5;
   object-fit:cover;
   display:block;
-  border-radius:6px;
+  border-radius:8px;
   background:#f2f2f2;
 }
-.pol__cap{
-  position:absolute;
-  left:18px;
-  bottom:16px;
-  font-family:"Dancing Script",cursive;
-  font-size:26px;
-  color: rgba(0,0,0,0.65);
-}
 
-.pol--1{ left:8%; top:8%;  --r:-8deg; z-index:10; }
+/* ✅ 폴라로이드 아래 글자 없음 -> (캡션 자체를 사용 안 함) */
+
+.pol--1{ left:8%;  top:7%;  --r:-8deg; z-index:10; }
 .pol--2{ left:22%; top:32%; --r: 6deg; z-index:20; }
 .pol--3{ left:14%; top:58%; --r:-3deg; z-index:30; }
 
 /* we getting married!!! 다다닥 */
 .burst{
   position:absolute;
-  right:6%;
-  top:16%;
+  right:7%;
+  top:14%;
   font-family:"Dancing Script",cursive;
   font-size:44px;
   color: rgba(0,0,0,0.86);
@@ -107,7 +102,7 @@ button{ font:inherit; }
 .handwrite{
   position:absolute;
   left:0; right:0;
-  bottom:8%;
+  bottom:12%;
   text-align:center;
   pointer-events:none;
   font-family:"Dancing Script",cursive;
@@ -123,18 +118,18 @@ button{ font:inherit; }
 .handwrite.is-write .line{ animation: write 1.15s ease forwards; }
 .handwrite.is-write .line:nth-child(2){ animation-delay: .2s; }
 
-/* 인트로 하단에 날짜/장소 한 화면 */
+/* 인트로 하단 날짜/장소 */
 .introMeta{
   position:absolute;
   left:0; right:0;
-  bottom:3%;
+  bottom:4%;
   text-align:center;
   padding:0 18px;
 }
 .introMeta .date{ font-weight:800; font-size:18px; }
 .introMeta .place{ margin-top:8px; font-size:14px; color: rgba(0,0,0,0.65); line-height:1.5; }
 
-/* ===== Main ===== */
+/* ===== MAIN ===== */
 .card{
   margin-top:14px;
   padding:18px 16px;
@@ -245,7 +240,7 @@ button{ font:inherit; }
   width:100%;
   aspect-ratio: 4 / 5;
   object-fit:cover;
-  border-radius:0; /* ✅ 라운드 제거 */
+  border-radius:0;
   border:1px solid rgba(0,0,0,0.10);
   display:block;
   cursor:pointer;
@@ -255,7 +250,7 @@ button{ font:inherit; }
   width:100%;
   aspect-ratio: 1 / 1;
   object-fit:cover;
-  border-radius:0; /* ✅ 라운드 제거 */
+  border-radius:0;
   border:1px solid rgba(0,0,0,0.10);
   display:block;
   cursor:pointer;
@@ -271,7 +266,7 @@ button{ font:inherit; }
   display: none;
   place-items: center;
   z-index: 50;
-  touch-action: none; /* ✅ 모달에서 스크롤/바운스 줄임 */
+  touch-action: none;
 }
 .modal.is-open{ display:grid; }
 .modal__backdrop{
@@ -282,7 +277,7 @@ button{ font:inherit; }
   position: relative;
   max-width: min(92vw, 520px);
   max-height: 86vh;
-  border-radius:0; /* ✅ 라운드 제거 */
+  border-radius:0;
   border:1px solid rgba(255,255,255,0.18);
   box-shadow: 0 18px 60px rgba(0,0,0,0.35);
   user-select:none;
@@ -310,6 +305,21 @@ button{ font:inherit; }
 .modal__nav:hover{ background: rgba(0,0,0,0.45); }
 .modal__nav--prev{ left: 14px; }
 .modal__nav--next{ right: 14px; }
+
+.modal__counter{
+  position:absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  color: #fff;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,255,255,0.18);
+  z-index: 60;
+}
+
 @media (max-width:420px){
   .modal__nav{ width:40px; height:40px; }
 }

@@ -1,4 +1,5 @@
 export const INVITE = {
+  // ✅ 인트로 폴라로이드에 들어갈 사진(사진 자체는 “폴라로이드 프레임 없는 일반 사진”이어도 OK)
   heroPolaroids: [
     "/assets/hero1.jpg",
     "/assets/hero2.jpg",
@@ -41,6 +42,11 @@ export const INVITE = {
     "/assets/d13.jpg","/assets/d14.jpg","/assets/d15.jpg","/assets/d16.jpg",
     "/assets/d17.jpg","/assets/d18.jpg"
   ],
+
+  // ✅ 하객 전체 공유 방명록(구글 Apps Script 웹앱 URL)
+  // 아래 값을 네 Apps Script 배포 URL로 교체해야 “모든 하객 공유”가 됨.
+  // 예: "https://script.google.com/macros/s/AKfycbxxxxxx/exec"
+  GUESTBOOK_ENDPOINT: "https://script.google.com/macros/s/AKfycbxMcfMgG9sw4_vWxFtkvXV56Oqv2dPvUzVPpcYkKF7dVGJnBNR4vTfa9KdYa8kgynKO/exec",
 
   footerText: "© 2026 DASOM · JAEGI Wedding",
 };

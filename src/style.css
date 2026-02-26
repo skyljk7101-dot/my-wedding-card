@@ -84,27 +84,7 @@ button{ font:inherit; }
 .pol--3{ left:10%; top:50%; --r:-3deg; z-index:30; }
 
 /* phrase */
-.writePhrase{
-  position:absolute;
-  left:50%;
-  bottom:7vh;
-  transform: translateX(-50%) rotate(-1deg);
-  font-family:"Dancing Script", cursive;
-  font-size:34px;
-  color: rgba(0,0,0,0.86);
-  z-index:55;
-  pointer-events:none;
-  text-align:center;
-  white-space:nowrap;
 }
-.writePhrase .w{
-  display:inline-block;
-  margin-left:8px;
-  opacity:0;
-  clip-path: inset(0 100% 0 0);
-}
-.writePhrase .w1{ margin-left:0; }
-@keyframes writeWord { to { opacity:1; clip-path: inset(0 0 0 0); } }
 .handwrite{
   position:absolute;
   left:0; right:0;
@@ -345,11 +325,56 @@ button{ font:inherit; }
   .heroMeta{ display:none; }
 }
 
-.writePhrase.is-write .w1{ animation: writeWord 1.2s ease forwards; }
-.writePhrase.is-write .w2{ animation: writeWord 1.2s ease forwards; animation-delay: .75s; }
-.writePhrase.is-write .w3{ animation: writeWord 1.2s ease forwards; animation-delay: 1.5s; }
-.writePhrase.is-write .w4{ animation: writeWord 1.2s ease forwards; animation-delay: 2.25s; }
+.writePhrase{
+  position:absolute;
+  left:50%;
+  bottom:6vh;
+  transform: translateX(-50%) rotate(-1deg);
+  font-family: "Kaushan Script", cursive;
+  font-size: 44px;
+  line-height: 1.05;
+  color: #E9D8B4;
+  text-align:center;
+  white-space:nowrap;
+  z-index:55;
+  pointer-events:none;
+
+  /* brush-ish feel */
+  letter-spacing: .5px;
+  text-shadow: 0 1px 0 rgba(0,0,0,.08);
+  mix-blend-mode: normal;
+
+  /* reveal animation base */
+  opacity: 0;
+  clip-path: inset(0 100% 0 0);
+}
+
+.writePhrase.is-write{
+  animation: brushReveal 2.4s ease forwards;
+}
+
+@keyframes brushReveal{
+  0%{
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+    transform: translateX(-50%) translateY(8px) rotate(-1deg);
+    filter: blur(.2px);
+  }
+  20%{
+    opacity: 1;
+  }
+  100%{
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: translateX(-50%) translateY(0) rotate(-1deg);
+    filter: blur(0);
+  }
+}
 
 @media (max-width: 480px){
-  .writePhrase{ font-size:30px; bottom:6.5vh; }
+  .writePhrase{
+    font-size: 38px;
+    bottom: 6.5vh;
+  }
 }
+

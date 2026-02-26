@@ -183,12 +183,8 @@ function build() {
       <div class="pol pol--3" id="p3"><img class="pol__img" src="${d.heroPolaroids[2]}" alt="intro-3"></div>
 
       <div class="writePhrase" id="writePhrase" aria-label="Locked In For Life">
-        <span class="w w1">Locked</span>
-        <span class="w w2">In</span>
-        <span class="w w3">For</span>
-        <span class="w w4">Life</span>
+        Locked In For Life
       </div>
-  </div>
   </div>
 
   <main class="wrap" id="main" style="opacity:0;">

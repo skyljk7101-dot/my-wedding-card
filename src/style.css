@@ -331,3 +331,18 @@ button{ font:inherit; }
 .gbName{ font-weight:800; }
 .gbTime{ font-size:12px; color: rgba(0,0,0,0.45); }
 .gbMsg{ margin-top:8px; white-space:pre-wrap; line-height:1.6; }
+
+/* ===== HERO full-bleed on iPhone (and similar) ===== */
+@media (max-width: 480px){
+  /* keep main content padding, but let hero go edge-to-edge */
+  .heroCard{
+    height: 100svh;
+    margin: 0 calc(-1 * 14px) 0; /* cancel .wrap horizontal padding */
+    border-radius: 0;
+    border-left: 0;
+    border-right: 0;
+  }
+  .heroImg{ height: 100%; }
+  /* show the photo first; details continue below */
+  .heroMeta{ display:none; }
+}

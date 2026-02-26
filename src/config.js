@@ -34,6 +34,14 @@ export const INVITE = {
     "/assets/w13.jpg","/assets/w14.jpg"
   ],
 
+  dailyGallery: [
+    "/assets/d1.jpg","/assets/d2.jpg","/assets/d3.jpg","/assets/d4.jpg",
+    "/assets/d5.jpg","/assets/d6.jpg","/assets/d7.jpg","/assets/d8.jpg",
+    "/assets/d9.jpg","/assets/d10.jpg","/assets/d11.jpg","/assets/d12.jpg",
+    "/assets/d13.jpg","/assets/d14.jpg","/assets/d15.jpg","/assets/d16.jpg",
+    "/assets/d17.jpg","/assets/d18.jpg"
+  ],
+
   // Apps Script Web App URL
   GUESTBOOK_ENDPOINT: "https://script.google.com/macros/s/AKfycbyoiTXZkMShjPz8orFiUCcOiGsOabXujlTAGXvTKwc8wow5nLd25HgJHw6iUEXSUoZ9/exec",
 

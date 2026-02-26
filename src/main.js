@@ -187,12 +187,6 @@ function build() {
         <span class="w w2">getting</span>
         <span class="w w3">married</span>
       </div>
-
-      <div class="introMeta">
-        <div class="date">${d.wedding.dateText}</div>
-        <div class="place">${d.wedding.venueName}<br/>${d.wedding.address}</div>
-      </div>
-    </div>
   </div>
 
   <main class="wrap" id="main" style="opacity:0;">

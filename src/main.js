@@ -189,6 +189,7 @@ function build() {
         <span class="w w4">Life</span>
       </div>
   </div>
+  </div>
 
   <main class="wrap" id="main" style="opacity:0;">
     <div class="heroCard">

@@ -97,7 +97,6 @@ button{ font:inherit; }
   text-align:center;
   white-space:nowrap;
 }
-
 .writePhrase .w{
   display:inline-block;
   margin-left:8px;
@@ -105,11 +104,6 @@ button{ font:inherit; }
   clip-path: inset(0 100% 0 0);
 }
 .writePhrase .w1{ margin-left:0; }
-.writePhrase.is-write .w1{ animation: writeWord 1.2s ease forwards; }
-.writePhrase.is-write .w2{ animation: writeWord 1.2s ease forwards; animation-delay: .75s; }
-.writePhrase.is-write .w3{ animation: writeWord 1.2s ease forwards; animation-delay: 1.5s; }
-.writePhrase.is-write .w4{ animation: writeWord 1.2s ease forwards; animation-delay: 2.25s; }
-
 @keyframes writeWord { to { opacity:1; clip-path: inset(0 0 0 0); } }
 .handwrite{
   position:absolute;
@@ -350,6 +344,11 @@ button{ font:inherit; }
   /* show the photo first; details continue below */
   .heroMeta{ display:none; }
 }
+
+.writePhrase.is-write .w1{ animation: writeWord 1.2s ease forwards; }
+.writePhrase.is-write .w2{ animation: writeWord 1.2s ease forwards; animation-delay: .75s; }
+.writePhrase.is-write .w3{ animation: writeWord 1.2s ease forwards; animation-delay: 1.5s; }
+.writePhrase.is-write .w4{ animation: writeWord 1.2s ease forwards; animation-delay: 2.25s; }
 
 @media (max-width: 480px){
   .writePhrase{ font-size:30px; bottom:6.5vh; }

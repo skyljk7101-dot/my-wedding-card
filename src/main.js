@@ -182,10 +182,11 @@ function build() {
       <div class="pol pol--2" id="p2"><img class="pol__img" src="${d.heroPolaroids[1]}" alt="intro-2"></div>
       <div class="pol pol--3" id="p3"><img class="pol__img" src="${d.heroPolaroids[2]}" alt="intro-3"></div>
 
-      <div class="writePhrase" id="writePhrase" aria-label="we're getting married">
-        <span class="w w1">we're</span>
-        <span class="w w2">getting</span>
-        <span class="w w3">married</span>
+      <div class="writePhrase" id="writePhrase" aria-label="Locked In For Life">
+        <span class="w w1">Locked</span>
+        <span class="w w2">In</span>
+        <span class="w w3">For</span>
+        <span class="w w4">Life</span>
       </div>
   </div>
 

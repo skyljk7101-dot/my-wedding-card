@@ -261,13 +261,8 @@ function build() {
 
     <section class="card">
       <h2 class="card__title">갤러리</h2>
-      <div class="tabs">
-        <button class="tab is-active" id="tabWedding" type="button">웨딩</button>
-        <button class="tab" id="tabDaily" type="button">일상</button>
-      </div>
       <div style="margin-top:12px;">
         <div class="gallery gallery--wedding" id="weddingGallery"></div>
-        <div class="gallery gallery--daily" id="dailyGallery" style="display:none;"></div>
       </div>
     </section>
 
@@ -286,6 +281,7 @@ function build() {
         <button class="btn btn--primary" type="submit" style="width:100%;">남기기</button>
       </form>
       <div id="gbList" class="gbList"></div>
+      <button id="gbMore" class="btn" type="button" style="width:100%; margin-top:10px; display:none;">더보기</button>
       <p class="muted" id="gbHint" style="margin-top:10px; font-size:12px; line-height:1.5;"></p>
     </section>
 
@@ -342,26 +338,8 @@ function build() {
     }
   }, 5600);
 
-  /* ===== Tabs ===== */
+  /* ===== Gallery (웨딩만) ===== */
   const weddingEl = $("#weddingGallery");
-  const dailyEl = $("#dailyGallery");
-  const tabWedding = $("#tabWedding");
-  const tabDaily = $("#tabDaily");
-
-  function showWedding() {
-    tabWedding.classList.add("is-active");
-    tabDaily.classList.remove("is-active");
-    weddingEl.style.display = "grid";
-    dailyEl.style.display = "none";
-  }
-  function showDaily() {
-    tabDaily.classList.add("is-active");
-    tabWedding.classList.remove("is-active");
-    weddingEl.style.display = "none";
-    dailyEl.style.display = "grid";
-  }
-  tabWedding.addEventListener("click", showWedding);
-  tabDaily.addEventListener("click", showDaily);
 
   /* ===== Modal slider ===== */
   const modal = $("#modal");
@@ -440,6 +418,90 @@ function build() {
     if (e.key === "ArrowRight") next();
   });
 
+  /* ===== Swipe (손으로 쓸어 넘기기) =====
+     - 모바일: touchstart/touchend
+     - 데스크탑: pointer drag
+  */
+  const SWIPE_THRESHOLD_PX = 48;
+  let __swipeFiredAt = 0;
+  const fireSwipeOnce = (fn) => {
+    const now = Date.now();
+    if (now - __swipeFiredAt < 260) return; // 중복 트리거 방지
+    __swipeFiredAt = now;
+    fn();
+  };
+
+  function handleSwipe(dx, dy) {
+    const ax = Math.abs(dx);
+    const ay = Math.abs(dy);
+    if (ax < SWIPE_THRESHOLD_PX) return;
+    if (ax < ay * 1.2) return; // 세로 스와이프는 무시
+    if (dx < 0) fireSwipeOnce(next);
+    else fireSwipeOnce(prev);
+  }
+
+  // Touch
+  let tStartX = 0;
+  let tStartY = 0;
+  modalImg.addEventListener(
+    "touchstart",
+    (e) => {
+      if (!modal.classList.contains("is-open")) return;
+      const t = e.touches?.[0];
+      if (!t) return;
+      tStartX = t.clientX;
+      tStartY = t.clientY;
+    },
+    { passive: true }
+  );
+  modalImg.addEventListener(
+    "touchend",
+    (e) => {
+      if (!modal.classList.contains("is-open")) return;
+      const t = e.changedTouches?.[0];
+      if (!t) return;
+      handleSwipe(t.clientX - tStartX, t.clientY - tStartY);
+    },
+    { passive: true }
+  );
+
+  // Pointer
+  let pDown = false;
+  let pId = null;
+  let pStartX = 0;
+  let pStartY = 0;
+  let pDx = 0;
+  let pDy = 0;
+
+  modalImg.addEventListener("pointerdown", (e) => {
+    if (!modal.classList.contains("is-open")) return;
+    if (e.pointerType === "mouse" && e.button !== 0) return;
+    pDown = true;
+    pId = e.pointerId;
+    pStartX = e.clientX;
+    pStartY = e.clientY;
+    pDx = 0;
+    pDy = 0;
+    try { modalImg.setPointerCapture?.(e.pointerId); } catch {}
+  });
+  modalImg.addEventListener("pointermove", (e) => {
+    if (!pDown) return;
+    if (pId !== null && e.pointerId !== pId) return;
+    pDx = e.clientX - pStartX;
+    pDy = e.clientY - pStartY;
+  });
+  const endPointer = (e) => {
+    if (!pDown) return;
+    if (pId !== null && e.pointerId !== pId) return;
+    pDown = false;
+    pId = null;
+    handleSwipe(pDx, pDy);
+    pDx = 0;
+    pDy = 0;
+  };
+  modalImg.addEventListener("pointerup", endPointer);
+  modalImg.addEventListener("pointercancel", endPointer);
+
   // render galleries
   d.weddingGallery.forEach((src, i) => {
     const img = document.createElement("img");
@@ -448,15 +510,6 @@ function build() {
     img.loading = "lazy";
     img.addEventListener("click", () => openModal(d.weddingGallery, i));
     weddingEl.appendChild(img);
-  });
-
-  d.dailyGallery.forEach((src, i) => {
-    const img = document.createElement("img");
-    img.src = src;
-    img.alt = `daily-${i + 1}`;
-    img.loading = "lazy";
-    img.addEventListener("click", () => openModal(d.dailyGallery, i));
-    dailyEl.appendChild(img);
   });
 
   /* ===== Accounts ===== */
@@ -516,18 +569,38 @@ function build() {
 
   /* ===== Guestbook ===== */
   const gbListEl = $("#gbList");
+  const gbMoreBtn = $("#gbMore");
   const gbHint = $("#gbHint");
   const gbForm = $("#gbForm");
   const gbName = $("#gbName");
   const gbMsg = $("#gbMsg");
 
-  function renderGB(items) {
-    gbListEl.innerHTML = "";
-    if (!items || !items.length) {
-      gbListEl.innerHTML = `<div class="muted" style="padding:10px 2px;">아직 방명록이 없어요 🙂</div>`;
+  // ✅ 방명록: 5개까지만 보여주고, 이후에는 "더보기"로 5개씩 추가
+  const GB_PAGE_SIZE = 5;
+  let __gbAll = [];
+  let __gbVisible = GB_PAGE_SIZE;
+
+  function updateGbMoreBtn() {
+    if (!gbMoreBtn) return;
+    const remaining = Math.max(0, __gbAll.length - __gbVisible);
+    if (remaining <= 0) {
+      gbMoreBtn.style.display = "none";
       return;
     }
-    items.slice().reverse().forEach((it) => {
+    gbMoreBtn.style.display = "inline-flex";
+    gbMoreBtn.textContent = `더보기 (+${Math.min(GB_PAGE_SIZE, remaining)}개)`;
+  }
+
+  function paintGB() {
+    gbListEl.innerHTML = "";
+
+    if (!__gbAll.length) {
+      gbListEl.innerHTML = `<div class="muted" style="padding:10px 2px;">아직 방명록이 없어요 🙂</div>`;
+      if (gbMoreBtn) gbMoreBtn.style.display = "none";
+      return;
+    }
+
+    __gbAll.slice(0, __gbVisible).forEach((it) => {
       const div = document.createElement("div");
       div.className = "gbItem";
       div.innerHTML = `
@@ -538,6 +611,22 @@ function build() {
         <div class="gbMsg">${escapeHtml(it.msg)}</div>
       `;
       gbListEl.appendChild(div);
+    });
+
+    updateGbMoreBtn();
+  }
+
+  function renderGB(items) {
+    // 서버 응답이 보통 오래된 → 최신 순이라 가정하고 뒤집어서 최신이 위로 오게 표시
+    __gbAll = Array.isArray(items) ? items.slice().reverse() : [];
+    __gbVisible = GB_PAGE_SIZE;
+    paintGB();
+  }
+
+  if (gbMoreBtn) {
+    gbMoreBtn.addEventListener("click", () => {
+      __gbVisible = Math.min(__gbVisible + GB_PAGE_SIZE, __gbAll.length);
+      paintGB();
     });
   }
 

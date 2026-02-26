@@ -6,7 +6,8 @@
   --line:rgba(0,0,0,0.10);
   --soft:rgba(0,0,0,0.04);
   --shadow:0 18px 40px rgba(0,0,0,0.10);
-  --radius:18px;
+  /* ✅ 영역(카드) 라운드 제거 */
+  --radius:0px;
 }
 *{ box-sizing:border-box; }
 
@@ -145,13 +146,16 @@ button{ font:inherit; }
 
 /* ===== MAIN ===== */
 .card{
-  margin-top:14px;
+  /* ✅ 카드들을 이어지게(세로 갭 제거) */
+  margin-top:0;
   padding:18px 16px;
   background: var(--card);
   border:1px solid var(--line);
   border-radius: var(--radius);
-  box-shadow: 0 10px 22px rgba(0,0,0,0.06);
+  box-shadow: none;
 }
+.heroCard + .card{ border-top:0; }
+.card + .card{ border-top:0; }
 .card__title{
   display:flex; align-items:center; gap:10px;
   margin:0;
@@ -197,11 +201,11 @@ button{ font:inherit; }
 .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
 .heroCard{
-  margin-top:14px;
-  border-radius:22px;
+  margin-top:0;
+  border-radius: var(--radius);
   overflow:hidden;
   border:1px solid rgba(0,0,0,0.10);
-  box-shadow: var(--shadow);
+  box-shadow: none;
   background:#fff;
 }
 .heroImg{
@@ -215,48 +219,12 @@ button{ font:inherit; }
 .heroMeta__info{ margin-top:10px; color: rgba(0,0,0,0.72); line-height:1.7; }
 .heroMeta__info b{ color:#111; }
 
-/* tabs */
-.tabs{
-  margin-top:12px;
-  background: rgba(0,0,0,0.04);
-  border:1px solid rgba(0,0,0,0.10);
-  border-radius:999px;
-  padding:4px;
-  display:flex;
-  gap:4px;
-}
-.tab{
-  flex:1;
-  border:0;
-  border-radius:999px;
-  padding:10px 10px;
-  background: transparent;
-  color: rgba(0,0,0,0.70);
-  cursor:pointer;
-}
-.tab.is-active{
-  background:#fff;
-  color:#111;
-  box-shadow: 0 8px 18px rgba(0,0,0,0.08);
-  font-weight:700;
-}
-
 /* gallery */
 .gallery{ display:grid; gap:8px; }
 .gallery--wedding{ grid-template-columns: repeat(2, 1fr); }
 .gallery--wedding img{
   width:100%;
   aspect-ratio: 4 / 5;
-  object-fit:cover;
-  border-radius:0;
-  border:1px solid rgba(0,0,0,0.10);
-  display:block;
-  cursor:pointer;
-}
-.gallery--daily{ grid-template-columns: repeat(3, 1fr); }
-.gallery--daily img{
-  width:100%;
-  aspect-ratio: 1 / 1;
   object-fit:cover;
   border-radius:0;
   border:1px solid rgba(0,0,0,0.10);
@@ -322,7 +290,7 @@ button{ font:inherit; }
 
 .account{
   padding:12px;
-  border-radius:14px;
+  border-radius: var(--radius);
   border:1px solid rgba(0,0,0,0.12);
   background: rgba(0,0,0,0.03);
   margin-top:10px;
@@ -356,7 +324,7 @@ button{ font:inherit; }
 .gbItem{
   border:1px solid rgba(0,0,0,0.12);
   background: rgba(0,0,0,0.03);
-  border-radius:14px;
+  border-radius: var(--radius);
   padding:12px;
 }
 .gbMeta{ display:flex; justify-content:space-between; gap:10px; }

@@ -289,7 +289,12 @@ function build() {
 
     <section class="card">
       <h2 class="card__title">마음 전하실 곳</h2>
-      <p class="muted" style="margin:12px 0 16px; line-height:1.8; font-size:13px;">함께하지 못하시더라도 마음만은 가까이 전해주실 분들을 위해 계좌번호를 안내드립니다.<br>전해주시는 모든 마음에 깊이 감사드리며, 두 사람의 시작을 더욱 따뜻하게 간직하겠습니다.</p>
+      <p class="muted" style="margin:12px 0 16px; line-height:2; font-size:13px; text-align:center;">
+        함께하지 못하시더라도<br>
+        마음만은 가까이 전해주실 분들을 위해 계좌번호를 안내드립니다.<br>
+        전해주시는 모든 마음에 깊이 감사드리며,<br>
+        두 사람의 시작을 더욱 따뜻하게 간직하겠습니다.
+      </p>
 
       <div class="accGroup">
         <button class="accGroup__toggle" id="groomAccToggle" type="button">

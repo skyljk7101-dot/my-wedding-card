@@ -154,6 +154,46 @@ function escapeHtml(s) {
     .replaceAll("'", "&#039;");
 }
 
+/* ===== ✅ 손글씨 글자 하나씩 나오게 변환 ===== */
+function buildWritePhrase(el) {
+  const text = "we getting\nmarried!!!";
+  el.innerHTML = "";
+
+  // 줄 단위로 분리
+  const lines = text.split("\n");
+  let charIndex = 0;
+
+  lines.forEach((line, lineIdx) => {
+    // 각 글자를 span으로 감쌈
+    [...line].forEach((ch) => {
+      const span = document.createElement("span");
+      span.className = "char" + (ch === " " ? " space" : "");
+      span.textContent = ch === " " ? "\u00a0" : ch; // 공백은 nbsp
+      // 각 글자마다 딜레이를 다르게 - 불규칙하게 사람 쓰는 느낌
+      const baseDelay = charIndex * 68; // 글자당 약 68ms
+      const jitter = Math.random() * 20 - 10; // ±10ms 불규칙
+      span.dataset.delay = baseDelay + jitter;
+      el.appendChild(span);
+      charIndex++;
+    });
+
+    // 줄바꿈 (마지막 줄 제외)
+    if (lineIdx < lines.length - 1) {
+      const br = document.createElement("br");
+      el.appendChild(br);
+    }
+  });
+}
+
+function activateWritePhrase(el) {
+  el.classList.add("is-write");
+  const chars = el.querySelectorAll(".char");
+  chars.forEach((span) => {
+    const delay = parseFloat(span.dataset.delay) || 0;
+    span.style.animationDelay = `${delay}ms`;
+  });
+}
+
 function build() {
   const d = INVITE;
 
@@ -178,9 +218,7 @@ function build() {
       <div class="pol pol--2" id="p2"><img class="pol__img" src="${d.heroPolaroids[1]}" alt="intro-2"></div>
       <div class="pol pol--3" id="p3"><img class="pol__img" src="${d.heroPolaroids[2]}" alt="intro-3"></div>
 
-      <div class="writePhrase" id="writePhrase" aria-label="we getting married">
-        we getting<br>married!!!
-      </div>
+      <div class="writePhrase" id="writePhrase" aria-label="we getting married"></div>
     </div><!-- /introStage -->
   </div><!-- /intro -->
 
@@ -203,15 +241,15 @@ function build() {
 
       <div style="margin-top:16px; display:flex; flex-direction:column; gap:10px;">
         <div class="row">
-          <span class="muted" style="width:42px;">신부</span>
-          <span style="flex:1;">정대연 · 장영화의 장녀 <b>${bride.name}</b></span>
-          <a class="btn btn--mini" href="sms:${brideSms}">문자</a>
-        </div>
-
-        <div class="row">
           <span class="muted" style="width:42px;">신랑</span>
           <span style="flex:1;">유순덕의 장남 <b>${groom.name}</b></span>
           <a class="btn btn--mini" href="sms:${groomSms}">문자</a>
+        </div>
+
+        <div class="row">
+          <span class="muted" style="width:42px;">신부</span>
+          <span style="flex:1;">정대연 · 장영화의 장녀 <b>${bride.name}</b></span>
+          <a class="btn btn--mini" href="sms:${brideSms}">문자</a>
         </div>
       </div>
     </section>
@@ -227,6 +265,13 @@ function build() {
           <div class="muted" style="width:54px;">장소</div>
           <div><b>${d.wedding.venueName}</b><div class="muted" style="margin-top:4px;">${d.wedding.address}</div></div>
         </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2 class="card__title">갤러리</h2>
+      <div style="margin-top:12px;">
+        <div class="gallery gallery--wedding" id="weddingGallery"></div>
       </div>
     </section>
 
@@ -249,16 +294,63 @@ function build() {
     </section>
 
     <section class="card">
-      <h2 class="card__title">갤러리</h2>
-      <div style="margin-top:12px;">
-        <div class="gallery gallery--wedding" id="weddingGallery"></div>
-      </div>
-    </section>
-
-    <section class="card">
       <h2 class="card__title">마음 전하실 곳</h2>
-      <p class="muted" style="margin:10px 0 6px;">카드를 누르면 복사됩니다.</p>
-      <div id="accounts"></div>
+      <p class="muted" style="margin:12px 0 16px; line-height:1.8; font-size:13px;">함께하지 못하시더라도 마음만은 가까이 전해주실 분들을 위해 계좌번호를 안내드립니다.<br>전해주시는 모든 마음에 깊이 감사드리며, 두 사람의 시작을 더욱 따뜻하게 간직하겠습니다.</p>
+
+      <div class="accGroup">
+        <button class="accGroup__toggle" id="groomAccToggle" type="button">
+          <span>신랑측</span>
+          <span class="accGroup__arrow" id="groomArrow">▾</span>
+        </button>
+        <div class="accGroup__body" id="groomAccBody">
+          <div class="accRow">
+            <div class="accRow__info">
+              <span class="accRow__name">신랑</span>
+              <span class="accRow__number">1000-0126-3854</span>
+              <span class="accRow__bank">토스뱅크 이재기</span>
+            </div>
+            <div class="accRow__btns">
+              <button class="btn btn--mini accCopyBtn" type="button" data-copy="토스뱅크 1000-0126-3854 (이재기)">복사</button>
+              <a class="btn btn--kakaopay" href="KAKAOPAY_LINK_HERE" target="_blank" rel="noopener" target="_blank" rel="noopener">
+                <img src="https://developers.kakao.com/assets/img/about/logos/kakaopay/kakaopay_logo.png" alt="kakaopay" style="height:14px; vertical-align:middle; margin-right:3px;">pay
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="accGroup" style="margin-top:8px;">
+        <button class="accGroup__toggle" id="brideAccToggle" type="button">
+          <span>신부측</span>
+          <span class="accGroup__arrow" id="brideArrow">▾</span>
+        </button>
+        <div class="accGroup__body" id="brideAccBody">
+          <div class="accRow">
+            <div class="accRow__info">
+              <span class="accRow__name">신부</span>
+              <span class="accRow__number">3333-01-4592141</span>
+              <span class="accRow__bank">카카오뱅크 정다솜</span>
+            </div>
+            <button class="btn btn--mini accCopyBtn" type="button" data-copy="카카오뱅크 3333-01-4592141 (정다솜)">복사</button>
+          </div>
+          <div class="accRow">
+            <div class="accRow__info">
+              <span class="accRow__name">신부 아버지</span>
+              <span class="accRow__number">821113-56-143912</span>
+              <span class="accRow__bank">농협은행 정대연</span>
+            </div>
+            <button class="btn btn--mini accCopyBtn" type="button" data-copy="농협은행 821113-56-143912 (정대연)">복사</button>
+          </div>
+          <div class="accRow">
+            <div class="accRow__info">
+              <span class="accRow__name">신부 어머니</span>
+              <span class="accRow__number">596401-01-357009</span>
+              <span class="accRow__bank">국민은행 장영화</span>
+            </div>
+            <button class="btn btn--mini accCopyBtn" type="button" data-copy="국민은행 596401-01-357009 (장영화)">복사</button>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section class="card">
@@ -307,14 +399,16 @@ function build() {
   const p2 = $("#p2");
   const p3 = $("#p3");
   const writePhrase = document.getElementById("writePhrase");
-  const hand = $("#handwrite");
+
+  // ✅ 손글씨 글자 미리 세팅 (is-write 전에)
+  if (writePhrase) buildWritePhrase(writePhrase);
 
   if (p1) setTimeout(() => p1.classList.add("is-in"), 200);
   if (p2) setTimeout(() => p2.classList.add("is-in"), 700);
   if (p3) setTimeout(() => p3.classList.add("is-in"), 1200);
 
-  if (writePhrase) setTimeout(() => writePhrase.classList.add("is-write"), 1900);
-  if (hand) setTimeout(() => hand.classList.add("is-write"), 3100);
+  // ✅ 폴라로이드 다 들어온 후 손글씨 시작
+  if (writePhrase) setTimeout(() => activateWritePhrase(writePhrase), 1900);
 
   setTimeout(() => {
     if (intro) {
@@ -486,34 +580,45 @@ function build() {
   modalImg.addEventListener("pointerup", endPointer);
   modalImg.addEventListener("pointercancel", endPointer);
 
-  // ✅ 갤러리 렌더링: decoding="async" 추가로 메인 스레드 블로킹 방지
+  // ✅ 갤러리 렌더링
   d.weddingGallery.forEach((src, i) => {
     const img = document.createElement("img");
     img.src = src;
     img.alt = `wedding-${i + 1}`;
     img.loading = "lazy";
-    img.decoding = "async"; // ✅ 추가: 비동기 디코딩으로 렌더링 성능 개선
+    img.decoding = "async";
     img.addEventListener("click", () => openModal(d.weddingGallery, i));
     weddingEl.appendChild(img);
   });
 
-  /* ===== Accounts ===== */
-  const acc = $("#accounts");
-  d.accounts.forEach((a) => {
-    if (!a.number) return;
-    const el = document.createElement("div");
-    el.className = "account";
-    el.innerHTML = `
-      <div class="row" style="justify-content:space-between;">
-        <span class="muted">${a.label}</span>
-        <button class="btn btn--mini" type="button">계좌복사</button>
-      </div>
-      <b>${a.bank} ${a.number}</b>
-      <div class="muted" style="margin-top:4px;">예금주: ${a.holder}</div>
-    `;
-    const txt = `${a.bank} ${a.number} (${a.holder})`;
-    el.addEventListener("click", () => copyText(txt));
-    acc.appendChild(el);
+  /* ===== Accounts accordion ===== */
+  function setupAccordion(toggleId, bodyId, arrowId) {
+    const toggle = document.getElementById(toggleId);
+    const body = document.getElementById(bodyId);
+    const arrow = document.getElementById(arrowId);
+    if (!toggle || !body) return;
+    // 기본 닫힘
+    body.style.maxHeight = "0";
+    body.style.overflow = "hidden";
+    body.style.transition = "max-height 350ms ease";
+    arrow.style.display = "inline-block";
+    arrow.style.transition = "transform 300ms ease";
+    let open = false;
+    toggle.addEventListener("click", () => {
+      open = !open;
+      body.style.maxHeight = open ? body.scrollHeight + "px" : "0";
+      arrow.style.transform = open ? "rotate(180deg)" : "rotate(0deg)";
+    });
+  }
+  setupAccordion("groomAccToggle", "groomAccBody", "groomArrow");
+  setupAccordion("brideAccToggle", "brideAccBody", "brideArrow");
+
+  // 복사 버튼
+  document.querySelectorAll(".accCopyBtn").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      copyText(btn.dataset.copy);
+    });
   });
 
   /* ===== 지도 버튼 동작 ===== */

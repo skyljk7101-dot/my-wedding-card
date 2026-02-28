@@ -55,6 +55,7 @@ button{ font:inherit; }
   width:100%;
   max-width:420px;
   height:100vh;
+  height:100svh;
   margin:0 auto;
   padding:
     calc(env(safe-area-inset-top, 0px) + 10px)
@@ -73,8 +74,8 @@ button{ font:inherit; }
     0 1px 2px rgba(0,0,0,0.18),
     0 10px 22px rgba(0,0,0,0.20),
     0 28px 60px rgba(0,0,0,0.24);
-    filter: drop-shadow(0 2px 1px rgba(0,0,0,0.08)) drop-shadow(0 14px 18px rgba(0,0,0,0.10));
-opacity:0;
+  filter: drop-shadow(0 2px 1px rgba(0,0,0,0.08)) drop-shadow(0 14px 18px rgba(0,0,0,0.10));
+  opacity: 0;
   transform: translateY(20px) scale(0.96) rotate(var(--r,0deg));
   /* ✅ 폴라로이드 자체에도 미세한 노화 느낌 */
   overflow: hidden;
@@ -111,8 +112,7 @@ opacity:0;
      - brightness 살짝 올림: 안개낀 듯한 느낌
      - hue-rotate: 약간 따뜻하게
   */
-  filter:
-    contrast(0.88)
+  filter: contrast(0.88)
     saturate(0.78)
     brightness(1.03)
     sepia(0.18)
@@ -211,7 +211,28 @@ opacity:0;
 
 @media (max-width: 480px){
   .writePhrase { right: 3%; top: 16%; }
-  .writeName   { left: 3%; top: 66%; }
+
+  /* ✅ iOS 주소창 변화에도 안정적인 하단 여백 */
+  .introStage{
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
+  }
+
+  /* ✅ 모바일에서 이름은 '맨 아래'로 고정 (사진과 겹침 방지) */
+  .writeName{
+    left: 3%;
+    top: auto !important;
+    bottom: 0;
+    font-size: clamp(22px, 7.2vw, 32px);
+    line-height: 1.35;
+  }
+
+  /* ✅ 모바일에서 폴라로이드 조금 더 작게 + 위로 올려 여백 확보 */
+  .pol{
+    width: min(180px, 50vw);
+    padding: 12px 12px 56px 12px;
+  }
+  .pol--2{ top: 34%; }
+  .pol--3{ top: 50%; }
 }
 
 /* phrase (레거시 - 혹시 남아있다면) */

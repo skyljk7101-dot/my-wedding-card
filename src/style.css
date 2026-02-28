@@ -59,7 +59,7 @@ button{ font:inherit; }
   width:min(200px, 55vw);
   padding: 14px 14px 64px 14px;
   border-radius: 2px;
-  background: #ede9df;
+  background: #f5f2eb;
   outline: 1px solid rgba(0,0,0,0.10);
   box-shadow:
     0 2px 3px rgba(0,0,0,0.18),
@@ -103,11 +103,10 @@ button{ font:inherit; }
      - hue-rotate: 약간 따뜻하게
   */
   filter:
-    contrast(0.82)
-    saturate(0.55)
-    brightness(1.08)
-    sepia(0.32)
-    hue-rotate(-8deg);
+    contrast(0.92)
+    saturate(0.85)
+    brightness(1.04)
+    sepia(0.06);
 }
 /* ✅ 이미지 위 light-leak 효과 */
 .pol__img::after{
@@ -126,7 +125,7 @@ button{ font:inherit; }
   bottom: 18px;
   left: 0; right: 0;
   text-align: center;
-  font-family: "Caveat", cursive;
+  font-family: "Pinyon Script", cursive;
   font-size: 15px;
   color: rgba(0,0,0,0.32);
   letter-spacing: 1px;
@@ -147,7 +146,7 @@ button{ font:inherit; }
 .writePhrase,
 .writeName {
   position: absolute;
-  font-family: "Dancing Script", cursive;
+  font-family: "Pinyon Script", cursive;
   font-weight: 700;
   color: #111;
   text-align: left;
@@ -212,7 +211,7 @@ button{ font:inherit; }
   bottom:18%;
   text-align:center;
   pointer-events:none;
-  font-family:"Kaushan Script",cursive;
+  font-family:"Pinyon Script",cursive;
   color: rgba(0,0,0,0.62);
   z-index:50;
 }

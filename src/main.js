@@ -155,42 +155,32 @@ function escapeHtml(s) {
 }
 
 /* ===== ✅ 손글씨 글자 하나씩 나오게 변환 ===== */
-function buildWritePhrase(el) {
-  const text = "we getting\nmarried!!!";
+function buildWritePhrase(el, text) {
   el.innerHTML = "";
-
-  // 줄 단위로 분리
   const lines = text.split("\n");
   let charIndex = 0;
 
   lines.forEach((line, lineIdx) => {
-    // 각 글자를 span으로 감쌈
     [...line].forEach((ch) => {
       const span = document.createElement("span");
       span.className = "char" + (ch === " " ? " space" : "");
-      span.textContent = ch === " " ? "\u00a0" : ch; // 공백은 nbsp
-      // 각 글자마다 딜레이를 다르게 - 불규칙하게 사람 쓰는 느낌
-      const baseDelay = charIndex * 68; // 글자당 약 68ms
-      const jitter = Math.random() * 20 - 10; // ±10ms 불규칙
+      span.textContent = ch === " " ? "\u00a0" : ch;
+      const baseDelay = charIndex * 72;
+      const jitter = Math.random() * 22 - 11;
       span.dataset.delay = baseDelay + jitter;
       el.appendChild(span);
       charIndex++;
     });
-
-    // 줄바꿈 (마지막 줄 제외)
     if (lineIdx < lines.length - 1) {
-      const br = document.createElement("br");
-      el.appendChild(br);
+      el.appendChild(document.createElement("br"));
     }
   });
 }
 
 function activateWritePhrase(el) {
   el.classList.add("is-write");
-  const chars = el.querySelectorAll(".char");
-  chars.forEach((span) => {
-    const delay = parseFloat(span.dataset.delay) || 0;
-    span.style.animationDelay = `${delay}ms`;
+  el.querySelectorAll(".char").forEach((span) => {
+    span.style.animationDelay = `${parseFloat(span.dataset.delay) || 0}ms`;
   });
 }
 
@@ -215,10 +205,10 @@ function build() {
   <div class="intro" id="intro" aria-hidden="false">
     <div class="introStage">
       <div class="pol pol--1" id="p1"><img class="pol__img" src="${d.heroPolaroids[0]}" alt="intro-1"></div>
+      <div class="writePhrase" id="writePhrase" aria-label="we getting married"></div>
       <div class="pol pol--2" id="p2"><img class="pol__img" src="${d.heroPolaroids[1]}" alt="intro-2"></div>
       <div class="pol pol--3" id="p3"><img class="pol__img" src="${d.heroPolaroids[2]}" alt="intro-3"></div>
-
-      <div class="writePhrase" id="writePhrase" aria-label="we getting married"></div>
+      <div class="writeName" id="writeName" aria-label="lee jae gi and jeong da som"></div>
     </div><!-- /introStage -->
   </div><!-- /intro -->
 
@@ -266,6 +256,10 @@ function build() {
           <div><b>${d.wedding.venueName}</b><div class="muted" style="margin-top:4px;">${d.wedding.address}</div></div>
         </div>
       </div>
+      <div class="grid2" style="margin-top:16px;">
+        <button class="btn" id="calGoogleBtn" type="button">📅 구글 캘린더</button>
+        <button class="btn" id="calAppleBtn" type="button">🍎 애플 캘린더</button>
+      </div>
     </section>
 
     <section class="card">
@@ -311,7 +305,7 @@ function build() {
             </div>
             <div class="accRow__btns">
               <button class="btn btn--mini accCopyBtn" type="button" data-copy="토스뱅크 1000-0126-3854 (이재기)">복사</button>
-              <a class="btn btn--kakaopay" href="KAKAOPAY_LINK_HERE" target="_blank" rel="noopener" target="_blank" rel="noopener">
+              <a class="btn btn--kakaopay" href="https://qr.kakaopay.com/Ej8DZxnJE" target="_blank" rel="noopener" target="_blank" rel="noopener">
                 <img src="https://developers.kakao.com/assets/img/about/logos/kakaopay/kakaopay_logo.png" alt="kakaopay" style="height:14px; vertical-align:middle; margin-right:3px;">pay
               </a>
             </div>
@@ -400,15 +394,21 @@ function build() {
   const p3 = $("#p3");
   const writePhrase = document.getElementById("writePhrase");
 
-  // ✅ 손글씨 글자 미리 세팅 (is-write 전에)
-  if (writePhrase) buildWritePhrase(writePhrase);
+  const writeName = document.getElementById("writeName");
+
+  // ✅ 손글씨 글자 미리 세팅
+  if (writePhrase) buildWritePhrase(writePhrase, "we getting\nmarried!!!");
+  if (writeName)   buildWritePhrase(writeName,   "lee jae gi\n&\njeong da som");
 
   if (p1) setTimeout(() => p1.classList.add("is-in"), 200);
+  // p2는 1번 사진 아래에 위치
   if (p2) setTimeout(() => p2.classList.add("is-in"), 700);
   if (p3) setTimeout(() => p3.classList.add("is-in"), 1200);
 
-  // ✅ 폴라로이드 다 들어온 후 손글씨 시작
-  if (writePhrase) setTimeout(() => activateWritePhrase(writePhrase), 1900);
+  // 1번 사진 들어온 후 문구 시작
+  if (writePhrase) setTimeout(() => activateWritePhrase(writePhrase), 900);
+  // 이름은 3번 사진 다음에
+  if (writeName)   setTimeout(() => activateWritePhrase(writeName),   2200);
 
   setTimeout(() => {
     if (intro) {
@@ -620,6 +620,63 @@ function build() {
       copyText(btn.dataset.copy);
     });
   });
+
+  /* ===== 캘린더 추가 ===== */
+  const calGoogleBtn = $("#calGoogleBtn");
+  const calAppleBtn  = $("#calAppleBtn");
+
+  const weddingISO   = d.wedding.dateTimeISO;           // "2026-05-31T14:00:00+09:00"
+  const weddingEnd   = "2026-05-31T15:30:00+09:00";    // 예식 종료 (약 1시간 30분 후)
+  const calTitle     = encodeURIComponent("이재기 ♡ 정다솜 결혼식");
+  const calLocation  = encodeURIComponent(d.wedding.address);
+  const calDetails   = encodeURIComponent(d.wedding.venueName);
+
+  // 구글 캘린더용 날짜 포맷 (UTC, YYYYMMDDTHHmmssZ)
+  function toGCal(isoStr) {
+    return new Date(isoStr).toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+  }
+
+  if (calGoogleBtn) {
+    calGoogleBtn.addEventListener("click", () => {
+      const url = `https://calendar.google.com/calendar/render?action=TEMPLATE`
+        + `&text=${calTitle}`
+        + `&dates=${toGCal(weddingISO)}/${toGCal(weddingEnd)}`
+        + `&location=${calLocation}`
+        + `&details=${calDetails}`;
+      window.open(url, "_blank", "noopener");
+    });
+  }
+
+  if (calAppleBtn) {
+    calAppleBtn.addEventListener("click", () => {
+      // ICS 파일 생성 후 다운로드 → 애플 캘린더/아이폰 캘린더 자동 열림
+      const icsContent = [
+        "BEGIN:VCALENDAR",
+        "VERSION:2.0",
+        "PRODID:-//Wedding//KO",
+        "BEGIN:VEVENT",
+        `UID:wedding-jaegi-dasom-2026@invite`,
+        `DTSTAMP:${toGCal(new Date().toISOString())}`,
+        `DTSTART:${toGCal(weddingISO)}`,
+        `DTEND:${toGCal(weddingEnd)}`,
+        `SUMMARY:이재기 ♡ 정다솜 결혼식`,
+        `LOCATION:${d.wedding.address}`,
+        `DESCRIPTION:${d.wedding.venueName}`,
+        "END:VEVENT",
+        "END:VCALENDAR"
+      ].join("\r\n");
+
+      const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
+      const url  = URL.createObjectURL(blob);
+      const a    = document.createElement("a");
+      a.href     = url;
+      a.download = "wedding.ics";
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+    });
+  }
 
   /* ===== 지도 버튼 동작 ===== */
   const naverRouteBtn = $("#naverRouteBtn");

@@ -310,8 +310,8 @@ function build() {
             </div>
             <div class="accRow__btns">
               <button class="btn btn--mini accCopyBtn" type="button" data-copy="토스뱅크 1000-0126-3854 (이재기)">복사</button>
-              <a class="btn btn--kakaopay" href="https://qr.kakaopay.com/Ej8DZxnJE" target="_blank" rel="noopener" target="_blank" rel="noopener">
-                <img src="https://developers.kakao.com/assets/img/about/logos/kakaopay/kakaopay_logo.png" alt="kakaopay" style="height:14px; vertical-align:middle; margin-right:3px;">pay
+              <a class="btn btn--kakaopay" href="https://qr.kakaopay.com/Ej8DZxnJE" target="_blank" rel="noopener">
+                💛 카카오페이
               </a>
             </div>
           </div>

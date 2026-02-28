@@ -37,7 +37,7 @@ button{ font:inherit; }
 .intro{
   position:fixed;
   inset:0;
-  background: #faf8f4;
+  background: #f0ede8;
   z-index:100;
   display:grid;
   place-items:center;
@@ -67,7 +67,7 @@ button{ font:inherit; }
   width:min(200px, 55vw);
   padding: 14px 14px 64px 14px;
   border-radius: 2px;
-  background: #f5f2eb;
+  background: #ede9e3;
   outline: 1px solid rgba(0,0,0,0.10);
   box-shadow:
     0 2px 3px rgba(0,0,0,0.18),
@@ -111,17 +111,18 @@ button{ font:inherit; }
      - hue-rotate: 약간 따뜻하게
   */
   filter:
-    contrast(0.92)
-    saturate(0.85)
-    brightness(1.04)
-    sepia(0.06);
+    contrast(0.88)
+    saturate(0.78)
+    brightness(1.03)
+    sepia(0.18)
+    hue-rotate(-5deg);
 }
 /* ✅ 이미지 위 light-leak 효과 */
 .pol__img::after{
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(135deg, rgba(255,220,150,0.18) 0%, transparent 60%);
+  background: linear-gradient(135deg, rgba(255,210,160,0.22) 0%, rgba(255,240,200,0.08) 50%, transparent 70%);
   z-index: 2;
   pointer-events: none;
 }

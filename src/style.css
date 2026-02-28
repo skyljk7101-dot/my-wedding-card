@@ -37,7 +37,7 @@ button{ font:inherit; }
 .intro{
   position:fixed;
   inset:0;
-  background: #f0ede8;
+  background: linear-gradient(180deg, #e7e2db 0%, #ded7cf 100%);
   z-index:100;
   display:grid;
   place-items:center;
@@ -70,10 +70,11 @@ button{ font:inherit; }
   background: #ede9e3;
   outline: 1px solid rgba(0,0,0,0.10);
   box-shadow:
-    0 2px 3px rgba(0,0,0,0.18),
-    0 8px 24px rgba(0,0,0,0.28),
-    0 32px 64px rgba(0,0,0,0.22);
-  opacity:0;
+    0 1px 2px rgba(0,0,0,0.18),
+    0 10px 22px rgba(0,0,0,0.20),
+    0 28px 60px rgba(0,0,0,0.24);
+    filter: drop-shadow(0 2px 1px rgba(0,0,0,0.08)) drop-shadow(0 14px 18px rgba(0,0,0,0.10));
+opacity:0;
   transform: translateY(20px) scale(0.96) rotate(var(--r,0deg));
   /* ✅ 폴라로이드 자체에도 미세한 노화 느낌 */
   overflow: hidden;
@@ -177,7 +178,7 @@ button{ font:inherit; }
 /* lee jae gi & jeong da som - 3번 사진 왼쪽 아래 */
 .writeName {
   left: 4%;
-  top: 82%;
+  top: 88%;
   font-size: clamp(26px, 7.5vw, 36px);
   line-height: 1.4;
   z-index: 55;

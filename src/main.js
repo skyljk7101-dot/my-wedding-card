@@ -178,10 +178,11 @@ function build() {
       <div class="pol pol--2" id="p2"><img class="pol__img" src="${d.heroPolaroids[1]}" alt="intro-2"></div>
       <div class="pol pol--3" id="p3"><img class="pol__img" src="${d.heroPolaroids[2]}" alt="intro-3"></div>
 
-      <div class="writePhrase" id="writePhrase" aria-label="Locked In For Life">
-        Locked In For Life
+      <div class="writePhrase" id="writePhrase" aria-label="we getting married">
+        we getting<br>married!!!
       </div>
-  </div>
+    </div><!-- /introStage -->
+  </div><!-- /intro -->
 
   <main class="wrap" id="main" style="opacity:0;">
     <div class="heroCard">

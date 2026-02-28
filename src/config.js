@@ -28,10 +28,14 @@ export const INVITE = {
   ],
 
   weddingGallery: [
-    "/assets/w1.jpg","/assets/w2.jpg","/assets/w3.jpg","/assets/w4.jpg",
-    "/assets/w5.jpg","/assets/w6.jpg","/assets/w7.jpg","/assets/w8.jpg",
-    "/assets/w9.jpg","/assets/w10.jpg","/assets/w11.jpg","/assets/w12.jpg",
-    "/assets/w13.jpg","/assets/w14.jpg"
+    "/assets/1.jpg", "/assets/2.jpg", "/assets/3.jpg", "/assets/4.jpg",
+    "/assets/5.jpg", "/assets/6.jpg", "/assets/7.jpg", "/assets/8.jpg",
+    "/assets/8-1.jpg", "/assets/8-2.jpg", "/assets/8-3.jpg", "/assets/9.jpg",
+    "/assets/10.jpg", "/assets/11.jpg", "/assets/12.jpg", "/assets/12-1.jpg",
+    "/assets/13.jpg", "/assets/14.jpg", "/assets/15.jpg", "/assets/16.jpg",
+    "/assets/17.jpg", "/assets/18.jpg", "/assets/19.jpg", "/assets/20.jpg",
+    "/assets/21.jpg", "/assets/22.jpg", "/assets/23.jpg", "/assets/24.jpg",
+    "/assets/25.jpg"
   ],
 
   dailyGallery: [

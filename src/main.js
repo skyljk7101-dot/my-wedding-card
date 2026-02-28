@@ -157,20 +157,16 @@ function escapeHtml(s) {
 function build() {
   const d = INVITE;
 
-  // ✅ 원래 문구/구성 복원
-  const inviteMessage = `“매일 네 하루에 조용히 구독했어.\n이제 평생, 내 마음으로만 자동연장되는 사랑💗”`;
+  const inviteMessage = `"매일 네 하루에 조용히 구독했어.\n이제 평생, 내 마음으로만 자동연장되는 사랑💗"`;
 
-  // ✅ 원래 부모님/문자 기능 복원
   const bride = d.couple.bride;
   const groom = d.couple.groom;
 
   const brideSms = `${bride.phone}?&body=${encode(`${bride.name}에게 축하 메시지를 남겨주세요 🙂`)}`;
   const groomSms = `${groom.phone}?&body=${encode(`${groom.name}에게 축하 메시지를 남겨주세요 🙂`)}`;
 
-  // 지도 목적지
   const { lat, lng } = d.wedding;
 
-  // ✅ 네이버/카카오 지도 링크(원래대로)
   const naverSearchUrl = `https://map.naver.com/v5/search/${encode(d.wedding.venueName)}?c=${lng},${lat},15,0,0,0,dh`;
   const kakaoPlaceUrl = `https://map.kakao.com/link/map/${encode(d.wedding.venueName)},${lat},${lng}`;
   const kakaoRouteUrl = `https://map.kakao.com/link/to/${encode(d.wedding.venueName)},${lat},${lng}`;
@@ -303,14 +299,14 @@ function build() {
   </main>
   `;
 
-  /* ===== INTRO timing (✅ null-safe) ===== */
+  /* ===== INTRO timing ===== */
   const intro = $("#intro");
   const main = $("#main");
   const p1 = $("#p1");
   const p2 = $("#p2");
   const p3 = $("#p3");
   const writePhrase = document.getElementById("writePhrase");
-  const hand = $("#handwrite"); // 있으면 애니메이션, 없으면 스킵
+  const hand = $("#handwrite");
 
   if (p1) setTimeout(() => p1.classList.add("is-in"), 200);
   if (p2) setTimeout(() => p2.classList.add("is-in"), 700);
@@ -410,15 +406,12 @@ function build() {
     if (e.key === "ArrowRight") next();
   });
 
-  /* ===== Swipe (손으로 쓸어 넘기기) =====
-     - 모바일: touchstart/touchend
-     - 데스크탑: pointer drag
-  */
+  /* ===== Swipe ===== */
   const SWIPE_THRESHOLD_PX = 48;
   let __swipeFiredAt = 0;
   const fireSwipeOnce = (fn) => {
     const now = Date.now();
-    if (now - __swipeFiredAt < 260) return; // 중복 트리거 방지
+    if (now - __swipeFiredAt < 260) return;
     __swipeFiredAt = now;
     fn();
   };
@@ -427,12 +420,11 @@ function build() {
     const ax = Math.abs(dx);
     const ay = Math.abs(dy);
     if (ax < SWIPE_THRESHOLD_PX) return;
-    if (ax < ay * 1.2) return; // 세로 스와이프는 무시
+    if (ax < ay * 1.2) return;
     if (dx < 0) fireSwipeOnce(next);
     else fireSwipeOnce(prev);
   }
 
-  // Touch
   let tStartX = 0;
   let tStartY = 0;
   modalImg.addEventListener(
@@ -457,7 +449,6 @@ function build() {
     { passive: true }
   );
 
-  // Pointer
   let pDown = false;
   let pId = null;
   let pStartX = 0;
@@ -494,12 +485,13 @@ function build() {
   modalImg.addEventListener("pointerup", endPointer);
   modalImg.addEventListener("pointercancel", endPointer);
 
-  // render galleries
+  // ✅ 갤러리 렌더링: decoding="async" 추가로 메인 스레드 블로킹 방지
   d.weddingGallery.forEach((src, i) => {
     const img = document.createElement("img");
     img.src = src;
     img.alt = `wedding-${i + 1}`;
     img.loading = "lazy";
+    img.decoding = "async"; // ✅ 추가: 비동기 디코딩으로 렌더링 성능 개선
     img.addEventListener("click", () => openModal(d.weddingGallery, i));
     weddingEl.appendChild(img);
   });
@@ -567,7 +559,6 @@ function build() {
   const gbName = $("#gbName");
   const gbMsg = $("#gbMsg");
 
-  // ✅ 방명록: 5개까지만 보여주고, 이후에는 "더보기"로 5개씩 추가
   const GB_PAGE_SIZE = 5;
   let __gbAll = [];
   let __gbVisible = GB_PAGE_SIZE;
@@ -609,7 +600,6 @@ function build() {
   }
 
   function renderGB(items) {
-    // 서버 응답이 보통 오래된 → 최신 순이라 가정하고 뒤집어서 최신이 위로 오게 표시
     __gbAll = Array.isArray(items) ? items.slice().reverse() : [];
     __gbVisible = GB_PAGE_SIZE;
     paintGB();

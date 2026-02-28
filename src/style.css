@@ -84,7 +84,6 @@ button{ font:inherit; }
 .pol--3{ left:10%; top:50%; --r:-3deg; z-index:30; }
 
 /* phrase */
-}
 .handwrite{
   position:absolute;
   left:0; right:0;
@@ -203,7 +202,8 @@ button{ font:inherit; }
 .gallery--wedding img{
   width:100%;
   aspect-ratio: 4 / 5;
-  object-fit:cover;
+  object-fit: cover;
+  object-position: center top; /* ✅ 얼굴 기준 위쪽 크롭 */
   border-radius:0;
   border:1px solid rgba(0,0,0,0.10);
   display:block;
@@ -312,16 +312,14 @@ button{ font:inherit; }
 
 /* ===== HERO full-bleed on iPhone (and similar) ===== */
 @media (max-width: 480px){
-  /* keep main content padding, but let hero go edge-to-edge */
   .heroCard{
     height: 100svh;
-    margin: 0 calc(-1 * 14px) 0; /* cancel .wrap horizontal padding */
+    margin: 0 calc(-1 * 14px) 0;
     border-radius: 0;
     border-left: 0;
     border-right: 0;
   }
   .heroImg{ height: 100%; }
-  /* show the photo first; details continue below */
   .heroMeta{ display:none; }
 }
 
@@ -339,12 +337,10 @@ button{ font:inherit; }
   z-index:55;
   pointer-events:none;
 
-  /* brush-ish feel */
   letter-spacing: .5px;
   text-shadow: 0 1px 0 rgba(0,0,0,.08);
   mix-blend-mode: normal;
 
-  /* reveal animation base */
   opacity: 0;
   clip-path: inset(0 100% 0 0);
 }
@@ -377,4 +373,3 @@ button{ font:inherit; }
     bottom: 6.5vh;
   }
 }
-

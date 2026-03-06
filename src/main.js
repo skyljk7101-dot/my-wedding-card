@@ -191,7 +191,9 @@ function build() {
   const d = INVITE;
 
   const inviteTitle = "소중한 사람을 초대합니다.";
-  const inviteMessage = `서로의 오늘이 모여 같은 내일을 약속했습니다.\n저희 새로운 시작을 함께 축복해주세요!\n\n"매일 네 하루에 조용히 구독했어.\n이제 평생, 내 마음으로만 자동연장되는 사랑"`;
+  const inviteLeadLine1 = "서로의 오늘이 모여 같은 내일을 약속했습니다.";
+  const inviteLeadLine2 = "저희 새로운 시작을 함께 축복해주세요.";
+  const inviteQuote = `"매일 네 하루에 조용히 구독했어.\n이제 평생, 내 마음으로만 자동연장되는 사랑"`;
   const ceremonyDateText = d.wedding.dateText.replace(/\. /g, ".");
 
   const bride = d.couple.bride;
@@ -234,19 +236,35 @@ function build() {
 
     <section class="card card--invite">
       <h2 class="card__title">${inviteTitle}</h2>
-      <p class="message">${inviteMessage}</p>
+      <p class="message">
+        <span class="messageLead">
+          <span>${inviteLeadLine1}</span>
+          <span>${inviteLeadLine2}</span>
+        </span>
+        <span class="messageQuote">${inviteQuote}</span>
+      </p>
 
       <div style="margin-top:16px; display:flex; flex-direction:column; gap:10px;">
         <div class="row">
           <span class="muted" style="width:42px;">신랑</span>
-          <span style="flex:1;">유순덕의 장남 <b>${groom.name}</b></span>
-          <a class="contactIcon" href="sms:${groomSms}" aria-label="${groom.name}에게 문자 보내기">💬</a>
+          <span style="flex:1;">유순덕의 아들 <b>${groom.name}</b></span>
+          <a class="contactIcon" href="sms:${groomSms}" aria-label="${groom.name}에게 문자 보내기">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 6.5h16a1.5 1.5 0 0 1 1.5 1.5v8A1.5 1.5 0 0 1 20 17.5H4A1.5 1.5 0 0 1 2.5 16V8A1.5 1.5 0 0 1 4 6.5Z" />
+              <path d="m4 8 8 6 8-6" />
+            </svg>
+          </a>
         </div>
 
         <div class="row">
           <span class="muted" style="width:42px;">신부</span>
-          <span style="flex:1;">정대연 · 장영화의 장녀 <b>${bride.name}</b></span>
-          <a class="contactIcon" href="sms:${brideSms}" aria-label="${bride.name}에게 문자 보내기">💬</a>
+          <span style="flex:1;">정대연 장영화의 딸 <b>${bride.name}</b></span>
+          <a class="contactIcon" href="sms:${brideSms}" aria-label="${bride.name}에게 문자 보내기">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M4 6.5h16a1.5 1.5 0 0 1 1.5 1.5v8A1.5 1.5 0 0 1 20 17.5H4A1.5 1.5 0 0 1 2.5 16V8A1.5 1.5 0 0 1 4 6.5Z" />
+              <path d="m4 8 8 6 8-6" />
+            </svg>
+          </a>
         </div>
       </div>
     </section>

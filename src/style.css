@@ -303,10 +303,23 @@ button{ font:inherit; }
 }
 .message{
   margin:12px 0 0;
-  line-height:3.7;
   color: rgba(0,0,0,0.78);
-  white-space: pre-line;
   text-align: center;
+}
+.messageLead{
+  display:flex;
+  flex-direction:column;
+  gap:0;
+  line-height:1.85;
+}
+.messageLead span{
+  display:block;
+}
+.messageQuote{
+  display:block;
+  margin-top:28px;
+  white-space: pre-line;
+  line-height:3.7;
 }
 .ceremonyInfo{
   margin-top:28px;
@@ -341,6 +354,15 @@ button{ font:inherit; }
   font-size:18px;
   line-height:1;
   flex:0 0 36px;
+}
+.contactIcon svg{
+  width:18px;
+  height:18px;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
 .contactIcon:hover{
   background: rgba(0,0,0,0.06);

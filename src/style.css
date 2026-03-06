@@ -3,7 +3,7 @@
   src: url("/assets/fonts/Northwell.otf") format("opentype");
   font-weight: 400;
   font-style: normal;
-  font-display: swap;
+  font-display: block;
 }
 
 :root{
@@ -269,16 +269,6 @@ button{ font:inherit; }
 .introMeta .date{ font-weight:800; font-size:17px; }
 .introMeta .place{ margin-top:8px; font-size:13px; color: rgba(0,0,0,0.65); line-height:1.5; }
 
-@media (max-height:760px){
-  .introCanvas{ width: 344px; }
-  .pol{ width: 152px; padding:10px 10px 48px; }
-  .pol--1{ top: 24px; }
-  .pol--2{ top: 288px; }
-  .pol--3{ bottom: 26px; }
-  .writePhrase{ top: 114px; font-size: 38px; }
-  .writeName{ bottom: 8px; font-size: 31px; }
-}
-
 /* ===== MAIN ===== */
 .card{
   margin-top:0;
@@ -365,6 +355,7 @@ button{ font:inherit; }
   display:block;
   cursor:pointer;
 }
+.galleryWrap{ margin-top:12px; }
 
 /* modal */
 .modal{
@@ -468,6 +459,24 @@ button{ font:inherit; }
 
 /* ===== HERO full-bleed on iPhone ===== */
 @media (max-width: 480px){
+  .card--gallery{
+    width: calc(100% + 28px);
+    margin-left: -14px;
+    margin-right: -14px;
+    padding-left: 0;
+    padding-right: 0;
+    border-left: 0;
+    border-right: 0;
+  }
+  .card--gallery .card__title{
+    padding: 0 14px;
+  }
+  .card--gallery .galleryWrap{
+    margin-top: 12px;
+  }
+  .card--gallery .gallery--wedding{
+    gap: 4px;
+  }
   .heroCard{
     height: 100svh;
     margin: 0 calc(-1 * 14px) 0;

@@ -175,6 +175,18 @@ function activateWritePhrase(el) {
   el.classList.add("is-write");
 }
 
+function waitForIntroFont(timeoutMs = 1800) {
+  if (!document.fonts?.load) return Promise.resolve();
+
+  const fontReady = Promise.all([
+    document.fonts.load('1em "Northwell"'),
+    document.fonts.ready,
+  ]).catch(() => {});
+
+  const timeout = new Promise((resolve) => setTimeout(resolve, timeoutMs));
+  return Promise.race([fontReady, timeout]);
+}
+
 function build() {
   const d = INVITE;
 
@@ -207,7 +219,7 @@ function build() {
 
   <main class="wrap" id="main" style="opacity:0;">
     <div class="heroCard">
-      <img class="heroImg" src="${d.heroImage}" alt="hero"/>
+      <img class="heroImg" src="${d.heroImage}" alt="hero" loading="eager" decoding="async" fetchpriority="high"/>
       <div class="heroMeta">
         <div class="heroMeta__names">${groom.name} · ${bride.name}</div>
         <div class="heroMeta__info">
@@ -255,9 +267,9 @@ function build() {
       </div>
     </section>
 
-    <section class="card">
+    <section class="card card--gallery">
       <h2 class="card__title">갤러리</h2>
-      <div style="margin-top:12px;">
+      <div class="galleryWrap">
         <div class="gallery gallery--wedding" id="weddingGallery"></div>
       </div>
     </section>
@@ -394,19 +406,24 @@ function build() {
   if (writePhrase) buildWritePhrase(writePhrase, "we getting\nmarried!!!");
   if (writeName) buildWritePhrase(writeName, "lee jae gi\n&\njeong da som");
 
-  if (writePhrase) setTimeout(() => activateWritePhrase(writePhrase), 260);
-  if (writeName) setTimeout(() => activateWritePhrase(writeName), 1780);
+  const startIntroSequence = () => {
+    if (writePhrase) setTimeout(() => activateWritePhrase(writePhrase), 260);
+    if (writeName) setTimeout(() => activateWritePhrase(writeName), 1780);
 
-  setTimeout(() => {
-    if (intro) {
-      intro.classList.add("is-hide");
-      intro.setAttribute("aria-hidden", "true");
-    }
-    if (main) {
-      main.style.transition = "opacity 450ms ease";
-      main.style.opacity = "1";
-    }
-  }, 4700);
+    setTimeout(() => {
+      if (intro) {
+        intro.classList.add("is-hide");
+        intro.setAttribute("aria-hidden", "true");
+      }
+      if (main) {
+        main.style.transition = "opacity 450ms ease";
+        main.style.opacity = "1";
+      }
+      scheduleGalleryRender();
+    }, 4700);
+  };
+
+  waitForIntroFont().then(startIntroSequence);
 
   /* ===== Gallery (웨딩만) ===== */
   const weddingEl = $("#weddingGallery");
@@ -567,16 +584,29 @@ function build() {
   modalImg.addEventListener("pointerup", endPointer);
   modalImg.addEventListener("pointercancel", endPointer);
 
-  // ✅ 갤러리 렌더링
-  d.weddingGallery.forEach((src, i) => {
-    const img = document.createElement("img");
-    img.src = src;
-    img.alt = `wedding-${i + 1}`;
-    img.loading = "lazy";
-    img.decoding = "async";
-    img.addEventListener("click", () => openModal(d.weddingGallery, i));
-    weddingEl.appendChild(img);
-  });
+  function renderWeddingGallery() {
+    if (!weddingEl || weddingEl.childElementCount > 0) return;
+
+    d.weddingGallery.forEach((src, i) => {
+      const img = document.createElement("img");
+      img.src = src;
+      img.alt = `wedding-${i + 1}`;
+      img.loading = "lazy";
+      img.decoding = "async";
+      img.fetchPriority = "low";
+      img.addEventListener("click", () => openModal(d.weddingGallery, i));
+      weddingEl.appendChild(img);
+    });
+  }
+
+  const scheduleGalleryRender = () => {
+    if ("requestIdleCallback" in window) {
+      window.requestIdleCallback(renderWeddingGallery, { timeout: 1200 });
+      return;
+    }
+    setTimeout(renderWeddingGallery, 500);
+  };
+
 
   /* ===== Accounts accordion ===== */
   function setupAccordion(toggleId, bodyId, arrowId) {

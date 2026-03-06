@@ -301,7 +301,7 @@ function build() {
       </div>
     </section>
 
-    <section class="card">
+    <section class="card card--location">
       <h2 class="card__title">오시는 길</h2>
 
       <div class="grid2" style="margin-top:12px;">
@@ -319,7 +319,7 @@ function build() {
       </div>
     </section>
 
-    <section class="card">
+    <section class="card card--gift">
       <h2 class="card__title">마음 전하실 곳</h2>
       <p class="muted" style="margin:12px 0 16px; line-height:2; font-size:13px; text-align:center;">
         함께하지 못하시더라도<br>

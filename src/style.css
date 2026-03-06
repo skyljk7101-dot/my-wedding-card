@@ -179,7 +179,7 @@ button{ font:inherit; }
 .writePhrase {
   right: 18px;
   top: 128px;
-  font-size: 41px;
+  font-size: 47px;
   line-height: 1.3;
   z-index: 55;
   transform: rotate(-2deg);
@@ -191,7 +191,7 @@ button{ font:inherit; }
   left: calc(50% - 75px);
   top: auto;
   bottom: 15px;
-  font-size: 33px;
+  font-size: 36px;
   line-height: 1.35;
   z-index: 55;
   text-align: center;

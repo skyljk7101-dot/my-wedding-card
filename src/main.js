@@ -190,7 +190,8 @@ function waitForIntroFont(timeoutMs = 1800) {
 function build() {
   const d = INVITE;
 
-  const inviteMessage = `"매일 네 하루에 조용히 구독했어.\n이제 평생, 내 마음으로만 자동연장되는 사랑💗"`;
+  const inviteTitle = "소중한 사람을 초대합니다.";
+  const inviteMessage = `서로의 오늘이 모여 같은 내일을 약속했습니다.\n저희 새로운 시작을 함께 축복해주세요!\n\n"매일 네 하루에 조용히 구독했어.\n이제 평생, 내 마음으로만 자동연장되는 사랑"`;
 
   const bride = d.couple.bride;
   const groom = d.couple.groom;
@@ -231,7 +232,7 @@ function build() {
     </div>
 
     <section class="card">
-      <h2 class="card__title">초대합니다</h2>
+      <h2 class="card__title">${inviteTitle}</h2>
       <p class="message">${inviteMessage}</p>
 
       <div style="margin-top:16px; display:flex; flex-direction:column; gap:10px;">

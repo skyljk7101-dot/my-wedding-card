@@ -292,7 +292,7 @@ button{ font:inherit; }
 }
 .message{
   margin:12px 0 0;
-  line-height:1.85;
+  line-height:3.7;
   color: rgba(0,0,0,0.78);
   white-space: pre-line;
   text-align: center;

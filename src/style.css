@@ -286,6 +286,10 @@ button{ font:inherit; }
 .card--invite{
   border:0;
 }
+.card--invite .card__title{
+  margin-top:18px;
+  color:#8fa4cc;
+}
 .card--ceremony{
   border:0;
   padding-top:36px;
@@ -302,24 +306,29 @@ button{ font:inherit; }
   display: none;
 }
 .message{
-  margin:12px 0 0;
+  margin:14px 0 0;
   color: rgba(0,0,0,0.78);
   text-align: center;
 }
-.messageLead{
+.inviteIntro{
+  text-align:center;
+}
+.inviteKicker{
   display:flex;
   flex-direction:column;
-  gap:0;
-  line-height:1.85;
+  align-items:center;
+  gap:4px;
+  color: rgba(0,0,0,0.62);
+  font-size:15px;
+  letter-spacing:0.08em;
 }
-.messageLead span{
+.inviteKicker span{
   display:block;
 }
 .messageQuote{
   display:block;
-  margin-top:28px;
   white-space: pre-line;
-  line-height:3.7;
+  line-height:1.75;
 }
 .ceremonyInfo{
   margin-top:28px;

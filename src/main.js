@@ -191,9 +191,9 @@ function build() {
   const d = INVITE;
 
   const inviteTitle = "소중한 사람을 초대합니다.";
-  const inviteLeadLine1 = "서로의 오늘이 모여 같은 내일을 약속했습니다.";
-  const inviteLeadLine2 = "저희 새로운 시작을 함께 축복해주세요.";
-  const inviteQuote = `"매일 네 하루에 조용히 구독했어.\n이제 평생, 내 마음으로만 자동연장되는 사랑"`;
+  const inviteKickerLine1 = "Locked in for life.";
+  const inviteKickerLine2 = "Forever starts now";
+  const inviteQuote = `"매일 네 하루에 조용히 구독했어.\n이제 평생, 내 마음으로만 자동 연장되는 사랑"`;
   const ceremonyDateText = d.wedding.dateText.replace(/\. /g, ".");
 
   const bride = d.couple.bride;
@@ -235,14 +235,16 @@ function build() {
     </div>
 
     <section class="card card--invite">
+      <div class="inviteIntro">
+        <div class="inviteKicker">
+          <span>${inviteKickerLine1}</span>
+          <span>${inviteKickerLine2}</span>
+        </div>
+        <p class="message">
+          <span class="messageQuote">${inviteQuote}</span>
+        </p>
+      </div>
       <h2 class="card__title">${inviteTitle}</h2>
-      <p class="message">
-        <span class="messageLead">
-          <span>${inviteLeadLine1}</span>
-          <span>${inviteLeadLine2}</span>
-        </span>
-        <span class="messageQuote">${inviteQuote}</span>
-      </p>
 
       <div style="margin-top:16px; display:flex; flex-direction:column; gap:10px;">
         <div class="row">

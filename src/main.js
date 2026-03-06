@@ -258,7 +258,7 @@ function build() {
         </span>
       </p>
 
-      <div style="margin-top:16px; display:flex; flex-direction:column; gap:10px;">
+      <div class="inviteContacts">
         <div class="row">
           <span class="muted" style="width:42px;">신랑</span>
           <span style="flex:1;">유순덕의 아들 <b>${groom.name}</b></span>

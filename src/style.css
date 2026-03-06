@@ -296,6 +296,9 @@ button{ font:inherit; }
   padding-top:36px;
   padding-bottom:36px;
 }
+.card--ceremony .card__title{
+  color:#8fa4cc;
+}
 .card__title{
   display:flex; align-items:center; justify-content:center;
   margin:0;
@@ -342,6 +345,12 @@ button{ font:inherit; }
 }
 .messageLead span{
   display:block;
+}
+.inviteContacts{
+  margin-top:48px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
 }
 .ceremonyInfo{
   margin-top:28px;

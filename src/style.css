@@ -413,12 +413,16 @@ button{ font:inherit; }
   display:flex;
   flex-direction:column;
   gap:22px;
-  text-align:center;
+  align-items:flex-start;
+  font-size:14px;
+  text-align:left;
 }
 .locationGuide__group{
   display:flex;
   flex-direction:column;
   gap:8px;
+  align-items:flex-start;
+  width:100%;
 }
 .locationGuide__label{
   color:#75563f;

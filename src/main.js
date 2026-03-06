@@ -321,11 +321,11 @@ function build() {
       <div class="locationGuide">
         <div class="locationGuide__group">
           <div class="locationGuide__label">지하철</div>
-          <div class="locationGuide__text">공덕역 7, 10번 출구 도보 2분<br>(5호선, 6호선, 공항철도, 경의중앙선)</div>
+          <div class="locationGuide__text">공덕역 7,10번 출구 도보 2분(5호선, 6호선, 공항철도, 경의중앙선)</div>
         </div>
         <div class="locationGuide__group">
           <div class="locationGuide__label">버스</div>
-          <div class="locationGuide__text">간선 : 160 / 260 / 600<br>지선 : 7013A / 7013B / 7611<br>공항버스 : 6015, 6021<br>공덕역 하차 220m 이내 건물</div>
+          <div class="locationGuide__text">간선 : 160 / 260 / 600  지선 : 7013A / 7013B / 7611<br>공항버스 : 6015, 6021<br>공덕역 하차 220m 이내 건물</div>
         </div>
         <div class="locationGuide__group">
           <div class="locationGuide__label">자차</div>

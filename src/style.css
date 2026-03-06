@@ -149,18 +149,20 @@ button{ font:inherit; }
    writeName: 3번 사진 왼쪽 아래
 */
 .pol--1{ left:4%;  top:4%;   --r: 6deg;  z-index:10; }
-.pol--2{ left:2%;  top:38%;  --r:-7deg;  z-index:20; }
-.pol--3{ right:2%; top:48%;  --r: 4deg;  z-index:30; }
+.pol--2{ left:20%; top:47%;  --r:-7deg;  z-index:20; }
+.pol--3{ right:0;  top:auto; bottom:-22px; --r: 4deg; z-index:30; }
 
 /* ===== 손글씨 공통 ===== */
 .writePhrase,
 .writeName {
   position: absolute;
+  display: flex;
+  flex-direction: column;
   font-family: "Northwell", cursive;
   font-weight: 400;
   color: #111;
   text-align: left;
-  white-space: normal;
+  white-space: nowrap;
   pointer-events: none;
   text-shadow: 1px 2px 0 rgba(0,0,0,0.06), 0 0 1px rgba(0,0,0,0.03);
 }
@@ -178,7 +180,8 @@ button{ font:inherit; }
 /* lee jae gi & jeong da som - 3번 사진 왼쪽 아래 */
 .writeName {
   left: 4%;
-  top: 88%;
+  top: auto;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
   font-size: clamp(26px, 7.5vw, 36px);
   line-height: 1.4;
   z-index: 55;
@@ -186,27 +189,38 @@ button{ font:inherit; }
   color: #1a1a1a;
 }
 
-/* 글자 하나씩 등장 */
-.writePhrase .char,
-.writeName .char {
-  display: inline-block;
+/* 줄 단위로 왼쪽에서 오른쪽으로 필기되듯 나타난다. */
+.writePhrase .writeLine,
+.writeName .writeLine {
+  display: block;
   opacity: 0;
-  transform: translateY(5px) rotate(-2deg) scaleX(0.8);
-  transition: none;
+  clip-path: inset(0 100% 0 0);
+  transform: translateY(8px);
+  filter: blur(1px);
+  will-change: clip-path, opacity, transform;
 }
-.writePhrase .char.space,
-.writeName .char.space {
-  width: 0.3em;
-}
-.writePhrase.is-write .char,
-.writeName.is-write .char {
-  animation: charIn 0.15s cubic-bezier(0.22,1,0.36,1) forwards;
+.writePhrase.is-write .writeLine,
+.writeName.is-write .writeLine {
+  animation: writeLine var(--line-duration, 900ms) cubic-bezier(0.24,0.84,0.31,1) forwards;
+  animation-delay: var(--line-delay, 0ms);
 }
 
-@keyframes charIn{
-  0%   { opacity:0; transform: translateY(6px) rotate(-3deg) scaleX(0.75); }
-  50%  { opacity:1; }
-  100% { opacity:1; transform: translateY(0) rotate(0deg) scaleX(1); }
+@keyframes writeLine{
+  0%{
+    opacity: 0;
+    clip-path: inset(0 100% 0 0);
+    transform: translateY(8px);
+    filter: blur(1px);
+  }
+  18%{
+    opacity: 1;
+  }
+  100%{
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+    transform: translateY(0);
+    filter: blur(0);
+  }
 }
 
 @media (max-width: 480px){
@@ -221,18 +235,18 @@ button{ font:inherit; }
   .writeName{
     left: 3%;
     top: auto !important;
-    bottom: 0;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 6px);
     font-size: clamp(22px, 7.2vw, 32px);
     line-height: 1.35;
   }
 
-  /* ✅ 모바일에서 폴라로이드 조금 더 작게 + 위로 올려 여백 확보 */
+  /* 모바일에서 폴라로이드 배치를 더 분리한다. */
   .pol{
     width: min(180px, 50vw);
     padding: 12px 12px 56px 12px;
   }
-  .pol--2{ top: 34%; }
-  .pol--3{ top: 50%; }
+  .pol--2{ left: 22%; top: 44%; }
+  .pol--3{ right: -2%; top: auto; bottom: -26px; }
 }
 
 /* phrase (레거시 - 혹시 남아있다면) */
@@ -269,7 +283,8 @@ button{ font:inherit; }
 
 @media (max-height:760px){
   .pol{ width:min(185px, 52vw); padding:12px 12px 56px; }
-  .pol--3{ top:51%; }
+  .pol--2{ top: 42%; }
+  .pol--3{ bottom: -22px; }
 }
 
 /* ===== MAIN ===== */

@@ -154,34 +154,25 @@ function escapeHtml(s) {
     .replaceAll("'", "&#039;");
 }
 
-/* ===== ✅ 손글씨 글자 하나씩 나오게 변환 ===== */
+/* ===== 손글씨를 줄 단위로 필기하듯 구성 ===== */
 function buildWritePhrase(el, text) {
   el.innerHTML = "";
   const lines = text.split("\n");
-  let charIndex = 0;
 
   lines.forEach((line, lineIdx) => {
-    [...line].forEach((ch) => {
-      const span = document.createElement("span");
-      span.className = "char" + (ch === " " ? " space" : "");
-      span.textContent = ch === " " ? "\u00a0" : ch;
-      const baseDelay = charIndex * 72;
-      const jitter = Math.random() * 22 - 11;
-      span.dataset.delay = baseDelay + jitter;
-      el.appendChild(span);
-      charIndex++;
-    });
-    if (lineIdx < lines.length - 1) {
-      el.appendChild(document.createElement("br"));
-    }
+    const lineEl = document.createElement("span");
+    const duration = Math.max(760, line.replaceAll(" ", "").length * 92);
+
+    lineEl.className = "writeLine";
+    lineEl.textContent = line || "\u00a0";
+    lineEl.style.setProperty("--line-delay", `${lineIdx * 680}ms`);
+    lineEl.style.setProperty("--line-duration", `${duration}ms`);
+    el.appendChild(lineEl);
   });
 }
 
 function activateWritePhrase(el) {
   el.classList.add("is-write");
-  el.querySelectorAll(".char").forEach((span) => {
-    span.style.animationDelay = `${parseFloat(span.dataset.delay) || 0}ms`;
-  });
 }
 
 function build() {
@@ -204,10 +195,10 @@ function build() {
   $("#app").innerHTML = `
   <div class="intro" id="intro" aria-hidden="false">
     <div class="introStage">
-      <div class="pol pol--1" id="p1"><img class="pol__img" src="${d.heroPolaroids[0]}" alt="intro-1"></div>
+      <div class="pol pol--1 is-in"><img class="pol__img" src="${d.heroPolaroids[0]}" alt="intro-1"></div>
       <div class="writePhrase" id="writePhrase" aria-label="we getting married"></div>
-      <div class="pol pol--2" id="p2"><img class="pol__img" src="${d.heroPolaroids[1]}" alt="intro-2"></div>
-      <div class="pol pol--3" id="p3"><img class="pol__img" src="${d.heroPolaroids[2]}" alt="intro-3"></div>
+      <div class="pol pol--2 is-in"><img class="pol__img" src="${d.heroPolaroids[1]}" alt="intro-2"></div>
+      <div class="pol pol--3 is-in"><img class="pol__img" src="${d.heroPolaroids[2]}" alt="intro-3"></div>
       <div class="writeName" id="writeName" aria-label="lee jae gi and jeong da som"></div>
     </div><!-- /introStage -->
   </div><!-- /intro -->
@@ -394,26 +385,15 @@ function build() {
   /* ===== INTRO timing ===== */
   const intro = $("#intro");
   const main = $("#main");
-  const p1 = $("#p1");
-  const p2 = $("#p2");
-  const p3 = $("#p3");
   const writePhrase = document.getElementById("writePhrase");
-
   const writeName = document.getElementById("writeName");
 
-  // ✅ 손글씨 글자 미리 세팅
+  // 손글씨 문구를 먼저 구성하고 위에서 아래 순서로 재생한다.
   if (writePhrase) buildWritePhrase(writePhrase, "we getting\nmarried!!!");
-  if (writeName)   buildWritePhrase(writeName,   "lee jae gi\n&\njeong da som");
+  if (writeName) buildWritePhrase(writeName, "lee jae gi\n&\njeong da som");
 
-  if (p1) setTimeout(() => p1.classList.add("is-in"), 200);
-  // p2는 1번 사진 아래에 위치
-  if (p2) setTimeout(() => p2.classList.add("is-in"), 700);
-  if (p3) setTimeout(() => p3.classList.add("is-in"), 1200);
-
-  // 1번 사진 들어온 후 문구 시작
-  if (writePhrase) setTimeout(() => activateWritePhrase(writePhrase), 900);
-  // 이름은 3번 사진 다음에
-  if (writeName)   setTimeout(() => activateWritePhrase(writeName),   2200);
+  if (writePhrase) setTimeout(() => activateWritePhrase(writePhrase), 260);
+  if (writeName) setTimeout(() => activateWritePhrase(writeName), 1780);
 
   setTimeout(() => {
     if (intro) {
@@ -424,7 +404,7 @@ function build() {
       main.style.transition = "opacity 450ms ease";
       main.style.opacity = "1";
     }
-  }, 5600);
+  }, 4700);
 
   /* ===== Gallery (웨딩만) ===== */
   const weddingEl = $("#weddingGallery");

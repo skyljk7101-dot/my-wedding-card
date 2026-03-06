@@ -303,12 +303,21 @@ button{ font:inherit; }
 .card--gift .card__title{
   color:#75563f;
 }
+.card--gallery{
+  border-bottom:0;
+}
 .card--location,
 .card--gift,
 .card--guestbook,
 .card--rsvp,
 .card--share{
   border:0;
+}
+.card--location{
+  margin-top:72px;
+}
+.card--gift{
+  margin-top:144px;
 }
 .card__title{
   display:flex; align-items:center; justify-content:center;
@@ -388,6 +397,12 @@ button{ font:inherit; }
 }
 .ceremonyActions{
   margin-top:32px;
+}
+.locationActions{
+  margin-top:36px;
+}
+.locationTmapWrap{
+  margin-top:10px;
 }
 .row{ display:flex; align-items:center; gap:10px; }
 .contactIcon{

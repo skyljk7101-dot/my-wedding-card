@@ -304,7 +304,7 @@ function build() {
     <section class="card card--location">
       <h2 class="card__title">오시는 길</h2>
 
-      <div class="grid2" style="margin-top:12px;">
+      <div class="grid2 locationActions">
         <a class="btn" href="${naverSearchUrl}" target="_blank" rel="noopener">네이버지도 위치</a>
         <button class="btn" id="naverRouteBtn" type="button">네이버지도 길찾기</button>
       </div>
@@ -314,7 +314,7 @@ function build() {
         <a class="btn" href="${kakaoRouteUrl}" target="_blank" rel="noopener">카카오맵 길찾기</a>
       </div>
 
-      <div style="margin-top:10px;">
+      <div class="locationTmapWrap">
         <button class="btn" id="tmapBtn" type="button" style="width:100%;">티맵 길찾기</button>
       </div>
     </section>

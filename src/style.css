@@ -149,7 +149,7 @@ button{ font:inherit; }
    writeName: 3번 사진 왼쪽 아래
 */
 .pol--1{ left:calc(4% + 11px); top:4%; --r: 6deg; z-index:10; }
-.pol--2{ left:11%; top:calc(47% - 46px); --r:-7deg; z-index:20; }
+.pol--2{ left:calc(11% + 76px); top:calc(47% - 46px); --r:-7deg; z-index:20; }
 .pol--3{ right:22px; top:auto; bottom:48px; --r: 4deg; z-index:30; }
 
 /* ===== 손글씨 공통 ===== */
@@ -256,7 +256,7 @@ button{ font:inherit; }
     width: min(180px, 50vw);
     padding: 12px 12px 56px 12px;
   }
-  .pol--2{ left: 12%; top: calc(44% - 46px); }
+  .pol--2{ left: calc(12% + 76px); top: calc(44% - 46px); }
   .pol--3{ right: calc(-2% + 22px); top: auto; bottom: 42px; }
 }
 

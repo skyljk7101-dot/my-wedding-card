@@ -156,7 +156,7 @@ button{ font:inherit; }
    pol--3: 중간~하단 오른쪽
    writeName: 3번 사진 왼쪽 아래
 */
-.pol--1{ left:43px; top:13px; --r: 6deg; z-index:10; }
+.pol--1{ left:24px; top:13px; --r: 6deg; z-index:10; }
 .pol--2{ left:24px; top:255px; --r:-7deg; z-index:20; }
 .pol--3{ right:12px; top:auto; bottom:36px; --r: 4deg; z-index:30; }
 

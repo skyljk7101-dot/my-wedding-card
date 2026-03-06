@@ -408,6 +408,27 @@ button{ font:inherit; }
 .locationTmapWrap{
   margin-top:10px;
 }
+.locationGuide{
+  margin-top:36px;
+  display:flex;
+  flex-direction:column;
+  gap:22px;
+  text-align:center;
+}
+.locationGuide__group{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+.locationGuide__label{
+  color:#75563f;
+  font-weight:700;
+}
+.locationGuide__text{
+  color: rgba(0,0,0,0.76);
+  line-height:1.85;
+  white-space: pre-line;
+}
 .giftIntro{
   margin:24px 0 32px;
   line-height:2;

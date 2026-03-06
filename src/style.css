@@ -293,7 +293,7 @@ button{ font:inherit; }
 }
 .card--ceremony{
   border:0;
-  padding-top:36px;
+  padding-top:72px;
   padding-bottom:36px;
 }
 .card--ceremony .card__title{
@@ -455,7 +455,7 @@ button{ font:inherit; }
   display:block;
   cursor:pointer;
 }
-.galleryWrap{ margin-top:12px; }
+.galleryWrap{ margin-top:28px; }
 
 /* modal */
 .modal{
@@ -572,7 +572,7 @@ button{ font:inherit; }
     padding: 0 14px;
   }
   .card--gallery .galleryWrap{
-    margin-top: 12px;
+    margin-top: 28px;
   }
   .card--gallery .gallery--wedding{
     gap: 4px;

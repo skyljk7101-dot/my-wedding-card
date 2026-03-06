@@ -285,9 +285,10 @@ button{ font:inherit; }
 .card + .card{ border-top:0; }
 .card--invite{
   border:0;
+  padding-top:36px;
 }
 .card--invite .card__title{
-  margin-top:18px;
+  margin-top:54px;
   color:#8fa4cc;
 }
 .card--ceremony{
@@ -317,7 +318,7 @@ button{ font:inherit; }
   display:flex;
   flex-direction:column;
   align-items:center;
-  gap:4px;
+  gap:8px;
   color: rgba(0,0,0,0.62);
   font-size:15px;
   letter-spacing:0.08em;
@@ -329,6 +330,18 @@ button{ font:inherit; }
   display:block;
   white-space: pre-line;
   line-height:1.75;
+}
+.message--body{
+  margin-top:24px;
+}
+.messageLead{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  line-height:1.65;
+}
+.messageLead span{
+  display:block;
 }
 .ceremonyInfo{
   margin-top:28px;

@@ -192,6 +192,7 @@ function build() {
 
   const inviteTitle = "소중한 사람을 초대합니다.";
   const inviteMessage = `서로의 오늘이 모여 같은 내일을 약속했습니다.\n저희 새로운 시작을 함께 축복해주세요!\n\n"매일 네 하루에 조용히 구독했어.\n이제 평생, 내 마음으로만 자동연장되는 사랑"`;
+  const ceremonyDateText = d.wedding.dateText.replace(/\. /g, ".");
 
   const bride = d.couple.bride;
   const groom = d.couple.groom;
@@ -252,15 +253,10 @@ function build() {
 
     <section class="card">
       <h2 class="card__title">예식 안내</h2>
-      <div style="display:flex; flex-direction:column; gap:12px; margin-top:10px;">
-        <div class="row">
-          <div class="muted" style="width:54px;">일시</div>
-          <div><b>${d.wedding.dateText}</b></div>
-        </div>
-        <div class="row">
-          <div class="muted" style="width:54px;">장소</div>
-          <div><b>${d.wedding.venueName}</b><div class="muted" style="margin-top:4px;">${d.wedding.address}</div></div>
-        </div>
+      <div class="ceremonyInfo">
+        <div class="ceremonyInfo__date"><b>${ceremonyDateText}</b></div>
+        <div class="ceremonyInfo__venue"><b>${d.wedding.venueName}</b></div>
+        <div class="ceremonyInfo__address">${d.wedding.address}</div>
       </div>
       <div class="grid2" style="margin-top:16px;">
         <button class="btn" id="calGoogleBtn" type="button">📅 구글 캘린더</button>

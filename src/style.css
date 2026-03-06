@@ -278,7 +278,10 @@ button{ font:inherit; }
   border-radius: var(--radius);
   box-shadow: none;
 }
-.heroCard + .card{ border-top:0; }
+.heroCard + .card{
+  border-top:0;
+  margin-top:24px;
+}
 .card + .card{ border-top:0; }
 .card__title{
   display:flex; align-items:center; justify-content:center;
@@ -296,6 +299,23 @@ button{ font:inherit; }
   color: rgba(0,0,0,0.78);
   white-space: pre-line;
   text-align: center;
+}
+.ceremonyInfo{
+  margin-top:14px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
+  text-align:center;
+  line-height:1.8;
+}
+.ceremonyInfo__date,
+.ceremonyInfo__venue{
+  color:#111;
+}
+.ceremonyInfo__address{
+  color: rgba(0,0,0,0.72);
+  font-size:14px;
 }
 .row{ display:flex; align-items:center; gap:10px; }
 .muted{ color: var(--muted); font-size:13px; }

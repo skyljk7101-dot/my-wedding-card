@@ -300,7 +300,8 @@ button{ font:inherit; }
   color:#75563f;
 }
 .card--location .card__title,
-.card--gift .card__title{
+.card--gift .card__title,
+.card--guestbook .card__title{
   color:#75563f;
 }
 .card--gallery{
@@ -318,6 +319,9 @@ button{ font:inherit; }
 }
 .card--gift{
   margin-top:144px;
+}
+.card--guestbook{
+  margin-top:64px;
 }
 .card__title{
   display:flex; align-items:center; justify-content:center;

@@ -507,6 +507,7 @@ button{ font:inherit; }
   place-items: center;
   z-index: 50;
   touch-action: none;
+  overflow: hidden;
 }
 .modal.is-open{ display:grid; }
 .modal__backdrop{
@@ -515,14 +516,18 @@ button{ font:inherit; }
 }
 .modal__img{
   position: relative;
-  max-width: min(92vw, 520px);
-  max-height: 86vh;
+  max-width: 96vw;
+  max-height: 92svh;
   border-radius:0;
   border:1px solid rgba(255,255,255,0.18);
   box-shadow: 0 18px 60px rgba(0,0,0,0.35);
   user-select:none;
   -webkit-user-drag:none;
+  touch-action:none;
+  transform-origin:center center;
+  will-change: transform;
 }
+.modal__img.is-zoomed{ cursor: grab; }
 .modal__nav{
   position:absolute;
   top:50%;

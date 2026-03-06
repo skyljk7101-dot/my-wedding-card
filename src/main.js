@@ -464,8 +464,52 @@ function build() {
 
   let currentList = [];
   let currentIndex = 0;
+  let zoomScale = 1;
+  let panX = 0;
+  let panY = 0;
+
+  const MIN_ZOOM = 1;
+  const MAX_ZOOM = 4;
+  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
+
+  function clampModalPan() {
+    const width = modalImg.offsetWidth || 0;
+    const height = modalImg.offsetHeight || 0;
+    const maxX = Math.max(0, (width * zoomScale - width) / 2);
+    const maxY = Math.max(0, (height * zoomScale - height) / 2);
+
+    panX = clamp(panX, -maxX, maxX);
+    panY = clamp(panY, -maxY, maxY);
+  }
+
+  function applyModalTransform() {
+    modalImg.style.transform = `translate3d(${panX}px, ${panY}px, 0) scale(${zoomScale})`;
+    modalImg.classList.toggle("is-zoomed", zoomScale > 1.001);
+  }
+
+  function resetModalZoom() {
+    zoomScale = 1;
+    panX = 0;
+    panY = 0;
+    applyModalTransform();
+  }
+
+  function setModalZoom(nextScale) {
+    zoomScale = clamp(nextScale, MIN_ZOOM, MAX_ZOOM);
+
+    if (zoomScale <= 1.001) {
+      zoomScale = 1;
+      panX = 0;
+      panY = 0;
+    } else {
+      clampModalPan();
+    }
+
+    applyModalTransform();
+  }
 
   function renderModal() {
+    resetModalZoom();
     modalImg.src = currentList[currentIndex];
     modalCounter.textContent = `${currentIndex + 1}/${currentList.length}`;
 
@@ -489,8 +533,6 @@ function build() {
     modal.setAttribute("aria-hidden", "false");
 
     lockScroll();
-    document.addEventListener("touchmove", preventTouchMove, { passive: false });
-
     renderModal();
   }
 
@@ -498,8 +540,12 @@ function build() {
     modal.classList.remove("is-open");
     modal.setAttribute("aria-hidden", "true");
     modalImg.src = "";
-
-    document.removeEventListener("touchmove", preventTouchMove);
+    touchMode = "none";
+    pDown = false;
+    pId = null;
+    pMode = "swipe";
+    modalImg.style.cursor = "";
+    resetModalZoom();
     unlockScroll();
   }
 
@@ -543,6 +589,7 @@ function build() {
   };
 
   function handleSwipe(dx, dy) {
+    if (zoomScale > 1.001) return;
     const ax = Math.abs(dx);
     const ay = Math.abs(dy);
     if (ax < SWIPE_THRESHOLD_PX) return;
@@ -551,65 +598,177 @@ function build() {
     else fireSwipeOnce(prev);
   }
 
+  const getTouchDistance = (a, b) => Math.hypot(a.clientX - b.clientX, a.clientY - b.clientY);
+
+  let touchMode = "none";
   let tStartX = 0;
   let tStartY = 0;
+  let tLastX = 0;
+  let tLastY = 0;
+  let pinchStartDistance = 0;
+  let pinchStartScale = 1;
+
+  const beginSwipeTouch = (t) => {
+    touchMode = "swipe";
+    tStartX = t.clientX;
+    tStartY = t.clientY;
+    tLastX = t.clientX;
+    tLastY = t.clientY;
+  };
+
+  const beginPanTouch = (t) => {
+    touchMode = "pan";
+    tLastX = t.clientX;
+    tLastY = t.clientY;
+  };
+
+  const beginPinchTouch = (a, b) => {
+    touchMode = "pinch";
+    pinchStartDistance = Math.max(getTouchDistance(a, b), 1);
+    pinchStartScale = zoomScale;
+  };
+
   modalImg.addEventListener(
     "touchstart",
     (e) => {
       if (!modal.classList.contains("is-open")) return;
+      if (e.touches.length === 2) {
+        beginPinchTouch(e.touches[0], e.touches[1]);
+        e.preventDefault();
+        return;
+      }
+
       const t = e.touches?.[0];
       if (!t) return;
-      tStartX = t.clientX;
-      tStartY = t.clientY;
+
+      if (zoomScale > 1.001) beginPanTouch(t);
+      else beginSwipeTouch(t);
     },
-    { passive: true }
+    { passive: false }
+  );
+  modalImg.addEventListener(
+    "touchmove",
+    (e) => {
+      if (!modal.classList.contains("is-open")) return;
+
+      if (e.touches.length === 2) {
+        if (touchMode !== "pinch") {
+          beginPinchTouch(e.touches[0], e.touches[1]);
+        }
+
+        const nextDistance = Math.max(getTouchDistance(e.touches[0], e.touches[1]), 1);
+        setModalZoom(pinchStartScale * (nextDistance / pinchStartDistance));
+        e.preventDefault();
+        return;
+      }
+
+      const t = e.touches?.[0];
+      if (!t) return;
+
+      if (zoomScale > 1.001) {
+        if (touchMode !== "pan") beginPanTouch(t);
+
+        panX += t.clientX - tLastX;
+        panY += t.clientY - tLastY;
+        tLastX = t.clientX;
+        tLastY = t.clientY;
+        clampModalPan();
+        applyModalTransform();
+        e.preventDefault();
+      }
+    },
+    { passive: false }
   );
   modalImg.addEventListener(
     "touchend",
     (e) => {
       if (!modal.classList.contains("is-open")) return;
-      const t = e.changedTouches?.[0];
-      if (!t) return;
-      handleSwipe(t.clientX - tStartX, t.clientY - tStartY);
+
+      if (touchMode === "pinch" && e.touches.length === 1 && zoomScale > 1.001) {
+        beginPanTouch(e.touches[0]);
+        return;
+      }
+
+      if (touchMode === "swipe" && zoomScale === 1) {
+        const t = e.changedTouches?.[0];
+        if (t) handleSwipe(t.clientX - tStartX, t.clientY - tStartY);
+      }
+
+      if (e.touches.length === 0) touchMode = "none";
     },
     { passive: true }
   );
+  modalImg.addEventListener("touchcancel", () => { touchMode = "none"; });
 
   let pDown = false;
   let pId = null;
+  let pMode = "swipe";
   let pStartX = 0;
   let pStartY = 0;
+  let pLastX = 0;
+  let pLastY = 0;
   let pDx = 0;
   let pDy = 0;
 
   modalImg.addEventListener("pointerdown", (e) => {
     if (!modal.classList.contains("is-open")) return;
-    if (e.pointerType === "mouse" && e.button !== 0) return;
+    if (e.pointerType !== "mouse" || e.button !== 0) return;
     pDown = true;
     pId = e.pointerId;
+    pMode = zoomScale > 1.001 ? "pan" : "swipe";
     pStartX = e.clientX;
     pStartY = e.clientY;
+    pLastX = e.clientX;
+    pLastY = e.clientY;
     pDx = 0;
     pDy = 0;
+    if (pMode === "pan") modalImg.style.cursor = "grabbing";
     try { modalImg.setPointerCapture?.(e.pointerId); } catch {}
   });
   modalImg.addEventListener("pointermove", (e) => {
     if (!pDown) return;
     if (pId !== null && e.pointerId !== pId) return;
+
+    if (pMode === "pan" && zoomScale > 1.001) {
+      panX += e.clientX - pLastX;
+      panY += e.clientY - pLastY;
+      pLastX = e.clientX;
+      pLastY = e.clientY;
+      clampModalPan();
+      applyModalTransform();
+      return;
+    }
+
     pDx = e.clientX - pStartX;
     pDy = e.clientY - pStartY;
   });
   const endPointer = (e) => {
     if (!pDown) return;
     if (pId !== null && e.pointerId !== pId) return;
+    if (pMode === "swipe") handleSwipe(pDx, pDy);
     pDown = false;
     pId = null;
-    handleSwipe(pDx, pDy);
+    pMode = "swipe";
+    modalImg.style.cursor = "";
     pDx = 0;
     pDy = 0;
   };
   modalImg.addEventListener("pointerup", endPointer);
   modalImg.addEventListener("pointercancel", endPointer);
+  modalImg.addEventListener(
+    "wheel",
+    (e) => {
+      if (!modal.classList.contains("is-open")) return;
+      e.preventDefault();
+      const zoomStep = e.deltaY < 0 ? 0.24 : -0.24;
+      setModalZoom(zoomScale + zoomStep);
+    },
+    { passive: false }
+  );
+  modalImg.addEventListener("load", () => {
+    clampModalPan();
+    applyModalTransform();
+  });
 
   function renderWeddingGallery() {
     if (!weddingEl || weddingEl.childElementCount > 0) return;

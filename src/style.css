@@ -53,20 +53,28 @@ button{ font:inherit; }
 .introStage{
   position:relative;
   width:100%;
-  max-width:420px;
   height:100vh;
   height:100svh;
   margin:0 auto;
+  display:grid;
+  place-items:center;
   padding:
-    calc(env(safe-area-inset-top, 0px) + 10px)
-    14px
-    calc(env(safe-area-inset-bottom, 0px) + 16px);
+    calc(env(safe-area-inset-top, 0px) + 8px)
+    10px
+    calc(env(safe-area-inset-bottom, 0px) + 8px);
+}
+
+.introCanvas{
+  position:relative;
+  width:360px;
+  max-width:100%;
+  height:100%;
 }
 
 .pol{
   position:absolute;
-  width:min(200px, 55vw);
-  padding: 14px 14px 64px 14px;
+  width:160px;
+  padding: 10px 10px 50px 10px;
   border-radius: 2px;
   background: #ede9e3;
   outline: 1px solid rgba(0,0,0,0.10);
@@ -148,9 +156,9 @@ button{ font:inherit; }
    pol--3: 중간~하단 오른쪽
    writeName: 3번 사진 왼쪽 아래
 */
-.pol--1{ left:calc(4% + 11px); top:4%; --r: 6deg; z-index:10; }
-.pol--2{ left:11%; top:calc(47% - 46px); --r:-7deg; z-index:20; }
-.pol--3{ right:22px; top:auto; bottom:48px; --r: 4deg; z-index:30; }
+.pol--1{ left:24px; top:32px; --r: 6deg; z-index:10; }
+.pol--2{ left:43px; top:312px; --r:-7deg; z-index:20; }
+.pol--3{ right:12px; top:auto; bottom:36px; --r: 4deg; z-index:30; }
 
 /* ===== 손글씨 공통 ===== */
 .writePhrase,
@@ -169,10 +177,10 @@ button{ font:inherit; }
 
 /* we getting married!!! - 1번 사진 오른쪽 */
 .writePhrase {
-  right: calc(2% + 28px);
-  top: 18%;
-  font-size: clamp(53px, 14.5vw, 71px);
-  line-height: 1.34;
+  right: 18px;
+  top: 128px;
+  font-size: 41px;
+  line-height: 1.3;
   z-index: 55;
   transform: rotate(-2deg);
   align-items: flex-start;
@@ -180,11 +188,11 @@ button{ font:inherit; }
 
 /* lee jae gi & jeong da som - 하단 중앙 */
 .writeName {
-  left: calc(50% - 87px);
+  left: calc(50% - 75px);
   top: auto;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 29px);
-  font-size: clamp(31px, 9vw, 43px);
-  line-height: 1.4;
+  bottom: 15px;
+  font-size: 33px;
+  line-height: 1.35;
   z-index: 55;
   text-align: center;
   align-items: center;
@@ -229,83 +237,6 @@ button{ font:inherit; }
   }
 }
 
-@media (max-width: 480px){
-  .writePhrase {
-    right: calc(-1% + 24px);
-    top: 16%;
-    font-size: clamp(33px, 13.1vw, 48px);
-    line-height: 1.26;
-  }
-
-  /* ✅ iOS 주소창 변화에도 안정적인 하단 여백 */
-  .introStage{
-    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 8px);
-  }
-
-  /* ✅ 모바일에서 이름은 '맨 아래'로 고정 (사진과 겹침 방지) */
-  .writeName{
-    left: calc(50% - 87px);
-    top: auto !important;
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 17px);
-    font-size: clamp(26px, 8.6vw, 38px);
-    line-height: 1.35;
-  }
-
-  /* 모바일에서 폴라로이드 배치를 더 분리한다. */
-  .pol{
-    width: min(180px, 50vw);
-    padding: 12px 12px 56px 12px;
-  }
-  .pol--2{ left: 12%; top: calc(44% - 46px); }
-  .pol--3{ right: calc(-2% + 22px); top: auto; bottom: 42px; }
-}
-
-/* iPhone 15 Pro / 16 Pro viewport tuning
-   Inferred from Apple resolutions:
-   - 1179x2556 @3x => 393x852 CSS px
-   - 1206x2622 @3x => 402x874 CSS px
-*/
-@media (min-width: 390px) and (max-width: 405px) and (min-height: 840px) and (max-height: 880px){
-  .introStage{
-    padding-top: calc(env(safe-area-inset-top, 0px) + 6px);
-    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6px);
-  }
-
-  .pol{
-    width: min(170px, 45vw);
-    padding: 11px 11px 52px;
-  }
-
-  .pol--1{
-    left: calc(4% + 6px);
-    top: 3.5%;
-  }
-
-  .pol--2{
-    left: 10%;
-    top: calc(42% - 42px);
-  }
-
-  .pol--3{
-    right: 14px;
-    bottom: 36px;
-  }
-
-  .writePhrase{
-    right: calc(2% + 10px);
-    top: 14.5%;
-    font-size: clamp(48px, 12.4vw, 60px);
-    line-height: 1.3;
-  }
-
-  .writeName{
-    left: calc(50% - 76px);
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
-    font-size: clamp(28px, 7.8vw, 36px);
-    line-height: 1.32;
-  }
-}
-
 /* phrase (레거시 - 혹시 남아있다면) */
 .handwrite{
   position:absolute;
@@ -339,9 +270,13 @@ button{ font:inherit; }
 .introMeta .place{ margin-top:8px; font-size:13px; color: rgba(0,0,0,0.65); line-height:1.5; }
 
 @media (max-height:760px){
-  .pol{ width:min(185px, 52vw); padding:12px 12px 56px; }
-  .pol--2{ top: calc(42% - 46px); }
-  .pol--3{ bottom: 34px; }
+  .introCanvas{ width: 344px; }
+  .pol{ width: 152px; padding:10px 10px 48px; }
+  .pol--1{ top: 24px; }
+  .pol--2{ top: 288px; }
+  .pol--3{ bottom: 26px; }
+  .writePhrase{ top: 114px; font-size: 38px; }
+  .writeName{ bottom: 8px; font-size: 31px; }
 }
 
 /* ===== MAIN ===== */

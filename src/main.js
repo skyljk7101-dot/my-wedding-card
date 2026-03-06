@@ -232,7 +232,7 @@ function build() {
       </div>
     </div>
 
-    <section class="card">
+    <section class="card card--invite">
       <h2 class="card__title">${inviteTitle}</h2>
       <p class="message">${inviteMessage}</p>
 
@@ -251,14 +251,14 @@ function build() {
       </div>
     </section>
 
-    <section class="card">
+    <section class="card card--ceremony">
       <h2 class="card__title">예식 안내</h2>
       <div class="ceremonyInfo">
         <div class="ceremonyInfo__date"><b>${ceremonyDateText}</b></div>
         <div class="ceremonyInfo__venue"><b>${d.wedding.venueName}</b></div>
         <div class="ceremonyInfo__address">${d.wedding.address}</div>
       </div>
-      <div class="grid2" style="margin-top:16px;">
+      <div class="grid2 ceremonyActions">
         <button class="btn" id="calGoogleBtn" type="button">📅 구글 캘린더</button>
         <button class="btn" id="calAppleBtn" type="button">🍎 애플 캘린더</button>
       </div>

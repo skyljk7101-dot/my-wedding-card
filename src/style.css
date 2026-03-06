@@ -157,7 +157,7 @@ button{ font:inherit; }
    writeName: 3번 사진 왼쪽 아래
 */
 .pol--1{ left:24px; top:32px; --r: 6deg; z-index:10; }
-.pol--2{ left:43px; top:236px; --r:-7deg; z-index:20; }
+.pol--2{ left:43px; top:274px; --r:-7deg; z-index:20; }
 .pol--3{ right:12px; top:auto; bottom:36px; --r: 4deg; z-index:30; }
 
 /* ===== 손글씨 공통 ===== */

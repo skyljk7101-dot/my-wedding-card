@@ -149,8 +149,8 @@ button{ font:inherit; }
    writeName: 3번 사진 왼쪽 아래
 */
 .pol--1{ left:calc(4% + 11px); top:4%; --r: 6deg; z-index:10; }
-.pol--2{ left:11%; top:calc(47% - 30px); --r:-7deg; z-index:20; }
-.pol--3{ right:11px; top:auto; bottom:48px; --r: 4deg; z-index:30; }
+.pol--2{ left:11%; top:calc(47% - 38px); --r:-7deg; z-index:20; }
+.pol--3{ right:22px; top:auto; bottom:48px; --r: 4deg; z-index:30; }
 
 /* ===== 손글씨 공통 ===== */
 .writePhrase,
@@ -180,9 +180,9 @@ button{ font:inherit; }
 
 /* lee jae gi & jeong da som - 하단 중앙 */
 .writeName {
-  left: calc(50% - 76px);
+  left: calc(50% - 87px);
   top: auto;
-  bottom: calc(env(safe-area-inset-bottom, 0px) + 18px);
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 29px);
   font-size: clamp(31px, 9vw, 43px);
   line-height: 1.4;
   z-index: 55;
@@ -241,9 +241,9 @@ button{ font:inherit; }
 
   /* ✅ 모바일에서 이름은 '맨 아래'로 고정 (사진과 겹침 방지) */
   .writeName{
-    left: calc(50% - 76px);
+    left: calc(50% - 87px);
     top: auto !important;
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 6px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 17px);
     font-size: clamp(26px, 8.6vw, 38px);
     line-height: 1.35;
   }
@@ -253,8 +253,8 @@ button{ font:inherit; }
     width: min(180px, 50vw);
     padding: 12px 12px 56px 12px;
   }
-  .pol--2{ left: 12%; top: calc(44% - 30px); }
-  .pol--3{ right: calc(-2% + 11px); top: auto; bottom: 42px; }
+  .pol--2{ left: 12%; top: calc(44% - 38px); }
+  .pol--3{ right: calc(-2% + 22px); top: auto; bottom: 42px; }
 }
 
 /* phrase (레거시 - 혹시 남아있다면) */
@@ -291,7 +291,7 @@ button{ font:inherit; }
 
 @media (max-height:760px){
   .pol{ width:min(185px, 52vw); padding:12px 12px 56px; }
-  .pol--2{ top: calc(42% - 30px); }
+  .pol--2{ top: calc(42% - 38px); }
   .pol--3{ bottom: 34px; }
 }
 

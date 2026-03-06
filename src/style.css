@@ -352,6 +352,12 @@ button{ font:inherit; }
   flex-direction:column;
   gap:10px;
 }
+.inviteContactRow{
+  justify-content:center;
+}
+.inviteContactText{
+  text-align:center;
+}
 .ceremonyInfo{
   margin-top:28px;
   display:flex;

@@ -303,6 +303,13 @@ button{ font:inherit; }
 .card--gift .card__title{
   color:#75563f;
 }
+.card--location,
+.card--gift,
+.card--guestbook,
+.card--rsvp,
+.card--share{
+  border:0;
+}
 .card__title{
   display:flex; align-items:center; justify-content:center;
   margin:0;

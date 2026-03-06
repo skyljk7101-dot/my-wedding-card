@@ -384,7 +384,7 @@ function build() {
       </div>
     </section>
 
-    <section class="card">
+    <section class="card card--guestbook">
       <h2 class="card__title">방명록</h2>
       <p class="muted" style="margin:10px 0 6px;">작성자와 내용을 남겨주세요.</p>
       <form id="gbForm" class="guestbookForm">
@@ -397,13 +397,13 @@ function build() {
       <p class="muted" id="gbHint" style="margin-top:10px; font-size:12px; line-height:1.5;"></p>
     </section>
 
-    <section class="card">
+    <section class="card card--rsvp">
       <h2 class="card__title">RSVP</h2>
       <p class="muted" style="margin:10px 0 12px; line-height:1.6;">구글폼으로 참석 여부를 남겨주세요.</p>
       <a class="btn btn--primary" target="_blank" rel="noopener" href="${d.rsvpUrl}" style="width:100%;">참석 여부 남기기</a>
     </section>
 
-    <section class="card">
+    <section class="card card--share">
       <h2 class="card__title">청첩장 공유하기</h2>
       <p class="muted" style="margin:10px 0 12px; line-height:1.6;">카카오톡으로 예쁜 청첩장을 전해보세요.</p>
       <button id="kakaoShareBtn" class="btn" style="background-color:#FEE500; color:#000; border:none; font-weight:bold; width:100%; border-radius:14px;">

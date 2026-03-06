@@ -240,13 +240,13 @@ function build() {
         <div class="row">
           <span class="muted" style="width:42px;">신랑</span>
           <span style="flex:1;">유순덕의 장남 <b>${groom.name}</b></span>
-          <a class="btn btn--mini" href="sms:${groomSms}">문자</a>
+          <a class="contactIcon" href="sms:${groomSms}" aria-label="${groom.name}에게 문자 보내기">💬</a>
         </div>
 
         <div class="row">
           <span class="muted" style="width:42px;">신부</span>
           <span style="flex:1;">정대연 · 장영화의 장녀 <b>${bride.name}</b></span>
-          <a class="btn btn--mini" href="sms:${brideSms}">문자</a>
+          <a class="contactIcon" href="sms:${brideSms}" aria-label="${bride.name}에게 문자 보내기">💬</a>
         </div>
       </div>
     </section>

@@ -284,7 +284,7 @@ button{ font:inherit; }
 }
 .card + .card{ border-top:0; }
 .card--invite{
-  border-bottom:0;
+  border:0;
 }
 .card--ceremony{
   border:0;
@@ -329,6 +329,22 @@ button{ font:inherit; }
   margin-top:32px;
 }
 .row{ display:flex; align-items:center; gap:10px; }
+.contactIcon{
+  width:36px;
+  height:36px;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:999px;
+  border:1px solid rgba(0,0,0,0.12);
+  background: rgba(0,0,0,0.03);
+  font-size:18px;
+  line-height:1;
+  flex:0 0 36px;
+}
+.contactIcon:hover{
+  background: rgba(0,0,0,0.06);
+}
 .muted{ color: var(--muted); font-size:13px; }
 
 .btn{

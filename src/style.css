@@ -230,10 +230,15 @@ button{ font:inherit; }
 }
 
 @media (max-width: 480px){
+  .introStage{
+    /* 16 Pro Max 비율을 기준으로 iPhone 화면 폭에 따라 전체를 비례 축소한다. */
+    --iphone-scale: clamp(0.87, calc(0.87 + ((100vw - 375px) * 0.002364)), 1);
+  }
+
   .writePhrase {
-    right: calc(-1% + 24px);
+    right: calc(-1% + (24px * var(--iphone-scale)));
     top: 16%;
-    font-size: clamp(33px, 13.1vw, 48px);
+    font-size: clamp(33px, calc(48px * var(--iphone-scale)), 48px);
     line-height: 1.26;
   }
 
@@ -244,66 +249,25 @@ button{ font:inherit; }
 
   /* ✅ 모바일에서 이름은 '맨 아래'로 고정 (사진과 겹침 방지) */
   .writeName{
-    left: calc(50% - 87px);
+    left: calc(50% - (87px * var(--iphone-scale)));
     top: auto !important;
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 17px);
-    font-size: clamp(26px, 8.6vw, 38px);
+    bottom: calc(env(safe-area-inset-bottom, 0px) + (17px * var(--iphone-scale)));
+    font-size: clamp(26px, calc(38px * var(--iphone-scale)), 38px);
     line-height: 1.35;
   }
 
   /* 모바일에서 폴라로이드 배치를 더 분리한다. */
   .pol{
-    width: min(180px, 50vw);
-    padding: 12px 12px 56px 12px;
+    width: calc(180px * var(--iphone-scale));
+    padding:
+      calc(12px * var(--iphone-scale))
+      calc(12px * var(--iphone-scale))
+      calc(56px * var(--iphone-scale))
+      calc(12px * var(--iphone-scale));
   }
-  .pol--2{ left: 12%; top: calc(44% - 46px); }
-  .pol--3{ right: calc(-2% + 22px); top: auto; bottom: 42px; }
-}
-
-/* iPhone 15 Pro / 16 Pro viewport tuning
-   Inferred from Apple resolutions:
-   - 1179x2556 @3x => 393x852 CSS px
-   - 1206x2622 @3x => 402x874 CSS px
-*/
-@media (min-width: 390px) and (max-width: 405px) and (min-height: 840px) and (max-height: 880px){
-  .introStage{
-    padding-top: calc(env(safe-area-inset-top, 0px) + 6px);
-    padding-bottom: calc(env(safe-area-inset-bottom, 0px) + 6px);
-  }
-
-  .pol{
-    width: min(170px, 45vw);
-    padding: 11px 11px 52px;
-  }
-
-  .pol--1{
-    left: calc(4% + 6px);
-    top: 3.5%;
-  }
-
-  .pol--2{
-    left: 10%;
-    top: calc(42% - 42px);
-  }
-
-  .pol--3{
-    right: 14px;
-    bottom: 36px;
-  }
-
-  .writePhrase{
-    right: calc(2% + 10px);
-    top: 14.5%;
-    font-size: clamp(48px, 12.4vw, 60px);
-    line-height: 1.3;
-  }
-
-  .writeName{
-    left: calc(50% - 76px);
-    bottom: calc(env(safe-area-inset-bottom, 0px) + 20px);
-    font-size: clamp(28px, 7.8vw, 36px);
-    line-height: 1.32;
-  }
+  .pol--1{ left: calc(4% + (11px * var(--iphone-scale))); }
+  .pol--2{ left: 12%; top: calc(44% - (46px * var(--iphone-scale))); }
+  .pol--3{ right: calc(-2% + (22px * var(--iphone-scale))); top: auto; bottom: calc(42px * var(--iphone-scale)); }
 }
 
 /* phrase (레거시 - 혹시 남아있다면) */

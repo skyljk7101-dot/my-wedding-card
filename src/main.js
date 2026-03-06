@@ -175,11 +175,12 @@ function activateWritePhrase(el) {
   el.classList.add("is-write");
 }
 
-function waitForIntroFont(timeoutMs = 1800) {
+function waitForHandwritingFonts(timeoutMs = 1800) {
   if (!document.fonts?.load) return Promise.resolve();
 
   const fontReady = Promise.all([
     document.fonts.load('1em "Northwell"'),
+    document.fonts.load('1em "Great Vibes"'),
     document.fonts.ready,
   ]).catch(() => {});
 
@@ -199,6 +200,7 @@ function build() {
   const inviteBodyLine3 = "저희의 시작이 되는 봄";
   const inviteBodyLine4 = "따뜻한 축복으로 함께해주세요.";
   const ceremonyDateText = d.wedding.dateText.replace(/\. /g, ".");
+  const heroDateWriteText = d.wedding.dateText.match(/\d{4}\.\s*\d{2}\.\s*\d{2}/)?.[0].replaceAll(" ", "") || "2026.05.31";
 
   const bride = d.couple.bride;
   const groom = d.couple.groom;
@@ -227,7 +229,10 @@ function build() {
 
   <main class="wrap" id="main" style="opacity:0;">
     <div class="heroCard">
-      <img class="heroImg" src="${d.heroImage}" alt="hero" loading="eager" decoding="async" fetchpriority="high"/>
+      <div class="heroVisual">
+        <img class="heroImg" src="${d.heroImage}" alt="hero" loading="eager" decoding="async" fetchpriority="high"/>
+        <div class="heroDateWrite" id="heroDateWrite" aria-label="${heroDateWriteText}"></div>
+      </div>
       <div class="heroMeta">
         <div class="heroMeta__names">${groom.name} · ${bride.name}</div>
         <div class="heroMeta__info">
@@ -443,10 +448,12 @@ function build() {
   const main = $("#main");
   const writePhrase = document.getElementById("writePhrase");
   const writeName = document.getElementById("writeName");
+  const heroDateWrite = document.getElementById("heroDateWrite");
 
   // 손글씨 문구를 먼저 구성하고 위에서 아래 순서로 재생한다.
   if (writePhrase) buildWritePhrase(writePhrase, "we getting\nmarried!!!");
   if (writeName) buildWritePhrase(writeName, "lee jae gi\n&\njeong da som");
+  if (heroDateWrite) buildWritePhrase(heroDateWrite, heroDateWriteText);
 
   const startIntroSequence = () => {
     if (writePhrase) setTimeout(() => activateWritePhrase(writePhrase), 260);
@@ -461,11 +468,14 @@ function build() {
         main.style.transition = "opacity 450ms ease";
         main.style.opacity = "1";
       }
+      if (heroDateWrite) {
+        setTimeout(() => activateWritePhrase(heroDateWrite), 340);
+      }
       scheduleGalleryRender();
     }, 4700);
   };
 
-  waitForIntroFont().then(startIntroSequence);
+  waitForHandwritingFonts().then(startIntroSequence);
 
   /* ===== Gallery (웨딩만) ===== */
   const weddingEl = $("#weddingGallery");

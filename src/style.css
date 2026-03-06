@@ -404,6 +404,12 @@ button{ font:inherit; }
 .locationTmapWrap{
   margin-top:10px;
 }
+.giftIntro{
+  margin:24px 0 32px;
+  line-height:2;
+  font-size:13px;
+  text-align:center;
+}
 .row{ display:flex; align-items:center; gap:10px; }
 .contactIcon{
   width:36px;
@@ -642,6 +648,18 @@ button{ font:inherit; }
 }
 .accGroup__toggle:hover{ background: rgba(0,0,0,0.06); }
 .accGroup__arrow{ font-size: 16px; color: rgba(0,0,0,0.45); }
+.accGroup__toggle--groom{
+  color:#86a4b5;
+}
+.accGroup__toggle--groom .accGroup__arrow{
+  color:#86a4b5;
+}
+.accGroup__toggle--bride{
+  color:#b7929c;
+}
+.accGroup__toggle--bride .accGroup__arrow{
+  color:#b7929c;
+}
 .accGroup__body{ background: #fff; }
 .accRow{
   display: flex;

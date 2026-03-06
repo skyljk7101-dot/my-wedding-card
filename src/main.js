@@ -321,7 +321,7 @@ function build() {
 
     <section class="card card--gift">
       <h2 class="card__title">마음 전하실 곳</h2>
-      <p class="muted" style="margin:12px 0 16px; line-height:2; font-size:13px; text-align:center;">
+      <p class="muted giftIntro">
         함께하지 못하시더라도<br>
         마음만은 가까이 전해주실 분들을 위해 계좌번호를 안내드립니다.<br>
         전해주시는 모든 마음에 깊이 감사드리며,<br>
@@ -329,7 +329,7 @@ function build() {
       </p>
 
       <div class="accGroup">
-        <button class="accGroup__toggle" id="groomAccToggle" type="button">
+        <button class="accGroup__toggle accGroup__toggle--groom" id="groomAccToggle" type="button">
           <span>신랑측</span>
           <span class="accGroup__arrow" id="groomArrow">▾</span>
         </button>
@@ -351,7 +351,7 @@ function build() {
       </div>
 
       <div class="accGroup" style="margin-top:8px;">
-        <button class="accGroup__toggle" id="brideAccToggle" type="button">
+        <button class="accGroup__toggle accGroup__toggle--bride" id="brideAccToggle" type="button">
           <span>신부측</span>
           <span class="accGroup__arrow" id="brideArrow">▾</span>
         </button>

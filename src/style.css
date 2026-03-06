@@ -149,7 +149,7 @@ button{ font:inherit; }
    writeName: 3번 사진 왼쪽 아래
 */
 .pol--1{ left:calc(4% + 11px); top:4%; --r: 6deg; z-index:10; }
-.pol--2{ left:11%; top:calc(47% - 38px); --r:-7deg; z-index:20; }
+.pol--2{ left:11%; top:calc(47% - 46px); --r:-7deg; z-index:20; }
 .pol--3{ right:22px; top:auto; bottom:48px; --r: 4deg; z-index:30; }
 
 /* ===== 손글씨 공통 ===== */
@@ -169,10 +169,10 @@ button{ font:inherit; }
 
 /* we getting married!!! - 1번 사진 오른쪽 */
 .writePhrase {
-  right: 2%;
+  right: calc(2% + 28px);
   top: 18%;
   font-size: clamp(62px, 17vw, 83px);
-  line-height: 1.08;
+  line-height: 1.2;
   z-index: 55;
   transform: rotate(-2deg);
   align-items: flex-start;
@@ -202,6 +202,9 @@ button{ font:inherit; }
   filter: blur(1px);
   will-change: clip-path, opacity, transform;
 }
+.writePhrase .writeLine{
+  padding-bottom: 0.06em;
+}
 .writePhrase.is-write .writeLine,
 .writeName.is-write .writeLine {
   animation: writeLine var(--line-duration, 900ms) cubic-bezier(0.24,0.84,0.31,1) forwards;
@@ -228,10 +231,10 @@ button{ font:inherit; }
 
 @media (max-width: 480px){
   .writePhrase {
-    right: -1%;
+    right: calc(-1% + 24px);
     top: 16%;
     font-size: clamp(39px, 15.4vw, 57px);
-    line-height: 1.03;
+    line-height: 1.14;
   }
 
   /* ✅ iOS 주소창 변화에도 안정적인 하단 여백 */
@@ -253,7 +256,7 @@ button{ font:inherit; }
     width: min(180px, 50vw);
     padding: 12px 12px 56px 12px;
   }
-  .pol--2{ left: 12%; top: calc(44% - 38px); }
+  .pol--2{ left: 12%; top: calc(44% - 46px); }
   .pol--3{ right: calc(-2% + 22px); top: auto; bottom: 42px; }
 }
 
@@ -291,7 +294,7 @@ button{ font:inherit; }
 
 @media (max-height:760px){
   .pol{ width:min(185px, 52vw); padding:12px 12px 56px; }
-  .pol--2{ top: calc(42% - 38px); }
+  .pol--2{ top: calc(42% - 46px); }
   .pol--3{ bottom: 34px; }
 }
 

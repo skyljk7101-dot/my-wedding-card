@@ -194,10 +194,10 @@ function build() {
   const inviteKickerLine1 = "Locked in for life.";
   const inviteKickerLine2 = "Forever starts now";
   const inviteQuote = `"매일 네 하루에 조용히 구독했어.\n이제 평생, 내 마음으로만 자동 연장되는 사랑"`;
-  const inviteBodyLine1 = "서로의 오늘이 모여";
-  const inviteBodyLine2 = "같은 내일을 약속했습니다.";
-  const inviteBodyLine3 = "저희의 새로운 시작을";
-  const inviteBodyLine4 = "함께 축복해주세요";
+  const inviteBodyLine1 = "함께하면 더 편하고 더 즐거운 사람이 되어";
+  const inviteBodyLine2 = "평생을 함께하기로 했습니다.";
+  const inviteBodyLine3 = "저희의 시작이 되는 봄";
+  const inviteBodyLine4 = "따뜻한 축복으로 함께해주세요.";
   const ceremonyDateText = d.wedding.dateText.replace(/\. /g, ".");
 
   const bride = d.couple.bride;

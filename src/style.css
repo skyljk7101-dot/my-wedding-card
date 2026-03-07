@@ -518,7 +518,7 @@ button{ font:inherit; }
 .gallery--wedding{ grid-template-columns: repeat(3, 1fr); }
 .gallery--wedding img{
   width:100%;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 3 / 4;
   object-fit: cover;
   object-position: center top;
   border-radius:0;

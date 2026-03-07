@@ -540,13 +540,13 @@ button{ font:inherit; }
 }
 .calendarHead__month{
   color:#75563f;
-  font-size:52px;
+  font-size:42px;
   font-weight:700;
   line-height:0.95;
   letter-spacing:0.02em;
 }
 .calendarGrid{
-  margin-top:22px;
+  margin-top:33px;
   display:grid;
   grid-template-columns:repeat(7, 1fr);
   gap:8px 4px;
@@ -554,7 +554,7 @@ button{ font:inherit; }
 .calendarGrid__weekday{
   text-align:center;
   font-size:11px;
-  font-weight:700;
+  font-weight:800;
   color: rgba(0,0,0,0.42);
 }
 .calendarGrid__weekday.is-sun{
@@ -607,7 +607,7 @@ button{ font:inherit; }
 }
 .calendarCountdown__value{
   padding:0;
-  color:#75563f;
+  color:#b7929c;
   font-size:22px;
   font-weight:800;
   letter-spacing:0.04em;
@@ -641,6 +641,15 @@ button{ font:inherit; }
   touch-action:none;
   transform-origin:center center;
   will-change: transform;
+}
+.modal__img--crop34{
+  --modal-crop-h: min(90svh, calc(92vw * 4 / 3));
+  width: calc(var(--modal-crop-h) * 3 / 4);
+  height: var(--modal-crop-h);
+  max-width: 92vw;
+  max-height: 90svh;
+  object-fit: cover;
+  object-position: center center;
 }
 .modal__img.is-zoomed{ cursor: grab; }
 .modal__nav{
@@ -743,7 +752,7 @@ button{ font:inherit; }
     padding:6px 0 0;
   }
   .calendarHead__month{
-    font-size:44px;
+    font-size:35px;
   }
   .calendarGrid{
     gap:6px 2px;

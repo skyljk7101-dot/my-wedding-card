@@ -193,9 +193,9 @@ function getWeddingDdayText(dateTimeISO) {
   const weddingUTC = Date.UTC(parts.year, parts.month - 1, parts.day);
   const diffDays = Math.round((weddingUTC - todayUTC) / 86400000);
 
-  if (diffDays > 0) return `D-${diffDays} 일`;
-  if (diffDays === 0) return "D-Day";
-  return `D+${Math.abs(diffDays)} 일`;
+  if (diffDays > 0) return `D-${diffDays}일 남았습니다.`;
+  if (diffDays === 0) return "오늘입니다!";
+  return `${Math.abs(diffDays)}일이 지났습니다.`;
 }
 
 function buildWeddingCalendar(dateTimeISO) {
@@ -206,7 +206,6 @@ function buildWeddingCalendar(dateTimeISO) {
   const weekLabels = ["일", "월", "화", "수", "목", "금", "토"];
   const firstWeekday = new Date(Date.UTC(year, month - 1, 1)).getUTCDay();
   const lastDate = new Date(Date.UTC(year, month, 0)).getUTCDate();
-  const weddingWeekday = weekLabels[new Date(Date.UTC(year, month - 1, day)).getUTCDay()];
   const cells = [];
 
   for (let i = 0; i < firstWeekday; i += 1) {
@@ -231,7 +230,6 @@ function buildWeddingCalendar(dateTimeISO) {
     <div class="calendarBox">
       <div class="calendarHead">
         <div class="calendarHead__month">${year}.${pad2(month)}</div>
-        <div class="calendarHead__date">${year}.${pad2(month)}.${pad2(day)} (${weddingWeekday})</div>
       </div>
       <div class="calendarGrid" role="grid" aria-label="${year}년 ${month}월 결혼식 달력">
         ${weekLabels.map((label, idx) => `

@@ -290,7 +290,7 @@ function build() {
       </div>
       <div class="grid2 ceremonyActions">
         <button class="btn" id="calGoogleBtn" type="button">📅 구글 캘린더</button>
-        <button class="btn" id="calAppleBtn" type="button">🍎 애플 캘린더</button>
+        <a class="btn" id="calAppleBtn" href="/wedding.ics">🍎 애플 캘린더</a>
       </div>
     </section>
 
@@ -867,32 +867,8 @@ function build() {
 
   if (calAppleBtn) {
     calAppleBtn.addEventListener("click", () => {
-      // ICS 파일 생성 후 다운로드 → 애플 캘린더/아이폰 캘린더 자동 열림
-      const icsContent = [
-        "BEGIN:VCALENDAR",
-        "VERSION:2.0",
-        "PRODID:-//Wedding//KO",
-        "BEGIN:VEVENT",
-        `UID:wedding-jaegi-dasom-2026@invite`,
-        `DTSTAMP:${toGCal(new Date().toISOString())}`,
-        `DTSTART:${toGCal(weddingISO)}`,
-        `DTEND:${toGCal(weddingEnd)}`,
-        `SUMMARY:이재기 ♡ 정다솜 결혼식`,
-        `LOCATION:${d.wedding.address}`,
-        `DESCRIPTION:${d.wedding.venueName}`,
-        "END:VEVENT",
-        "END:VCALENDAR"
-      ].join("\r\n");
-
-      const blob = new Blob([icsContent], { type: "text/calendar;charset=utf-8" });
-      const url  = URL.createObjectURL(blob);
-      const a    = document.createElement("a");
-      a.href     = url;
-      a.download = "wedding.ics";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      // 카카오톡 인앱 브라우저/iOS에서 Blob 다운로드가 막히는 경우가 있어 정적 ICS로 직접 이동한다.
+      window.location.href = calAppleBtn.getAttribute("href") || "/wedding.ics";
     });
   }
 

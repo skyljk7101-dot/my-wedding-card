@@ -553,8 +553,8 @@ button{ font:inherit; }
 }
 .calendarGrid__weekday{
   text-align:center;
-  font-size:11px;
-  font-weight:800;
+  font-size:13.2px;
+  font-weight:900;
   color: rgba(0,0,0,0.42);
 }
 .calendarGrid__weekday.is-sun{

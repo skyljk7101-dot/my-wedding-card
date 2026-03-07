@@ -157,7 +157,7 @@ button{ font:inherit; }
    writeName: 3번 사진 왼쪽 아래
 */
 .pol--1{ left:24px; top:13px; --r: 6deg; z-index:10; }
-.pol--2{ left:24px; top:255px; --r:-7deg; z-index:20; }
+.pol--2{ left:24px; top:calc(255px - 4cm); --r:-7deg; z-index:20; }
 .pol--3{ right:12px; top:auto; bottom:36px; --r: 4deg; z-index:30; }
 
 /* ===== 손글씨 공통 ===== */
@@ -172,12 +172,13 @@ button{ font:inherit; }
   text-align: left;
   white-space: nowrap;
   pointer-events: none;
+  overflow: visible;
   text-shadow: 1px 2px 0 rgba(0,0,0,0.06), 0 0 1px rgba(0,0,0,0.03);
 }
 
 /* we getting married!!! - 1번 사진 오른쪽 */
 .writePhrase {
-  right: 18px;
+  right: calc(18px - 0.2cm);
   top: 78px;
   font-size: 47px;
   line-height: 1.3;
@@ -188,7 +189,7 @@ button{ font:inherit; }
 
 /* lee jae gi & jeong da som - 하단 중앙 */
 .writeName {
-  left: calc(50% - 75px);
+  left: calc(50% - 40px);
   top: auto;
   bottom: 15px;
   font-size: 36px;
@@ -200,29 +201,35 @@ button{ font:inherit; }
   color: #1a1a1a;
 }
 
-/* 줄 단위로 왼쪽에서 오른쪽으로 필기되듯 나타난다. */
+/* 줄 단위로 부드럽게 나타난다. */
 .writePhrase .writeLine,
 .writeName .writeLine {
-  display: block;
+  display: inline-block;
+  padding-left: 0.6em;
+  padding-right: 0.24em;
+  margin-left: -0.6em;
+  margin-right: -0.24em;
   opacity: 0;
-  clip-path: inset(0 100% 0 0);
   transform: translateY(8px);
   filter: blur(1px);
-  will-change: clip-path, opacity, transform;
+  overflow: visible;
+  will-change: opacity, transform, filter;
 }
 .writePhrase .writeLine{
   padding-bottom: 0.14em;
 }
+.writeName .writeLine{
+  padding-bottom: 0.14em;
+}
 .writePhrase.is-write .writeLine,
 .writeName.is-write .writeLine {
-  animation: writeLine var(--line-duration, 900ms) cubic-bezier(0.24,0.84,0.31,1) forwards;
+  animation: writeLineInk var(--line-duration, 900ms) cubic-bezier(0.24,0.84,0.31,1) forwards;
   animation-delay: var(--line-delay, 0ms);
 }
 
-@keyframes writeLine{
+@keyframes writeLineInk{
   0%{
     opacity: 0;
-    clip-path: inset(0 100% 0 0);
     transform: translateY(8px);
     filter: blur(1px);
   }
@@ -231,7 +238,6 @@ button{ font:inherit; }
   }
   100%{
     opacity: 1;
-    clip-path: inset(0 0 0 0);
     transform: translateY(0);
     filter: blur(0);
   }
@@ -485,7 +491,8 @@ button{ font:inherit; }
   -webkit-tap-highlight-color:transparent;
 }
 .btn:hover{ background: rgba(0,0,0,0.06); }
-.btn--primary{ background:#111; color:#fff; border-color:#111; }
+.btn--primary{ background:#5b4330; color:#fff; border-color:#5b4330; }
+.btn--primary:hover{ background:#4b3626; border-color:#4b3626; }
 .btn--mini{
   padding:8px 10px;
   border-radius:12px;
@@ -592,25 +599,27 @@ button{ font:inherit; }
   box-shadow: 0 12px 26px rgba(117,86,63,0.18);
 }
 .calendarCountdown{
-  margin-top:20px;
+  margin-top:36px;
   display:flex;
   flex-direction:column;
-  gap:6px;
+  gap:10px;
   justify-content:center;
   align-items:center;
 }
 .calendarCountdown__title{
-  color:#75563f;
+  color:#111;
   font-size:16px;
   font-weight:700;
+  line-height:1.5;
   text-align:center;
 }
 .calendarCountdown__value{
   padding:0;
-  color:#b7929c;
+  color:#75563f;
   font-size:22px;
   font-weight:800;
   letter-spacing:0.04em;
+  line-height:1.5;
   text-align:center;
 }
 

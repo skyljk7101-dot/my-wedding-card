@@ -254,6 +254,12 @@ function buildWritePhrase(el, text) {
     lineEl.textContent = line || "\u00a0";
     lineEl.style.setProperty("--line-delay", `${lineIdx * 680}ms`);
     lineEl.style.setProperty("--line-duration", `${duration}ms`);
+    lineEl.addEventListener("animationend", () => {
+      lineEl.style.animation = "none";
+      lineEl.style.opacity = "1";
+      lineEl.style.transform = "translateY(0)";
+      lineEl.style.filter = "blur(0)";
+    }, { once: true });
     el.appendChild(lineEl);
   });
 }

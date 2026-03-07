@@ -184,18 +184,26 @@ function getDatePartsInTimeZone(date, timeZone = "Asia/Seoul") {
   };
 }
 
-function getWeddingDdayText(dateTimeISO) {
+function getWeddingDdayContent(dateTimeISO) {
   const parts = getWeddingDateParts(dateTimeISO);
-  if (!parts) return "";
+  if (!parts) return { html: "", text: "" };
 
   const today = getDatePartsInTimeZone(new Date(), "Asia/Seoul");
   const todayUTC = Date.UTC(today.year, today.month - 1, today.day);
   const weddingUTC = Date.UTC(parts.year, parts.month - 1, parts.day);
   const diffDays = Math.round((weddingUTC - todayUTC) / 86400000);
 
-  if (diffDays > 0) return `D-${diffDays} 일 남았습니다.`;
-  if (diffDays === 0) return "오늘입니다!";
-  return `${Math.abs(diffDays)}일이 지났습니다.`;
+  if (diffDays > 0) {
+    return {
+      html: `<span class="calendarCountdown__valueLead">D-${diffDays}</span><span class="calendarCountdown__valueTail">일 남았습니다.</span>`,
+      text: `D-${diffDays} 일 남았습니다.`,
+    };
+  }
+  if (diffDays === 0) return { html: "오늘입니다!", text: "오늘입니다!" };
+  return {
+    html: `${Math.abs(diffDays)}일이 지났습니다.`,
+    text: `${Math.abs(diffDays)}일이 지났습니다.`,
+  };
 }
 
 function buildWeddingCalendar(dateTimeISO) {
@@ -294,7 +302,7 @@ function build() {
   const inviteBodyLine4 = "따뜻한 축복으로 함께해주세요.";
   const ceremonyDateText = d.wedding.dateText.replace(/\. /g, ".");
   const weddingCalendar = buildWeddingCalendar(d.wedding.dateTimeISO);
-  const weddingDdayText = getWeddingDdayText(d.wedding.dateTimeISO);
+  const weddingDdayContent = getWeddingDdayContent(d.wedding.dateTimeISO);
 
   const bride = d.couple.bride;
   const groom = d.couple.groom;
@@ -401,7 +409,7 @@ function build() {
       ${weddingCalendar}
       <div class="calendarCountdown">
         <div class="calendarCountdown__title">다솜 ♥ 재기의 결혼식</div>
-        <div class="calendarCountdown__value" id="weddingDday">${weddingDdayText}</div>
+        <div class="calendarCountdown__value" id="weddingDday" aria-label="${escapeHtml(weddingDdayContent.text)}">${weddingDdayContent.html}</div>
       </div>
     </section>
 
@@ -1126,7 +1134,9 @@ function build() {
 
   if (weddingDdayEl) {
     const renderWeddingDday = () => {
-      weddingDdayEl.textContent = getWeddingDdayText(d.wedding.dateTimeISO);
+      const content = getWeddingDdayContent(d.wedding.dateTimeISO);
+      weddingDdayEl.innerHTML = content.html;
+      weddingDdayEl.setAttribute("aria-label", content.text);
     };
 
     renderWeddingDday();

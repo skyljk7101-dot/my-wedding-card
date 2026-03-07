@@ -614,6 +614,11 @@ button{ font:inherit; }
   text-align:center;
 }
 .calendarCountdown__value{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:baseline;
+  justify-content:center;
+  gap:0.16em;
   padding:0;
   color:#75563f;
   font-size:22px;
@@ -621,6 +626,12 @@ button{ font:inherit; }
   letter-spacing:0.04em;
   line-height:1.5;
   text-align:center;
+}
+.calendarCountdown__valueLead{
+  font-size:1.05em;
+}
+.calendarCountdown__valueTail{
+  font-size:0.9em;
 }
 
 /* modal */

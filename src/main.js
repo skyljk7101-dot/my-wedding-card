@@ -269,7 +269,8 @@ function buildWritePhrase(el, text) {
       textEl.style.opacity = "1";
       textEl.style.transform = "translateY(0)";
       textEl.style.filter = "blur(0)";
-      textEl.style.clipPath = "inset(0 0 0 0)";
+      textEl.style.clipPath = "none";
+      textEl.style.webkitClipPath = "none";
     }, { once: true });
     lineEl.appendChild(textEl);
     el.appendChild(lineEl);

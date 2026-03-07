@@ -222,6 +222,12 @@ button{ font:inherit; }
 .writePhrase .writeLine__text,
 .writeName .writeLine__text {
   display: inline-block;
+  padding-left: 0.12em;
+  padding-right: 0.1em;
+  padding-bottom: 0.16em;
+  margin-left: -0.12em;
+  margin-right: -0.1em;
+  margin-bottom: -0.16em;
   will-change: opacity, transform, filter, clip-path;
 }
 

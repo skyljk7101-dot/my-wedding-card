@@ -300,7 +300,6 @@ button{ font:inherit; }
   color:#75563f;
 }
 .card--location .card__title,
-.card--calendar .card__title,
 .card--gift .card__title,
 .card--guestbook .card__title{
   color:#75563f;
@@ -537,16 +536,17 @@ button{ font:inherit; }
   background:transparent;
 }
 .calendarHead{
-  text-align:center;
+  text-align:left;
 }
 .calendarHead__month{
   color:#75563f;
-  font-size:18px;
+  font-size:52px;
   font-weight:700;
-  letter-spacing:0.14em;
+  line-height:0.95;
+  letter-spacing:0.02em;
 }
 .calendarGrid{
-  margin-top:14px;
+  margin-top:22px;
   display:grid;
   grid-template-columns:repeat(7, 1fr);
   gap:8px 4px;
@@ -594,7 +594,16 @@ button{ font:inherit; }
 .calendarCountdown{
   margin-top:20px;
   display:flex;
+  flex-direction:column;
+  gap:6px;
   justify-content:center;
+  align-items:center;
+}
+.calendarCountdown__title{
+  color:#75563f;
+  font-size:16px;
+  font-weight:700;
+  text-align:center;
 }
 .calendarCountdown__value{
   padding:0;
@@ -733,11 +742,17 @@ button{ font:inherit; }
   .calendarBox{
     padding:6px 0 0;
   }
+  .calendarHead__month{
+    font-size:44px;
+  }
   .calendarGrid{
     gap:6px 2px;
   }
   .calendarGrid__cell{
     min-height:42px;
+  }
+  .calendarCountdown__title{
+    font-size:15px;
   }
   .calendarCountdown__value{
     font-size:20px;

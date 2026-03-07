@@ -193,7 +193,7 @@ function getWeddingDdayText(dateTimeISO) {
   const weddingUTC = Date.UTC(parts.year, parts.month - 1, parts.day);
   const diffDays = Math.round((weddingUTC - todayUTC) / 86400000);
 
-  if (diffDays > 0) return `D-${diffDays}일 남았습니다.`;
+  if (diffDays > 0) return `D-${diffDays} 일 남았습니다.`;
   if (diffDays === 0) return "오늘입니다!";
   return `${Math.abs(diffDays)}일이 지났습니다.`;
 }
@@ -391,9 +391,9 @@ function build() {
     </section>
 
     <section class="card card--calendar">
-      <h2 class="card__title">캘린더</h2>
       ${weddingCalendar}
       <div class="calendarCountdown">
+        <div class="calendarCountdown__title">다솜 ♥ 재기의 결혼식</div>
         <div class="calendarCountdown__value" id="weddingDday">${weddingDdayText}</div>
       </div>
     </section>

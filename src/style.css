@@ -157,7 +157,7 @@ button{ font:inherit; }
    writeName: 3번 사진 왼쪽 아래
 */
 .pol--1{ left:24px; top:13px; --r: 6deg; z-index:10; }
-.pol--2{ left:24px; top:calc(255px + 1cm); --r:-7deg; z-index:20; }
+.pol--2{ left:24px; top:calc(255px - 0.5cm); --r:-7deg; z-index:20; }
 .pol--3{ right:12px; top:auto; bottom:36px; --r: 4deg; z-index:30; }
 
 /* ===== 손글씨 공통 ===== */
@@ -189,7 +189,7 @@ button{ font:inherit; }
 
 /* lee jae gi & jeong da som - 하단 중앙 */
 .writeName {
-  left: calc(50% - 40px - 2cm);
+  left: calc(50% - 40px - 1.5cm);
   top: auto;
   bottom: 15px;
   font-size: 36px;

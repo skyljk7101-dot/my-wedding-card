@@ -413,7 +413,7 @@ function build() {
     </section>
 
     <section class="card card--rsvp">
-      <h2 class="card__title">RSVP</h2>
+      <h2 class="card__title">참석 여부 확인</h2>
       <p class="muted" style="margin:10px 0 12px; line-height:1.6;">구글폼으로 참석 여부를 남겨주세요.</p>
       <a class="btn btn--primary" target="_blank" rel="noopener" href="${d.rsvpUrl}" style="width:100%;">참석 여부 남기기</a>
     </section>

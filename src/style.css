@@ -493,6 +493,10 @@ button{ font:inherit; }
   background: rgba(0,0,0,0.06);
 }
 .muted{ color: var(--muted); font-size:13px; }
+.guestbookIntro{
+  margin:20px 0 12px;
+  line-height:2;
+}
 
 .btn{
   display:inline-flex;

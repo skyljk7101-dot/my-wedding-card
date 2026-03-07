@@ -34,8 +34,8 @@ export const INVITE = {
     "/assets/10.jpg", "/assets/11.jpg", "/assets/12.jpg", "/assets/12-1.jpg",
     "/assets/13.jpg", "/assets/14.jpg", "/assets/15.jpg", "/assets/16.jpg",
     "/assets/17.jpg", "/assets/18.jpg", "/assets/20.jpg",
-    "/assets/21.jpg", "/assets/22.jpg", "/assets/23.jpg", "/assets/24.jpg",
-    "/assets/25.jpg"
+    "/assets/21.jpg", "/assets/22.jpg", "/assets/23.jpg", "/assets/25.jpg",
+    "/assets/24.jpg"
   ],
 
   dailyGallery: [

@@ -518,7 +518,7 @@ function build() {
 
     <section class="card card--guestbook">
       <h2 class="card__title">방명록</h2>
-      <p class="muted guestbookIntro">신랑과 신부에게 축하의 메세지를 남겨주세요!</p>
+      <p class="muted guestbookIntro">신랑과 신부에게 축하의 메세지를 남겨주세요! 💌</p>
       <form id="gbForm" class="guestbookForm">
         <input id="gbName" class="input" maxlength="20" placeholder="작성자" required />
         <textarea id="gbMsg" class="textarea" maxlength="300" placeholder="내용" required></textarea>

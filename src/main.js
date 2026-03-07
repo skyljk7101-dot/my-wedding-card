@@ -256,18 +256,22 @@ function buildWritePhrase(el, text) {
 
   lines.forEach((line, lineIdx) => {
     const lineEl = document.createElement("span");
+    const textEl = document.createElement("span");
     const duration = Math.max(760, line.replaceAll(" ", "").length * 92);
 
     lineEl.className = "writeLine";
-    lineEl.textContent = line || "\u00a0";
+    textEl.className = "writeLine__text";
+    textEl.textContent = line || "\u00a0";
     lineEl.style.setProperty("--line-delay", `${lineIdx * 680}ms`);
     lineEl.style.setProperty("--line-duration", `${duration}ms`);
-    lineEl.addEventListener("animationend", () => {
-      lineEl.style.animation = "none";
-      lineEl.style.opacity = "1";
-      lineEl.style.transform = "translateY(0)";
-      lineEl.style.filter = "blur(0)";
+    textEl.addEventListener("animationend", () => {
+      textEl.style.animation = "none";
+      textEl.style.opacity = "1";
+      textEl.style.transform = "translateY(0)";
+      textEl.style.filter = "blur(0)";
+      textEl.style.clipPath = "inset(0 0 0 0)";
     }, { once: true });
+    lineEl.appendChild(textEl);
     el.appendChild(lineEl);
   });
 }

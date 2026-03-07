@@ -300,12 +300,17 @@ button{ font:inherit; }
   color:#75563f;
 }
 .card--location .card__title,
+.card--calendar .card__title,
 .card--gift .card__title,
 .card--guestbook .card__title{
   color:#75563f;
 }
 .card--gallery{
   border-bottom:0;
+}
+.card--calendar{
+  border:0;
+  margin-top:56px;
 }
 .card--location,
 .card--gift,
@@ -524,6 +529,90 @@ button{ font:inherit; }
 }
 .galleryWrap{ margin-top:28px; }
 
+.calendarBox{
+  margin-top:28px;
+  padding:20px 14px 16px;
+  border-radius:22px;
+  border:1px solid rgba(117,86,63,0.14);
+  background: linear-gradient(180deg, #fcfaf7 0%, #f6f0e9 100%);
+}
+.calendarHead{
+  text-align:center;
+}
+.calendarHead__month{
+  color:#75563f;
+  font-size:18px;
+  font-weight:700;
+  letter-spacing:0.14em;
+}
+.calendarHead__date{
+  margin-top:8px;
+  color: rgba(0,0,0,0.62);
+  font-size:13px;
+}
+.calendarGrid{
+  margin-top:18px;
+  display:grid;
+  grid-template-columns:repeat(7, 1fr);
+  gap:8px 4px;
+}
+.calendarGrid__weekday{
+  text-align:center;
+  font-size:11px;
+  font-weight:700;
+  color: rgba(0,0,0,0.42);
+}
+.calendarGrid__weekday.is-sun{
+  color:#b27a68;
+}
+.calendarGrid__weekday.is-sat{
+  color:#86a4b5;
+}
+.calendarGrid__cell{
+  min-height:46px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:3px;
+  border-radius:14px;
+  color: rgba(0,0,0,0.76);
+}
+.calendarGrid__cell--empty{
+  background:transparent;
+}
+.calendarGrid__date{
+  font-size:13px;
+  line-height:1;
+}
+.calendarGrid__badge{
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:0.1em;
+  line-height:1;
+}
+.calendarGrid__cell.is-wedding{
+  background:#75563f;
+  color:#fff9f3;
+  box-shadow: 0 12px 26px rgba(117,86,63,0.18);
+}
+.calendarCountdown{
+  margin-top:20px;
+  display:flex;
+  justify-content:center;
+}
+.calendarCountdown__value{
+  min-width:138px;
+  padding:12px 18px;
+  border-radius:999px;
+  background: rgba(117,86,63,0.08);
+  color:#75563f;
+  font-size:28px;
+  font-weight:800;
+  letter-spacing:0.04em;
+  text-align:center;
+}
+
 /* modal */
 .modal{
   position: fixed;
@@ -648,6 +737,18 @@ button{ font:inherit; }
   }
   .card--gallery .gallery--wedding{
     gap: 4px;
+  }
+  .calendarBox{
+    padding:18px 12px 14px;
+  }
+  .calendarGrid{
+    gap:6px 2px;
+  }
+  .calendarGrid__cell{
+    min-height:42px;
+  }
+  .calendarCountdown__value{
+    font-size:24px;
   }
   .heroCard{
     height: 100svh;

@@ -154,6 +154,95 @@ function escapeHtml(s) {
     .replaceAll("'", "&#039;");
 }
 
+function getWeddingDateParts(dateTimeISO) {
+  const match = String(dateTimeISO || "").match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!match) return null;
+  return {
+    year: Number(match[1]),
+    month: Number(match[2]),
+    day: Number(match[3]),
+  };
+}
+
+function getDatePartsInTimeZone(date, timeZone = "Asia/Seoul") {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(date);
+
+  const values = {};
+  parts.forEach(({ type, value }) => {
+    if (type !== "literal") values[type] = value;
+  });
+
+  return {
+    year: Number(values.year),
+    month: Number(values.month),
+    day: Number(values.day),
+  };
+}
+
+function getWeddingDdayText(dateTimeISO) {
+  const parts = getWeddingDateParts(dateTimeISO);
+  if (!parts) return "";
+
+  const today = getDatePartsInTimeZone(new Date(), "Asia/Seoul");
+  const todayUTC = Date.UTC(today.year, today.month - 1, today.day);
+  const weddingUTC = Date.UTC(parts.year, parts.month - 1, parts.day);
+  const diffDays = Math.round((weddingUTC - todayUTC) / 86400000);
+
+  if (diffDays > 0) return `D-${diffDays} 일`;
+  if (diffDays === 0) return "D-Day";
+  return `D+${Math.abs(diffDays)} 일`;
+}
+
+function buildWeddingCalendar(dateTimeISO) {
+  const parts = getWeddingDateParts(dateTimeISO);
+  if (!parts) return "";
+
+  const { year, month, day } = parts;
+  const weekLabels = ["일", "월", "화", "수", "목", "금", "토"];
+  const firstWeekday = new Date(Date.UTC(year, month - 1, 1)).getUTCDay();
+  const lastDate = new Date(Date.UTC(year, month, 0)).getUTCDate();
+  const weddingWeekday = weekLabels[new Date(Date.UTC(year, month - 1, day)).getUTCDay()];
+  const cells = [];
+
+  for (let i = 0; i < firstWeekday; i += 1) {
+    cells.push(`<div class="calendarGrid__cell calendarGrid__cell--empty" aria-hidden="true"></div>`);
+  }
+
+  for (let date = 1; date <= lastDate; date += 1) {
+    const isWeddingDay = date === day;
+    cells.push(`
+      <div class="calendarGrid__cell${isWeddingDay ? " is-wedding" : ""}" role="gridcell" aria-label="${month}월 ${date}일${isWeddingDay ? " 예식일" : ""}">
+        <span class="calendarGrid__date">${date}</span>
+        ${isWeddingDay ? '<span class="calendarGrid__badge">WEDDING</span>' : ""}
+      </div>
+    `);
+  }
+
+  while (cells.length % 7 !== 0) {
+    cells.push(`<div class="calendarGrid__cell calendarGrid__cell--empty" aria-hidden="true"></div>`);
+  }
+
+  return `
+    <div class="calendarBox">
+      <div class="calendarHead">
+        <div class="calendarHead__month">${year}.${pad2(month)}</div>
+        <div class="calendarHead__date">${year}.${pad2(month)}.${pad2(day)} (${weddingWeekday})</div>
+      </div>
+      <div class="calendarGrid" role="grid" aria-label="${year}년 ${month}월 결혼식 달력">
+        ${weekLabels.map((label, idx) => `
+          <div class="calendarGrid__weekday${idx === 0 ? " is-sun" : ""}${idx === 6 ? " is-sat" : ""}" role="columnheader">${label}</div>
+        `).join("")}
+        ${cells.join("")}
+      </div>
+    </div>
+  `;
+}
+
 /* ===== 손글씨를 줄 단위로 필기하듯 구성 ===== */
 function buildWritePhrase(el, text) {
   el.innerHTML = "";
@@ -199,6 +288,8 @@ function build() {
   const inviteBodyLine3 = "저희의 시작이 되는 봄";
   const inviteBodyLine4 = "따뜻한 축복으로 함께해주세요.";
   const ceremonyDateText = d.wedding.dateText.replace(/\. /g, ".");
+  const weddingCalendar = buildWeddingCalendar(d.wedding.dateTimeISO);
+  const weddingDdayText = getWeddingDdayText(d.wedding.dateTimeISO);
 
   const bride = d.couple.bride;
   const groom = d.couple.groom;
@@ -298,6 +389,14 @@ function build() {
       <h2 class="card__title">갤러리</h2>
       <div class="galleryWrap">
         <div class="gallery gallery--wedding" id="weddingGallery"></div>
+      </div>
+    </section>
+
+    <section class="card card--calendar">
+      <h2 class="card__title">캘린더</h2>
+      ${weddingCalendar}
+      <div class="calendarCountdown">
+        <div class="calendarCountdown__value" id="weddingDday">${weddingDdayText}</div>
       </div>
     </section>
 
@@ -915,6 +1014,7 @@ function build() {
   const gbForm = $("#gbForm");
   const gbName = $("#gbName");
   const gbMsg = $("#gbMsg");
+  const weddingDdayEl = $("#weddingDday");
 
   const GB_PAGE_SIZE = 5;
   let __gbAll = [];
@@ -1015,6 +1115,15 @@ function build() {
       );
     }
   });
+
+  if (weddingDdayEl) {
+    const renderWeddingDday = () => {
+      weddingDdayEl.textContent = getWeddingDdayText(d.wedding.dateTimeISO);
+    };
+
+    renderWeddingDday();
+    window.setInterval(renderWeddingDday, 60000);
+  }
 }
 
 build();

@@ -325,10 +325,10 @@ function build() {
   <div class="intro" id="intro" aria-hidden="false">
     <div class="introStage">
       <div class="introCanvas">
-        <div class="pol pol--1 is-in"><img class="pol__img" src="${d.heroPolaroids[0]}" alt="intro-1"></div>
+        <div class="pol pol--1 is-in"><img class="pol__img" src="${d.heroPolaroids[0]}" alt="intro-1" decoding="async" fetchpriority="high"></div>
         <div class="writePhrase" id="writePhrase" aria-label="we getting married"></div>
-        <div class="pol pol--2 is-in"><img class="pol__img" src="${d.heroPolaroids[1]}" alt="intro-2"></div>
-        <div class="pol pol--3 is-in"><img class="pol__img" src="${d.heroPolaroids[2]}" alt="intro-3"></div>
+        <div class="pol pol--2 is-in"><img class="pol__img" src="${d.heroPolaroids[1]}" alt="intro-2" decoding="async" fetchpriority="high"></div>
+        <div class="pol pol--3 is-in"><img class="pol__img" src="${d.heroPolaroids[2]}" alt="intro-3" decoding="async" fetchpriority="high"></div>
         <div class="writeName" id="writeName" aria-label="lee jae gi and jeong da som"></div>
       </div>
     </div><!-- /introStage -->

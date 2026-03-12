@@ -664,6 +664,10 @@ button{ font:inherit; }
   z-index: 50;
   touch-action: none;
   overflow: hidden;
+  padding:
+    max(env(safe-area-inset-top, 0px), 12px)
+    12px
+    max(env(safe-area-inset-bottom, 0px), 12px);
 }
 .modal.is-open{ display:grid; }
 .modal__backdrop{
@@ -672,25 +676,20 @@ button{ font:inherit; }
 }
 .modal__img{
   position: relative;
-  max-width: 96vw;
-  max-height: 92svh;
+  width: auto;
+  height: auto;
+  max-width: min(96vw, calc(100vw - 24px));
+  max-height: calc(100svh - 24px);
   border-radius:0;
   border:1px solid rgba(255,255,255,0.18);
   box-shadow: 0 18px 60px rgba(0,0,0,0.35);
   user-select:none;
   -webkit-user-drag:none;
   touch-action:none;
+  object-fit: contain;
+  object-position: center center;
   transform-origin:center center;
   will-change: transform;
-}
-.modal__img--crop34{
-  --modal-crop-h: min(90svh, calc(92vw * 4 / 3));
-  width: calc(var(--modal-crop-h) * 3 / 4);
-  height: var(--modal-crop-h);
-  max-width: 92vw;
-  max-height: 90svh;
-  object-fit: cover;
-  object-position: center center;
 }
 .modal__img.is-zoomed{ cursor: grab; }
 .modal__nav{
@@ -816,6 +815,28 @@ button{ font:inherit; }
   }
   .heroImg{ height: 100%; }
   .heroMeta{ display:none; }
+  .modal{
+    padding:
+      max(env(safe-area-inset-top, 0px), 0px)
+      0
+      max(env(safe-area-inset-bottom, 0px), 0px);
+  }
+  .modal__img{
+    max-width: 100vw;
+    max-height: 100svh;
+    border: 0;
+    box-shadow: none;
+  }
+  .modal__counter{
+    top: calc(env(safe-area-inset-top, 0px) + 12px);
+  }
+  .modal__nav{
+    top: auto;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+    transform: none;
+  }
+  .modal__nav--prev{ left: 16px; }
+  .modal__nav--next{ right: 16px; }
 }
 
 /* ===== Account Accordion ===== */

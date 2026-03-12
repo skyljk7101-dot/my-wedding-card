@@ -295,7 +295,6 @@ function waitForIntroFont(timeoutMs = 1800) {
 
 function build() {
   const d = INVITE;
-  const modalCrop34Images = new Set(["/assets/12.jpg", "/assets/13.jpg", "/assets/14.jpg", "/assets/16.jpg"]);
 
   const inviteTitle = "소중한 사람을 초대합니다.";
   const inviteKickerLine1 = "Locked in for life.";
@@ -643,7 +642,6 @@ function build() {
   function renderModal() {
     resetModalZoom();
     const currentSrc = currentList[currentIndex];
-    modalImg.classList.toggle("modal__img--crop34", modalCrop34Images.has(currentSrc));
     modalImg.src = currentSrc;
     modalCounter.textContent = `${currentIndex + 1}/${currentList.length}`;
 
@@ -674,7 +672,6 @@ function build() {
     modal.classList.remove("is-open");
     modal.setAttribute("aria-hidden", "true");
     modalImg.src = "";
-    modalImg.classList.remove("modal__img--crop34");
     touchMode = "none";
     pDown = false;
     pId = null;

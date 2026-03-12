@@ -547,6 +547,7 @@ function build() {
     <div id="modal" class="modal" aria-hidden="true">
       <div class="modal__backdrop"></div>
       <div class="modal__counter" id="modalCounter">1/1</div>
+      <button class="modal__close" id="modalClose" type="button" aria-label="닫기">&times;</button>
       <button class="modal__nav modal__nav--prev" id="modalPrev" type="button" aria-label="이전 사진">‹</button>
       <img class="modal__img" id="modalImg" alt="modal" />
       <button class="modal__nav modal__nav--next" id="modalNext" type="button" aria-label="다음 사진">›</button>
@@ -592,6 +593,7 @@ function build() {
   const modalPrev = $("#modalPrev");
   const modalNext = $("#modalNext");
   const modalCounter = $("#modalCounter");
+  const modalClose = $("#modalClose");
 
   let currentList = [];
   let currentIndex = 0;
@@ -701,6 +703,7 @@ function build() {
 
   modalPrev.addEventListener("click", (e) => { e.stopPropagation(); prev(); });
   modalNext.addEventListener("click", (e) => { e.stopPropagation(); next(); });
+  modalClose.addEventListener("click", (e) => { e.stopPropagation(); closeModal(); });
   modalImg.addEventListener("click", (e) => e.stopPropagation());
 
   window.addEventListener("keydown", (e) => {

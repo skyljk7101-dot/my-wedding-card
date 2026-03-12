@@ -3,6 +3,21 @@ $ErrorActionPreference = "Stop"
 
 Add-Type -AssemblyName System.Drawing
 
+function Get-TotalBytes($items) {
+  $collection = @($items)
+  if ($collection.Count -eq 0) {
+    return 0
+  }
+
+  [long]$sum = 0
+  foreach ($item in $collection) {
+    if ($null -ne $item -and $null -ne $item.Length) {
+      $sum += [long]$item.Length
+    }
+  }
+  return $sum
+}
+
 function Get-ProjectRoot {
   return (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
 }
@@ -175,13 +190,10 @@ $referenced = Get-ReferencedImagePaths -projectRoot $projectRoot
 $allImages = Get-ChildItem $assetsRoot -Recurse -File |
   Where-Object { $_.Extension -match "^\.(avif|gif|jpe?g|png|webp)$" }
 
-$beforeTotal = ($allImages | Measure-Object Length -Sum).Sum
+$beforeTotal = Get-TotalBytes $allImages
 
 $unusedImages = $allImages | Where-Object { -not $referenced.Contains($_.FullName) }
-$removedBytes = ($unusedImages | Measure-Object Length -Sum).Sum
-if ($null -eq $removedBytes) {
-  $removedBytes = 0
-}
+$removedBytes = Get-TotalBytes $unusedImages
 foreach ($image in $unusedImages) {
   Remove-Item $image.FullName -Force
 }
@@ -211,16 +223,16 @@ foreach ($image in $retainedImages) {
 
 $afterImages = Get-ChildItem $assetsRoot -Recurse -File |
   Where-Object { $_.Extension -match "^\.(avif|gif|jpe?g|png|webp)$" }
-$afterTotal = ($afterImages | Measure-Object Length -Sum).Sum
+$afterTotal = Get-TotalBytes $afterImages
 
 [PSCustomObject]@{
-  RemovedCount = $unusedImages.Count
+  RemovedCount = @($unusedImages).Count
   RemovedMB = [Math]::Round($removedBytes / 1MB, 2)
-  OptimizedCount = $optimized.Count
+  OptimizedCount = @($optimized).Count
   BeforeTotalMB = [Math]::Round($beforeTotal / 1MB, 2)
   AfterTotalMB = [Math]::Round($afterTotal / 1MB, 2)
 } | Format-List
 
-if ($optimized.Count -gt 0) {
+if (@($optimized).Count -gt 0) {
   $optimized | Sort-Object Path | Format-Table -AutoSize
 }

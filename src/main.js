@@ -534,7 +534,7 @@ function build() {
         </div>
         <div class="locationGuide__group">
           <div class="locationGuide__label">자차</div>
-          <div class="locationGuide__text">서울시 마포구 마포대로 92 효성해링턴스퀘어<br>건물 내 주차 가능</div>
+          <div class="locationGuide__text">서울시 마포구 마포대로 92 효성해링턴스퀘어<br>건물 내 주차 가능<br><br>예식장 규정에 따라 화환 반입이 불가하여<br>마음만 감사히 받겠습니다.<br>(리본띠만 받습니다.)</div>
         </div>
       </div>
     </section>

@@ -1,6 +1,7 @@
 param(
   [string]$Endpoint = "https://script.google.com/macros/s/AKfycbyoiTXZkMShjPz8orFiUCcOiGsOabXujlTAGXvTKwc8wow5nLd25HgJHw6iUEXSUoZ9/exec",
-  [string]$OutCsv = ""
+  [string]$OutCsv = "",
+  [string]$AdminKey = $env:GUESTBOOK_ADMIN_KEY
 )
 
 $ErrorActionPreference = "Stop"
@@ -58,8 +59,18 @@ function Get-KstString {
   return [DateTimeOffset]::FromUnixTimeMilliseconds($UnixMs).ToOffset($offset).ToString("yyyy-MM-dd HH:mm:ss")
 }
 
-$uri = "${Endpoint}?action=list&_=$(Get-Date -UFormat %s)"
+$query = "action=list"
+if ($AdminKey) {
+  $escapedAdminKey = [System.Uri]::EscapeDataString($AdminKey)
+  $query = "action=listAdmin&adminKey=$escapedAdminKey"
+}
+
+$uri = "${Endpoint}?${query}&_=$(Get-Date -UFormat %s)"
 $items = Invoke-RestMethod -Method Get -Uri $uri
+
+if ($items -is [pscustomobject] -and $items.PSObject.Properties.Name -contains "ok" -and -not $items.ok) {
+  throw "Guestbook admin request failed: $([string]$items.error)"
+}
 
 $rows = foreach ($item in @($items)) {
   $decoded = Convert-GuestbookMessage -RawMessage ([string]$item.msg)
@@ -76,7 +87,7 @@ $rows = foreach ($item in @($items)) {
     TimeKst = Get-KstString -UnixMs ([long]$item.ts)
     Name = $name
     Message = $message
-    IP = [string]$decoded.Ip
+    IP = if ($item.PSObject.Properties.Name -contains "ip" -and [string]$item.ip) { [string]$item.ip } else { [string]$decoded.Ip }
   }
 }
 

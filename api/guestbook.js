@@ -95,6 +95,7 @@ async function addGuestbookEntry({ name, msg, ip }) {
       action: "add",
       name,
       msg: encodeGuestbookMessage(msg, ip),
+      ip,
     }),
     redirect: "follow",
     cache: "no-store",

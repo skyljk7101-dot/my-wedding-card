@@ -1,5 +1,5 @@
 const APPS_SCRIPT_GUESTBOOK_ENDPOINT =
-  "https://script.google.com/macros/s/AKfycbyoiTXZkMShjPz8orFiUCcOiGsOabXujlTAGXvTKwc8wow5nLd25HgJHw6iUEXSUoZ9/exec";
+  "https://script.google.com/macros/s/AKfycbyOCgbblTDzo11Aus3u0Gj3kyaQt_tNbs2mAMUYYZZiavthOBNTc9i-5viko8OACxNx/exec";
 
 const GUESTBOOK_MESSAGE_PREFIX = "__GBV1__";
 const HIDDEN_GUESTBOOK_ENTRIES = new Set([

@@ -121,12 +121,28 @@ const INTRO_SCROLL_KEYS = new Set([
   "Home",
   "End",
 ]);
+const INTRO_SCROLL_EVENT_OPTIONS = { passive: false };
+const INTRO_SCROLL_TARGETS = [window, document];
 
 let __introScrollLocked = false;
 
 function preventIntroScrollKey(e) {
   if (!INTRO_SCROLL_KEYS.has(e.key)) return;
   e.preventDefault();
+}
+
+function keepIntroScrollTop() {
+  if (!__introScrollLocked) return;
+  if ((window.scrollY || window.pageYOffset || 0) !== 0) {
+    window.scrollTo(0, 0);
+  }
+}
+
+function setIntroBodyLock(locked) {
+  document.body.style.position = locked ? "fixed" : "";
+  document.body.style.inset = locked ? "0" : "";
+  document.body.style.width = locked ? "100%" : "";
+  document.body.style.overflow = locked ? "hidden" : "";
 }
 
 function setIntroScrollLock(locked) {
@@ -137,9 +153,19 @@ function setIntroScrollLock(locked) {
   document.body.classList.toggle("is-intro-locked", locked);
 
   const method = locked ? "addEventListener" : "removeEventListener";
-  window[method]("wheel", preventTouchMove, { passive: false });
-  window[method]("touchmove", preventTouchMove, { passive: false });
-  window[method]("keydown", preventIntroScrollKey, { passive: false });
+  INTRO_SCROLL_TARGETS.forEach((target) => {
+    target[method]("wheel", preventTouchMove, INTRO_SCROLL_EVENT_OPTIONS);
+    target[method]("touchmove", preventTouchMove, INTRO_SCROLL_EVENT_OPTIONS);
+    target[method]("keydown", preventIntroScrollKey, INTRO_SCROLL_EVENT_OPTIONS);
+  });
+  window[method]("scroll", keepIntroScrollTop, INTRO_SCROLL_EVENT_OPTIONS);
+
+  setIntroBodyLock(locked);
+  window.scrollTo(0, 0);
+
+  if (locked) {
+    requestAnimationFrame(keepIntroScrollTop);
+  }
 }
 
 function formatTime(ts) {

@@ -64,147 +64,76 @@ button{ font:inherit; }
   margin:0 auto;
   display:grid;
   place-items:center;
-  padding:
-    calc(env(safe-area-inset-top, 0px) + 8px)
-    10px
-    calc(env(safe-area-inset-bottom, 0px) + 8px);
+  padding:0;
 }
 
 .introCanvas{
   position:relative;
-  width:360px;
-  max-width:100%;
+  width:100%;
   height:100%;
 }
 
-.pol{
+.introHero{
   position:absolute;
-  width:160px;
-  padding: 10px 10px 50px 10px;
-  border-radius: 2px;
-  background: #ede9e3;
-  outline: 1px solid rgba(0,0,0,0.10);
-  box-shadow:
-    0 1px 2px rgba(0,0,0,0.18),
-    0 10px 22px rgba(0,0,0,0.20),
-    0 28px 60px rgba(0,0,0,0.24);
-  filter: drop-shadow(0 2px 1px rgba(0,0,0,0.08)) drop-shadow(0 14px 18px rgba(0,0,0,0.10));
-  opacity: 0;
-  transform: translateY(20px) scale(0.96) rotate(var(--r,0deg));
-  /* ✅ 폴라로이드 자체에도 미세한 노화 느낌 */
-  overflow: hidden;
+  inset:0;
+  overflow:hidden;
 }
-.pol::before{
-  /* ✅ 그레인 노이즈 오버레이 - 사진 위 */
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-  opacity: 0.035;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 160px 160px;
-  mix-blend-mode: overlay;
+.introHero::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    linear-gradient(180deg, rgba(25, 18, 12, 0.14) 0%, rgba(25, 18, 12, 0.06) 28%, rgba(25, 18, 12, 0.22) 100%),
+    radial-gradient(circle at top right, rgba(255, 236, 214, 0.32) 0%, rgba(255, 236, 214, 0) 38%);
+  z-index:1;
+  pointer-events:none;
 }
-.pol.is-in{
-  opacity:1;
-  transform: translateY(0) scale(1) rotate(var(--r,0deg));
-  transition: opacity 500ms ease, transform 580ms cubic-bezier(0.22,1,0.36,1);
-}
-.pol__img{
+.introHero__img{
   width:100%;
-  aspect-ratio: 1 / 1.18;
-  object-fit: cover;
-  object-position: center top;
+  height:100%;
+  object-fit:cover;
+  object-position:center center;
   display:block;
-  position: relative;
-  z-index: 1;
-  /* ✅ 핵심: 진짜 바랜 필름 사진 느낌
-     - contrast 낮춤: 흐릿한 오래된 느낌
-     - saturate 많이 낮춤: 색이 빠진 느낌
-     - sepia 강하게: 노르스름한 변색
-     - brightness 살짝 올림: 안개낀 듯한 느낌
-     - hue-rotate: 약간 따뜻하게
-  */
-  filter: contrast(0.88)
-    saturate(0.78)
-    brightness(1.03)
-    sepia(0.18)
-    hue-rotate(-5deg);
-}
-/* ✅ 이미지 위 light-leak 효과 */
-.pol__img::after{
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(255,210,160,0.22) 0%, rgba(255,240,200,0.08) 50%, transparent 70%);
-  z-index: 2;
-  pointer-events: none;
+  transform:scale(1.015);
+  filter: contrast(0.93) saturate(0.9) brightness(0.95);
 }
 
-/* ✅ 폴라로이드 하단 - 손으로 쓴 날짜 */
-.pol::after{
-  content: "2026 · 05 · 31";
-  position: absolute;
-  bottom: 18px;
-  left: 0; right: 0;
-  text-align: center;
-  font-family: "Northwell", cursive;
-  font-size: 15px;
-  color: rgba(0,0,0,0.32);
-  letter-spacing: 1px;
-  z-index: 4;
-}
-/* 이미지 참고 레이아웃:
-   pol--1: 상단 중앙 약간 왼쪽, 오른쪽으로 살짝 기울
-   writePhrase: 1번 사진 오른쪽
-   pol--2: 중간 왼쪽, 왼쪽으로 살짝 기울
-   pol--3: 중간~하단 오른쪽
-   writeName: 3번 사진 왼쪽 아래
-*/
-.pol--1{ left:24px; top:13px; --r: 6deg; z-index:10; }
-.pol--2{ left:24px; top:calc(255px - 0.5cm); --r:-7deg; z-index:20; }
-.pol--3{ right:12px; top:auto; bottom:36px; --r: 4deg; z-index:30; }
-
-/* ===== 손글씨 공통 ===== */
 .writePhrase,
 .writeName {
-  position: absolute;
+  position:absolute;
   display: flex;
   flex-direction: column;
   font-family: "Northwell", cursive;
   font-weight: 400;
-  color: #111;
-  text-align: left;
+  color: #fff8f0;
+  text-align: center;
   white-space: nowrap;
   pointer-events: none;
   overflow: visible;
-  text-shadow: 1px 2px 0 rgba(0,0,0,0.06), 0 0 1px rgba(0,0,0,0.03);
+  text-shadow: 0 3px 18px rgba(0,0,0,0.24), 0 1px 2px rgba(0,0,0,0.22);
+  z-index:2;
 }
 
-/* we getting married!!! - 1번 사진 오른쪽 */
 .writePhrase {
-  right: calc(18px - 0.2cm);
-  top: calc(78px + 2cm);
-  font-size: 47px;
-  line-height: 1.3;
-  z-index: 55;
-  transform: rotate(-2deg);
-  align-items: flex-start;
+  left:50%;
+  top:calc(env(safe-area-inset-top, 0px) + 68px);
+  width:min(100%, 320px);
+  font-size:clamp(46px, 12vw, 74px);
+  line-height:1.05;
+  transform:translateX(-50%) rotate(-3deg);
+  align-items:center;
 }
 
-/* lee jae gi & jeong da som - 하단 중앙 */
 .writeName {
-  left: calc(50% - 40px - 1.5cm);
-  top: auto;
-  bottom: 15px;
-  font-size: 36px;
-  line-height: 1.35;
-  z-index: 55;
+  left:50%;
+  bottom:calc(env(safe-area-inset-bottom, 0px) + 44px);
+  width:min(100%, 320px);
+  font-size:clamp(34px, 8.8vw, 54px);
+  line-height:1.18;
   text-align: center;
   align-items: center;
-  transform: translateX(-50%) rotate(-3deg);
-  color: #1a1a1a;
+  transform:translateX(-50%) rotate(-2deg);
+  color:#fffdf9;
 }
 
 /* 줄 단위 손글씨 */

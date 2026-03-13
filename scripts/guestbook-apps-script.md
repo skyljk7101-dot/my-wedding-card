@@ -18,8 +18,9 @@ Sheet layout:
 
 Display:
 
-- The `ts` column is written as a real spreadsheet date and formatted like
-  `2026년 3월 14일`.
+- The `ts` column is written as a real spreadsheet date.
+- The sheet timezone is forced to `Asia/Seoul`.
+- The displayed format is `2026년 3월 14일 11시 22분 33초`.
 - The API still converts that value back to a Unix millisecond timestamp for the
   wedding site and admin tools.
 

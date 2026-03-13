@@ -2,7 +2,8 @@ const SHEET_NAME = 'guestbook';
 const HAS_HEADER_ROW = true;
 const GUESTBOOK_MESSAGE_PREFIX = '__GBV1__';
 const ADMIN_KEY_PROPERTY = 'GUESTBOOK_ADMIN_KEY';
-const TS_COLUMN_FORMAT = 'yyyy"년" m"월" d"일"';
+const SHEET_TIME_ZONE = 'Asia/Seoul';
+const TS_COLUMN_FORMAT = 'yyyy"\uB144" m"\uC6D4" d"\uC77C" hh"\uC2DC" mm"\uBD84" ss"\uCD08"';
 
 function doGet(e) {
   try {
@@ -18,7 +19,7 @@ function doGet(e) {
 
     return jsonOutput({ ok: false, error: 'invalid action' });
   } catch (error) {
-    return jsonOutput({ ok: false, error: String(error && error.message || error || 'unknown') });
+    return jsonOutput({ ok: false, error: String((error && error.message) || error || 'unknown') });
   }
 }
 
@@ -48,7 +49,7 @@ function doPost(e) {
     appendGuestbookRow_(ts, name, msg, ip || fallbackIp);
     return jsonOutput({ ok: true, ts: ts });
   } catch (error) {
-    return jsonOutput({ ok: false, error: String(error && error.message || error || 'unknown') });
+    return jsonOutput({ ok: false, error: String((error && error.message) || error || 'unknown') });
   }
 }
 
@@ -93,6 +94,7 @@ function appendGuestbookRow_(ts, name, msg, ip) {
 
 function getGuestbookSheet_() {
   const ss = SpreadsheetApp.getActiveSpreadsheet();
+  ss.setSpreadsheetTimeZone(SHEET_TIME_ZONE);
   const sheet = ss.getSheetByName(SHEET_NAME) || ss.insertSheet(SHEET_NAME);
   ensureHeaderRow_(sheet);
   return sheet;
@@ -156,8 +158,8 @@ function decodeMessagePayload_(message) {
     const json = Utilities.newBlob(Utilities.base64DecodeWebSafe(encoded)).getDataAsString();
     const parsed = JSON.parse(json);
     return {
-      msg: String(parsed && parsed.msg || ''),
-      ip: String(parsed && parsed.ip || ''),
+      msg: String((parsed && parsed.msg) || ''),
+      ip: String((parsed && parsed.ip) || ''),
     };
   } catch (error) {
     return { msg: raw, ip: '' };

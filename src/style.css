@@ -78,11 +78,14 @@ button{ font:inherit; }
   inset:0;
   background:#fff;
   overflow:hidden;
+  z-index:0;
 }
 .introHero::after{
   content:none;
 }
 .introHero__img{
+  position:relative;
+  z-index:0;
   width:100%;
   height:100%;
   object-fit:contain;
@@ -105,7 +108,7 @@ button{ font:inherit; }
   pointer-events: none;
   overflow: visible;
   text-shadow:none;
-  z-index:2;
+  z-index:5;
 }
 
 .writePhrase {
@@ -143,16 +146,18 @@ button{ font:inherit; }
 }
 .writePhrase .writeLine{
   padding-bottom: 0.14em;
-  transform:translateX(40%);
+  transform:translateX(80%);
 }
 .writeName .writeLine{
   padding-bottom: 0.14em;
-  transform:translateX(-40%);
+  transform:translateX(-80%);
 }
 
 .writePhrase .writeLine__text,
 .writeName .writeLine__text {
   display: inline-block;
+  position:relative;
+  z-index:6;
   padding-left: 0.12em;
   padding-right: 0.1em;
   padding-bottom: 0.16em;

@@ -106,6 +106,37 @@ function unlockScroll() {
 }
 function preventTouchMove(e) { e.preventDefault(); }
 
+const INTRO_SCROLL_KEYS = new Set([
+  " ",
+  "Spacebar",
+  "PageDown",
+  "PageUp",
+  "ArrowDown",
+  "ArrowUp",
+  "Home",
+  "End",
+]);
+
+let __introScrollLocked = false;
+
+function preventIntroScrollKey(e) {
+  if (!INTRO_SCROLL_KEYS.has(e.key)) return;
+  e.preventDefault();
+}
+
+function setIntroScrollLock(locked) {
+  if (__introScrollLocked === locked) return;
+  __introScrollLocked = locked;
+
+  document.documentElement.classList.toggle("is-intro-locked", locked);
+  document.body.classList.toggle("is-intro-locked", locked);
+
+  const method = locked ? "addEventListener" : "removeEventListener";
+  window[method]("wheel", preventTouchMove, { passive: false });
+  window[method]("touchmove", preventTouchMove, { passive: false });
+  window[method]("keydown", preventIntroScrollKey, { passive: false });
+}
+
 function formatTime(ts) {
   const d = new Date(ts);
   const yy = String(d.getFullYear()).slice(2);
@@ -569,6 +600,8 @@ function build() {
   const writePhrase = document.getElementById("writePhrase");
   const writeName = document.getElementById("writeName");
 
+  if (intro) setIntroScrollLock(true);
+
   // 손글씨 문구를 먼저 구성하고 위에서 아래 순서로 재생한다.
   if (writePhrase) buildWritePhrase(writePhrase, "we getting\nmarried!!!");
   if (writeName) buildWritePhrase(writeName, "lee jae gi\n&\njeong da som");
@@ -581,6 +614,9 @@ function build() {
       if (intro) {
         intro.classList.add("is-hide");
         intro.setAttribute("aria-hidden", "true");
+        setTimeout(() => setIntroScrollLock(false), 650);
+      } else {
+        setIntroScrollLock(false);
       }
       if (main) {
         main.style.transition = "opacity 450ms ease";

@@ -6,14 +6,8 @@ const HIDDEN_GUESTBOOK_ENTRIES = new Set([
   "codex-test::ping",
   "codex-ip-test::ping",
   "codex-cors-test::ping",
+  "codex-proxy-test::ping",
 ]);
-
-function json(data, init = {}) {
-  const headers = new Headers(init.headers || {});
-  headers.set("Content-Type", "application/json; charset=utf-8");
-  headers.set("Cache-Control", "no-store");
-  return new Response(JSON.stringify(data), { ...init, headers });
-}
 
 function toBase64Url(value) {
   return Buffer.from(value, "utf8")
@@ -55,9 +49,17 @@ function isHiddenGuestbookEntry(item) {
   return HIDDEN_GUESTBOOK_ENTRIES.has(key);
 }
 
+function getQueryValue(value) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function getHeaderValue(value) {
+  return Array.isArray(value) ? value[0] : value;
+}
+
 function getClientIp(request) {
-  const forwardedFor = request.headers.get("x-forwarded-for") || request.headers.get("x-real-ip") || "";
-  const firstIp = forwardedFor.split(",")[0]?.trim();
+  const forwardedFor = getHeaderValue(request.headers["x-forwarded-for"]) || getHeaderValue(request.headers["x-real-ip"]) || "";
+  const firstIp = String(forwardedFor).split(",")[0]?.trim();
   return firstIp || "";
 }
 
@@ -116,8 +118,25 @@ async function addGuestbookEntry({ name, msg, ip }) {
   return jsonBody;
 }
 
+async function readRequestBody(request) {
+  if (request.body !== undefined && request.body !== null) {
+    if (typeof request.body === "string") return request.body;
+    if (Buffer.isBuffer(request.body)) return request.body.toString("utf8");
+    return JSON.stringify(request.body);
+  }
+
+  return await new Promise((resolve, reject) => {
+    let raw = "";
+    request.on("data", (chunk) => {
+      raw += chunk;
+    });
+    request.on("end", () => resolve(raw));
+    request.on("error", reject);
+  });
+}
+
 async function parseRequestBody(request) {
-  const raw = await request.text();
+  const raw = await readRequestBody(request);
   if (!raw) return {};
 
   try {
@@ -127,48 +146,62 @@ async function parseRequestBody(request) {
   }
 }
 
-export async function GET(request) {
-  const url = new URL(request.url);
-  const action = url.searchParams.get("action") || "list";
-
-  if (action !== "list") {
-    return json({ ok: false, error: "invalid action" }, { status: 400 });
-  }
-
-  try {
-    const items = await fetchGuestbookList();
-    return json(items);
-  } catch (error) {
-    return json(
-      { ok: false, error: String(error?.message || error || "unknown") },
-      { status: 502 }
-    );
-  }
+function sendJson(response, statusCode, payload) {
+  response.status(statusCode);
+  response.setHeader("Content-Type", "application/json; charset=utf-8");
+  response.setHeader("Cache-Control", "no-store");
+  response.json(payload);
 }
 
-export async function POST(request) {
-  const body = await parseRequestBody(request);
-  if (!body) {
-    return json({ ok: false, error: "invalid json" }, { status: 400 });
+export default async function handler(request, response) {
+  if (request.method === "GET") {
+    const action = getQueryValue(request.query?.action) || "list";
+    if (action !== "list") {
+      sendJson(response, 400, { ok: false, error: "invalid action" });
+      return;
+    }
+
+    try {
+      const items = await fetchGuestbookList();
+      sendJson(response, 200, items);
+    } catch (error) {
+      sendJson(response, 502, {
+        ok: false,
+        error: String(error?.message || error || "unknown"),
+      });
+    }
+    return;
   }
 
-  const name = String(body?.name || "").trim();
-  const msg = String(body?.msg || "").trim();
-  if (!name || !msg) {
-    return json({ ok: false, error: "missing fields" }, { status: 400 });
+  if (request.method === "POST") {
+    const body = await parseRequestBody(request);
+    if (!body) {
+      sendJson(response, 400, { ok: false, error: "invalid json" });
+      return;
+    }
+
+    const name = String(body?.name || "").trim();
+    const msg = String(body?.msg || "").trim();
+    if (!name || !msg) {
+      sendJson(response, 400, { ok: false, error: "missing fields" });
+      return;
+    }
+
+    try {
+      const result = await addGuestbookEntry({
+        name,
+        msg,
+        ip: getClientIp(request),
+      });
+      sendJson(response, 200, { ok: true, ts: result.ts });
+    } catch (error) {
+      sendJson(response, 502, {
+        ok: false,
+        error: String(error?.message || error || "unknown"),
+      });
+    }
+    return;
   }
 
-  try {
-    const result = await addGuestbookEntry({
-      name,
-      msg,
-      ip: getClientIp(request),
-    });
-    return json({ ok: true, ts: result.ts });
-  } catch (error) {
-    return json(
-      { ok: false, error: String(error?.message || error || "unknown") },
-      { status: 502 }
-    );
-  }
+  sendJson(response, 405, { ok: false, error: "method not allowed" });
 }

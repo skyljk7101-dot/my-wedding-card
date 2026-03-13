@@ -27,8 +27,8 @@ export const INVITE = {
   ],
 
   weddingGallery: [
-    "/assets/18.jpg", "/assets/20.jpg", "/assets/21.jpg", "/assets/22.jpg",
-    "/assets/23.jpg", "/assets/24.jpg", "/assets/25.jpg", "/assets/26.jpg",
+    "/assets/18.jpg", "/assets/20.jpg", "/assets/26.jpg", "/assets/21.jpg",
+    "/assets/22.jpg", "/assets/23.jpg", "/assets/24.jpg", "/assets/25.jpg",
     "/assets/1.jpg", "/assets/2.jpg", "/assets/3.jpg", "/assets/4.jpg",
     "/assets/5.jpg", "/assets/6.jpg", "/assets/7.jpg", "/assets/8.jpg",
     "/assets/8-1.jpg", "/assets/8-2.jpg", "/assets/9.jpg",

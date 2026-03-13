@@ -14,6 +14,7 @@ const GUESTBOOK_ENDPOINT = INVITE.GUESTBOOK_ENDPOINT;
 const HIDDEN_GUESTBOOK_ENTRIES = new Set([
   "codex-test::ping",
   "codex-ip-test::ping",
+  "codex-cors-test::ping",
 ]);
 
 function toast(msg) {
@@ -166,7 +167,8 @@ async function gbFetchList() {
 async function gbAddItem(name, msg) {
   const res = await fetch(GUESTBOOK_ENDPOINT, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "text/plain;charset=UTF-8" },
+    redirect: "follow",
     body: JSON.stringify({ action: "add", name, msg }),
   });
   if (!res.ok) throw new Error(`Guestbook add failed: ${res.status}`);

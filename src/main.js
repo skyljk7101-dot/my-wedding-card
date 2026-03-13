@@ -478,6 +478,14 @@ function build() {
               </a>
             </div>
           </div>
+          <div class="accRow">
+            <div class="accRow__info">
+              <span class="accRow__name">신랑 어머니</span>
+              <span class="accRow__number">1002748770753</span>
+              <span class="accRow__bank">우리은행 유순덕</span>
+            </div>
+            <button class="btn btn--mini accCopyBtn" type="button" data-copy="우리은행 1002748770753 (유순덕)">복사</button>
+          </div>
         </div>
       </div>
 

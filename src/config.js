@@ -25,6 +25,7 @@ export const INVITE = {
 
   accounts: [
     { label: "신랑 측", bank: "토스뱅크", number: "1000-0126-3854", holder: "이재기" },
+    { label: "신랑 어머니", bank: "우리은행", number: "1002748770753", holder: "유순덕" },
   ],
 
   weddingGallery: [

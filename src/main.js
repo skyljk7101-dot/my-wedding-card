@@ -5,6 +5,24 @@ const $ = (sel) => document.querySelector(sel);
 const encode = (s) => encodeURIComponent(String(s ?? ""));
 const pad2 = (n) => String(n).padStart(2, "0");
 
+if ("scrollRestoration" in window.history) {
+  window.history.scrollRestoration = "manual";
+}
+
+function forceScrollTop() {
+  window.scrollTo(0, 0);
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+}
+
+function scheduleScrollTopReset() {
+  forceScrollTop();
+  requestAnimationFrame(forceScrollTop);
+  setTimeout(forceScrollTop, 60);
+}
+
+window.addEventListener("pageshow", scheduleScrollTopReset);
+
 // ✅ Kakao
 const KAKAO_JS_KEY = "950d726b2979c7f8113c72f6fbfb8771";
 const KAKAO_TEMPLATE_ID = 129829;
@@ -362,6 +380,8 @@ function waitForIntroFont(timeoutMs = 1800) {
 }
 
 function build() {
+  scheduleScrollTopReset();
+
   const d = INVITE;
 
   const inviteTitle = "소중한 사람을 초대합니다.";

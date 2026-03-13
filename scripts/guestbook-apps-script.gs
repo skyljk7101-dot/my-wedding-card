@@ -2,6 +2,7 @@ const SHEET_NAME = 'guestbook';
 const HAS_HEADER_ROW = true;
 const GUESTBOOK_MESSAGE_PREFIX = '__GBV1__';
 const ADMIN_KEY_PROPERTY = 'GUESTBOOK_ADMIN_KEY';
+const TS_COLUMN_FORMAT = 'yyyy"년" m"월" d"일"';
 
 function doGet(e) {
   try {
@@ -71,7 +72,7 @@ function listGuestbook_(options) {
       const decoded = decodeMessagePayload_(String(row[2] || ''));
       const ip = String(row[3] || '').trim() || String(decoded.ip || '').trim();
       const item = {
-        ts: Number(row[0] || 0),
+        ts: toTimestamp_(row[0]),
         name: String(row[1] || ''),
         msg: String(decoded.msg || ''),
       };
@@ -85,7 +86,9 @@ function listGuestbook_(options) {
 function appendGuestbookRow_(ts, name, msg, ip) {
   const sheet = getGuestbookSheet_();
   ensureHeaderRow_(sheet);
-  sheet.appendRow([ts, name, msg, ip]);
+  const rowIndex = sheet.getLastRow() + 1;
+  sheet.getRange(rowIndex, 1, 1, 4).setValues([[new Date(ts), name, msg, ip]]);
+  sheet.getRange(rowIndex, 1).setNumberFormat(TS_COLUMN_FORMAT);
 }
 
 function getGuestbookSheet_() {
@@ -99,6 +102,7 @@ function ensureHeaderRow_(sheet) {
   if (!HAS_HEADER_ROW) return;
   if (sheet.getLastRow() === 0) {
     sheet.appendRow(['ts', 'name', 'msg', 'ip']);
+    sheet.getRange('A:A').setNumberFormat(TS_COLUMN_FORMAT);
     return;
   }
 
@@ -107,6 +111,7 @@ function ensureHeaderRow_(sheet) {
     sheet.insertRows(1, 1);
     sheet.getRange(1, 1, 1, 4).setValues([['ts', 'name', 'msg', 'ip']]);
   }
+  sheet.getRange('A:A').setNumberFormat(TS_COLUMN_FORMAT);
 }
 
 function parsePayload_(e) {
@@ -129,6 +134,15 @@ function requireAdminKey_(providedKey) {
   if (!providedKey || providedKey !== expectedKey) {
     throw new Error('forbidden');
   }
+}
+
+function toTimestamp_(value) {
+  if (Object.prototype.toString.call(value) === '[object Date]' && !isNaN(value.getTime())) {
+    return value.getTime();
+  }
+
+  const numeric = Number(value || 0);
+  return isFinite(numeric) && numeric > 0 ? numeric : 0;
 }
 
 function decodeMessagePayload_(message) {

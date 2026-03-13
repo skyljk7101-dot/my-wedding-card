@@ -16,6 +16,13 @@ Sheet layout:
 - `msg`
 - `ip`
 
+Display:
+
+- The `ts` column is written as a real spreadsheet date and formatted like
+  `2026년 3월 14일`.
+- The API still converts that value back to a Unix millisecond timestamp for the
+  wedding site and admin tools.
+
 Apply steps:
 
 1. Open the current Google Apps Script project.

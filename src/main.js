@@ -330,7 +330,7 @@ function build() {
   const inviteTitle = "소중한 사람을 초대합니다.";
   const inviteKickerLine1 = "Locked in for life.";
   const inviteKickerLine2 = "Forever starts now";
-  const inviteQuote = "서로의 하루를 구독하던 우리, 이제는 평생 자동 연장됩니다";
+  const inviteQuote = `"서로의 하루를 구독하던 우리,\n이제는 평생 자동 연장됩니다"`;
   const inviteBodyLine1 = "함께하면 더 편하고 더 즐거운 사람이 되어";
   const inviteBodyLine2 = "평생을 함께하기로 했습니다.";
   const inviteBodyLine3 = "저희의 시작이 되는 봄";

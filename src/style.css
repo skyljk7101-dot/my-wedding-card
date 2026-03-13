@@ -143,11 +143,11 @@ button{ font:inherit; }
 }
 .writePhrase .writeLine{
   padding-bottom: 0.14em;
-  transform:translateX(20%);
+  transform:translateX(40%);
 }
 .writeName .writeLine{
   padding-bottom: 0.14em;
-  transform:translateX(-20%);
+  transform:translateX(-40%);
 }
 
 .writePhrase .writeLine__text,

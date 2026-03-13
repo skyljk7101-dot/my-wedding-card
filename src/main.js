@@ -154,7 +154,7 @@ function formatTime(ts) {
 
 /* ===== Guestbook ===== */
 function hasGuestbookEndpoint() {
-  return typeof GUESTBOOK_ENDPOINT === "string" && GUESTBOOK_ENDPOINT.includes("script.google.com/macros/s/");
+  return typeof GUESTBOOK_ENDPOINT === "string" && GUESTBOOK_ENDPOINT.trim().length > 0;
 }
 
 async function gbFetchList() {
@@ -1149,7 +1149,7 @@ function build() {
   }
 
   if (!hasGuestbookEndpoint()) {
-    gbHint.textContent = "⚠️ 방명록 서버 URL이 설정되지 않았어요. config.js의 GUESTBOOK_ENDPOINT를 배포 URL로 바꿔주세요.";
+    gbHint.textContent = "⚠️ 방명록 서버 URL이 설정되지 않았어요. config.js의 GUESTBOOK_ENDPOINT를 확인해주세요.";
     renderGB([]);
   } else {
     gbHint.textContent = "하객 모두가 같은 방명록을 공유합니다.";

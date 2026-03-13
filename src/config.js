@@ -45,8 +45,8 @@ export const INVITE = {
     "/assets/d17.jpg","/assets/d18.jpg"
   ],
 
-  // Apps Script Web App URL
-  GUESTBOOK_ENDPOINT: "https://script.google.com/macros/s/AKfycbyoiTXZkMShjPz8orFiUCcOiGsOabXujlTAGXvTKwc8wow5nLd25HgJHw6iUEXSUoZ9/exec",
+  // Same-origin guestbook API (proxied by Vercel)
+  GUESTBOOK_ENDPOINT: "/api/guestbook",
 
   footerText: "© 2026 DASOM · JAEGI Wedding",
 };

@@ -1,5 +1,5 @@
 const APPS_SCRIPT_GUESTBOOK_ENDPOINT =
-  "https://script.google.com/macros/s/AKfycbyOCgbblTDzo11Aus3u0Gj3kyaQt_tNbs2mAMUYYZZiavthOBNTc9i-5viko8OACxNx/exec";
+  "https://script.google.com/macros/s/AKfycbwrjGMW0Ehv0-vfyDps1nUm_wQv9-_-nE29BoSWzDeTRqbJJFaQWra1oaIWMFwEKh6R/exec";
 
 const GUESTBOOK_MESSAGE_PREFIX = "__GBV1__";
 const HIDDEN_GUESTBOOK_ENTRIES = new Set([
@@ -78,12 +78,14 @@ async function fetchGuestbookList() {
   return items
     .map((item) => {
       const decoded = decodeGuestbookMessage(item?.msg);
+      const ts = Number(item?.ts);
       return {
-        ts: item?.ts,
+        ts,
         name: String(item?.name || ""),
         msg: decoded.msg,
       };
     })
+    .filter((item) => Number.isFinite(item.ts) && item.ts > 0)
     .filter((item) => !isHiddenGuestbookEntry(item));
 }
 

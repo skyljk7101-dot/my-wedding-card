@@ -112,7 +112,7 @@ button{ font:inherit; }
 }
 
 .writePhrase {
-  left:calc(50% - 0.5cm);
+  left:calc(50% - 0.8cm);
   top:calc(env(safe-area-inset-top, 0px) + 68px + 2cm);
   width:min(100%, 320px);
   font-size:clamp(46px, 12vw, 74px);

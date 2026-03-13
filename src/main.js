@@ -1137,11 +1137,20 @@ function build() {
   const gbForm = $("#gbForm");
   const gbName = $("#gbName");
   const gbMsg = $("#gbMsg");
+  const gbSubmitBtn = gbForm?.querySelector('button[type="submit"]');
   const weddingDdayEl = $("#weddingDday");
 
   const GB_PAGE_SIZE = 5;
   let __gbAll = [];
   let __gbVisible = GB_PAGE_SIZE;
+  let __gbSubmitting = false;
+
+  function setGuestbookSubmitting(submitting) {
+    __gbSubmitting = submitting;
+    if (!gbSubmitBtn) return;
+    gbSubmitBtn.disabled = submitting;
+    gbSubmitBtn.textContent = submitting ? "남기는 중..." : "남기기";
+  }
 
   function updateGbMoreBtn() {
     if (!gbMoreBtn) return;
@@ -1187,6 +1196,12 @@ function build() {
     paintGB();
   }
 
+  function prependGB(item) {
+    if (!item) return;
+    __gbAll = [item, ...__gbAll];
+    paintGB();
+  }
+
   if (gbMoreBtn) {
     gbMoreBtn.addEventListener("click", () => {
       __gbVisible = Math.min(__gbVisible + GB_PAGE_SIZE, __gbAll.length);
@@ -1213,6 +1228,7 @@ function build() {
 
   gbForm.addEventListener("submit", async (e) => {
     e.preventDefault();
+    if (__gbSubmitting) return;
     const name = (gbName.value || "").trim();
     const msg = (gbMsg.value || "").trim();
     if (!name || !msg) return;
@@ -1223,12 +1239,20 @@ function build() {
     }
 
     try {
-      await gbAddItem(name, msg);
+      setGuestbookSubmitting(true);
+      const result = await gbAddItem(name, msg);
       gbName.value = "";
       gbMsg.value = "";
+      prependGB({
+        ts: Number(result?.ts) || Date.now(),
+        name,
+        msg,
+      });
       toast("방명록을 남겼어요!");
-      const items = await gbFetchList();
-      renderGB(items);
+      Promise.resolve()
+        .then(() => gbFetchList())
+        .then((items) => renderGB(items))
+        .catch((error) => console.error("Guestbook background refresh failed", error));
     } catch (err) {
       console.error(err);
       const m = String(err?.message || err);
@@ -1239,6 +1263,8 @@ function build() {
         m.includes("Failed to fetch") ? "방명록 저장 실패 (CORS/배포 권한/URL 확인)" :
         "방명록 저장 실패"
       );
+    } finally {
+      setGuestbookSubmitting(false);
     }
   });
 

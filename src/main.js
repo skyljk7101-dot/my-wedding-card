@@ -11,6 +11,10 @@ const KAKAO_TEMPLATE_ID = 129829;
 
 // ✅ Guestbook endpoint (Apps Script Web App URL)
 const GUESTBOOK_ENDPOINT = INVITE.GUESTBOOK_ENDPOINT;
+const HIDDEN_GUESTBOOK_ENTRIES = new Set([
+  "codex-test::ping",
+  "codex-ip-test::ping",
+]);
 
 function toast(msg) {
   let el = document.getElementById("__toast");
@@ -160,20 +164,25 @@ async function gbFetchList() {
 }
 
 async function gbAddItem(name, msg) {
-  const body = new URLSearchParams();
-  body.set("action", "add");
-  body.set("name", name);
-  body.set("msg", msg);
-
   const res = await fetch(GUESTBOOK_ENDPOINT, {
     method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded;charset=UTF-8" },
-    body,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ action: "add", name, msg }),
   });
   if (!res.ok) throw new Error(`Guestbook add failed: ${res.status}`);
-  const json = await res.json();
+  let json;
+  try {
+    json = await res.json();
+  } catch {
+    throw new Error("Guestbook add failed: invalid json");
+  }
   if (!json?.ok) throw new Error(`Guestbook add failed: ${json?.error || "unknown"}`);
   return json;
+}
+
+function isHiddenGuestbookEntry(item) {
+  const key = `${String(item?.name || "").trim()}::${String(item?.msg || "").trim()}`;
+  return HIDDEN_GUESTBOOK_ENTRIES.has(key);
 }
 
 function escapeHtml(s) {
@@ -1123,7 +1132,9 @@ function build() {
   }
 
   function renderGB(items) {
-    __gbAll = Array.isArray(items) ? items.slice().reverse() : [];
+    __gbAll = Array.isArray(items)
+      ? items.filter((item) => !isHiddenGuestbookEntry(item)).slice().reverse()
+      : [];
     __gbVisible = GB_PAGE_SIZE;
     paintGB();
   }
@@ -1176,6 +1187,7 @@ function build() {
       toast(
         m.includes("403") ? "방명록 저장 실패 (권한/배포 설정 403)" :
         m.includes("500") ? "방명록 저장 실패 (서버 오류 500)" :
+        m.includes("invalid json") ? "방명록 저장 실패 (요청 형식/서버 응답 확인)" :
         m.includes("Failed to fetch") ? "방명록 저장 실패 (CORS/배포 권한/URL 확인)" :
         "방명록 저장 실패"
       );

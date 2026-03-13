@@ -43,7 +43,7 @@ button{ font:inherit; }
 .intro{
   position:fixed;
   inset:0;
-  background: linear-gradient(180deg, #e7e2db 0%, #ded7cf 100%);
+  background:#fff;
   z-index:100;
   display:grid;
   place-items:center;
@@ -76,6 +76,7 @@ button{ font:inherit; }
 .introHero{
   position:absolute;
   inset:0;
+  background:#fff;
   overflow:hidden;
 }
 .introHero::after{
@@ -84,7 +85,7 @@ button{ font:inherit; }
 .introHero__img{
   width:100%;
   height:100%;
-  object-fit:cover;
+  object-fit:contain;
   object-position:center center;
   display:block;
   transform:none;

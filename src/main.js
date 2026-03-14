@@ -719,6 +719,53 @@ function build() {
 
   /* ===== Gallery (웨딩만) ===== */
   const weddingEl = $("#weddingGallery");
+  const GALLERY_WARMUP_COUNT = 8;
+  const GALLERY_EAGER_RENDER_COUNT = 6;
+  let galleryWarmupStarted = false;
+
+  function warmWeddingGallery() {
+    if (galleryWarmupStarted) return;
+    galleryWarmupStarted = true;
+
+    const sources = d.weddingGallery.slice(0, GALLERY_WARMUP_COUNT);
+    if (!sources.length) return;
+
+    const MAX_PARALLEL_WARMUPS = 3;
+    let nextIndex = 0;
+    let activeCount = 0;
+
+    const pump = () => {
+      while (activeCount < MAX_PARALLEL_WARMUPS && nextIndex < sources.length) {
+        const src = sources[nextIndex];
+        nextIndex += 1;
+        activeCount += 1;
+
+        const img = new Image();
+        img.decoding = "async";
+        if ("fetchPriority" in img) {
+          img.fetchPriority = "low";
+        }
+
+        const finish = () => {
+          activeCount -= 1;
+          pump();
+        };
+
+        img.addEventListener("load", finish, { once: true });
+        img.addEventListener("error", finish, { once: true });
+        img.src = src;
+      }
+    };
+
+    if ("requestIdleCallback" in window) {
+      window.requestIdleCallback(pump, { timeout: 800 });
+      return;
+    }
+
+    setTimeout(pump, 120);
+  }
+
+  warmWeddingGallery();
 
   /* ===== Modal slider ===== */
   const modal = $("#modal");
@@ -1045,9 +1092,9 @@ function build() {
       const img = document.createElement("img");
       img.src = src;
       img.alt = `wedding-${i + 1}`;
-      img.loading = "lazy";
+      img.loading = i < GALLERY_EAGER_RENDER_COUNT ? "eager" : "lazy";
       img.decoding = "async";
-      img.fetchPriority = "low";
+      img.fetchPriority = i < 3 ? "high" : i < GALLERY_EAGER_RENDER_COUNT ? "auto" : "low";
       img.addEventListener("click", () => openModal(d.weddingGallery, i));
       weddingEl.appendChild(img);
     });

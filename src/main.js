@@ -589,7 +589,7 @@ function build() {
             <div class="accRow__btns">
               <button class="btn btn--mini accCopyBtn" type="button" data-copy="토스뱅크 1000-0126-3854 (이재기)">복사</button>
               <a class="btn btn--kakaopay" href="https://qr.kakaopay.com/Ej8DZxnJE" target="_blank" rel="noopener">
-                💛 카카오페이
+                💙 카카오페이
               </a>
             </div>
           </div>
@@ -618,8 +618,8 @@ function build() {
             </div>
             <div class="accRow__btns">
               <button class="btn btn--mini accCopyBtn" type="button" data-copy="카카오뱅크 3333-01-4592141 (정다솜)">복사</button>
-              <a class="btn btn--kakaopay" href="https://qr.kakaopay.com/Ej8DZxnJE" target="_blank" rel="noopener">
-                💛 카카오페이
+              <a class="btn btn--kakaopay" href="https://qr.kakaopay.com/Ej9NAytiq" target="_blank" rel="noopener">
+                🩷 카카오페이
               </a>
             </div>
           </div>

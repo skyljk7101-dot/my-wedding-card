@@ -535,7 +535,7 @@ function build() {
 
       <div class="inviteContacts">
         <div class="row inviteContactRow">
-          <span class="inviteContactText">유순덕의 아들 <b>${groom.name}</b></span>
+          <span class="inviteContactText">유순덕의 아들&nbsp;&nbsp;&nbsp;<b>${groom.name}</b></span>
           <a class="contactIcon" href="sms:${groomSms}" aria-label="${groom.name}에게 문자 보내기">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M4 6.5h16a1.5 1.5 0 0 1 1.5 1.5v8A1.5 1.5 0 0 1 20 17.5H4A1.5 1.5 0 0 1 2.5 16V8A1.5 1.5 0 0 1 4 6.5Z" />
@@ -545,7 +545,7 @@ function build() {
         </div>
 
         <div class="row inviteContactRow">
-          <span class="inviteContactText">정대연 · 장영화의 딸 <b>${bride.name}</b></span>
+          <span class="inviteContactText">정대연 · 장영화의 딸&nbsp;&nbsp;&nbsp;<b>${bride.name}</b></span>
           <a class="contactIcon" href="sms:${brideSms}" aria-label="${bride.name}에게 문자 보내기">
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M4 6.5h16a1.5 1.5 0 0 1 1.5 1.5v8A1.5 1.5 0 0 1 20 17.5H4A1.5 1.5 0 0 1 2.5 16V8A1.5 1.5 0 0 1 4 6.5Z" />

@@ -337,7 +337,7 @@ function buildWeddingCalendar(dateTimeISO) {
     cells.push(`
       <div class="calendarGrid__cell${isWeddingDay ? " is-wedding" : ""}" role="gridcell" aria-label="${month}월 ${date}일${isWeddingDay ? " 예식일" : ""}">
         <span class="calendarGrid__date">${date}</span>
-        ${isWeddingDay ? '<span class="calendarGrid__badge">WEDDING</span>' : ""}
+        ${isWeddingDay ? '<span class="calendarGrid__badge">D-day</span>' : ""}
       </div>
     `);
   }

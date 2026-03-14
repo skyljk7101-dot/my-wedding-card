@@ -550,15 +550,26 @@ button{ font:inherit; }
   line-height:1;
 }
 .calendarGrid__badge{
-  font-size:9px;
-  font-weight:700;
-  letter-spacing:0.1em;
+  font-size:8px;
+  font-weight:800;
+  letter-spacing:0.02em;
   line-height:1;
 }
 .calendarGrid__cell.is-wedding{
-  background:#75563f;
-  color:#fff9f3;
-  box-shadow: 0 12px 26px rgba(117,86,63,0.18);
+  width: 52px;
+  min-height: 50px;
+  margin: 0 auto;
+  padding: 7px 0 10px;
+  gap: 2px;
+  background: linear-gradient(180deg, #f5a7bb 0%, #ec7f9b 100%);
+  color: #fffafc;
+  border-radius: 0;
+  clip-path: polygon(50% 100%, 91% 63%, 98% 30%, 82% 8%, 50% 25%, 18% 8%, 2% 30%, 9% 63%);
+  box-shadow: 0 14px 28px rgba(236, 127, 155, 0.28);
+}
+.calendarGrid__cell.is-wedding .calendarGrid__date{
+  font-weight:800;
+  color:#fffafc;
 }
 .calendarCountdown{
   margin-top:36px;
@@ -758,6 +769,14 @@ button{ font:inherit; }
   }
   .calendarGrid__cell{
     min-height:42px;
+  }
+  .calendarGrid__cell.is-wedding{
+    width: 48px;
+    min-height: 46px;
+    padding: 6px 0 9px;
+  }
+  .calendarGrid__cell.is-wedding .calendarGrid__badge{
+    font-size: 7px;
   }
   .calendarCountdown__title{
     font-size:15px;

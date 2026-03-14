@@ -556,20 +556,58 @@ button{ font:inherit; }
   line-height:1;
 }
 .calendarGrid__cell.is-wedding{
-  width: 52px;
-  min-height: 50px;
-  margin: 0 auto;
-  padding: 7px 0 10px;
-  gap: 2px;
-  background: linear-gradient(180deg, #f5a7bb 0%, #ec7f9b 100%);
+  position: relative;
   color: #fffafc;
-  border-radius: 0;
-  clip-path: polygon(50% 100%, 91% 63%, 98% 30%, 82% 8%, 50% 25%, 18% 8%, 2% 30%, 9% 63%);
+  background: transparent;
+  box-shadow: none;
+}
+.calendarGrid__heart{
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  margin: 4px auto 0;
+  background: linear-gradient(180deg, #f5a7bb 0%, #ec7f9b 100%);
+  transform: rotate(-45deg);
+  border-radius: 10px 0 6px 0;
   box-shadow: 0 14px 28px rgba(236, 127, 155, 0.28);
 }
-.calendarGrid__cell.is-wedding .calendarGrid__date{
+.calendarGrid__heart::before,
+.calendarGrid__heart::after{
+  content: "";
+  position: absolute;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: inherit;
+}
+.calendarGrid__heart::before{
+  top: -18px;
+  left: 0;
+}
+.calendarGrid__heart::after{
+  top: 0;
+  left: 18px;
+}
+.calendarGrid__heartContent{
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  transform: rotate(45deg) translate(2px, -1px);
+}
+.calendarGrid__cell.is-wedding .calendarGrid__date,
+.calendarGrid__cell.is-wedding .calendarGrid__badge{
   font-weight:800;
   color:#fffafc;
+}
+.calendarGrid__cell.is-wedding .calendarGrid__badge{
+  font-size: 7px;
 }
 .calendarCountdown{
   margin-top:36px;
@@ -770,10 +808,21 @@ button{ font:inherit; }
   .calendarGrid__cell{
     min-height:42px;
   }
-  .calendarGrid__cell.is-wedding{
-    width: 48px;
-    min-height: 46px;
-    padding: 6px 0 9px;
+  .calendarGrid__heart{
+    width: 32px;
+    height: 32px;
+    margin-top: 5px;
+  }
+  .calendarGrid__heart::before,
+  .calendarGrid__heart::after{
+    width: 32px;
+    height: 32px;
+  }
+  .calendarGrid__heart::before{
+    top: -16px;
+  }
+  .calendarGrid__heart::after{
+    left: 16px;
   }
   .calendarGrid__cell.is-wedding .calendarGrid__badge{
     font-size: 7px;

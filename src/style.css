@@ -271,6 +271,7 @@ button{ font:inherit; }
   color:#75563f;
 }
 .card--gallery{
+  margin-top:27px;
   border-bottom:0;
 }
 .card--calendar{

@@ -616,7 +616,12 @@ function build() {
               <span class="accRow__number">3333-01-4592141</span>
               <span class="accRow__bank">카카오뱅크 정다솜</span>
             </div>
-            <button class="btn btn--mini accCopyBtn" type="button" data-copy="카카오뱅크 3333-01-4592141 (정다솜)">복사</button>
+            <div class="accRow__btns">
+              <button class="btn btn--mini accCopyBtn" type="button" data-copy="카카오뱅크 3333-01-4592141 (정다솜)">복사</button>
+              <a class="btn btn--kakaopay" href="https://qr.kakaopay.com/Ej8DZxnJE" target="_blank" rel="noopener">
+                💛 카카오페이
+              </a>
+            </div>
           </div>
           <div class="accRow">
             <div class="accRow__info">

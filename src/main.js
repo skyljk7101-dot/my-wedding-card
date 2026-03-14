@@ -509,6 +509,7 @@ function build() {
           </a>
         </div>
       </div>
+      <p class="inviteContactsNote">문자 버튼을 누르시면 신랑 신부에게 축하메세지를 전달할 수 있습니다.</p>
     </section>
 
     <section class="card card--ceremony">

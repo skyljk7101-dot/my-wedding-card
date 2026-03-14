@@ -267,6 +267,9 @@ button{ font:inherit; }
 .card--guestbook .card__title{
   color:#75563f;
 }
+.card--gallery .card__title{
+  color:#75563f;
+}
 .card--gallery{
   border-bottom:0;
 }
@@ -342,6 +345,14 @@ button{ font:inherit; }
   display:flex;
   flex-direction:column;
   gap:10px;
+}
+.inviteContactsNote{
+  margin:12px auto 0;
+  max-width:320px;
+  color: rgba(117,86,63,0.9);
+  font-size:11px;
+  line-height:1.55;
+  text-align:center;
 }
 .inviteContactRow{
   justify-content:center;

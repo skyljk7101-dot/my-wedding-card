@@ -29,6 +29,7 @@ const KAKAO_TEMPLATE_ID = 129829;
 
 // ✅ Guestbook endpoint (Apps Script Web App URL)
 const GUESTBOOK_ENDPOINT = INVITE.GUESTBOOK_ENDPOINT;
+const GUESTBOOK_TS_CACHE_KEY = "__guestbookTsCacheV1";
 const HIDDEN_GUESTBOOK_ENTRIES = new Set([
   "codex-test::ping",
   "codex-ip-test::ping",
@@ -196,7 +197,8 @@ function formatTime(ts) {
   const dd = String(d.getDate()).padStart(2, "0");
   const hh = String(d.getHours()).padStart(2, "0");
   const mi = String(d.getMinutes()).padStart(2, "0");
-  return `${yy}.${mm}.${dd} ${hh}:${mi}`;
+  const ss = String(d.getSeconds()).padStart(2, "0");
+  return `${yy}.${mm}.${dd} ${hh}:${mi}:${ss}`;
 }
 
 /* ===== Guestbook ===== */
@@ -255,6 +257,49 @@ function normalizeGuestbookTimestamp(rawValue) {
 
   const parsed = Date.parse(value);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
+function getGuestbookCacheKey(item) {
+  return `${String(item?.name || "").trim()}::${String(item?.msg || "").trim()}`;
+}
+
+function readGuestbookTimestampCache() {
+  try {
+    const raw = window.localStorage.getItem(GUESTBOOK_TS_CACHE_KEY);
+    const parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === "object" ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeGuestbookTimestampCache(cache) {
+  try {
+    window.localStorage.setItem(GUESTBOOK_TS_CACHE_KEY, JSON.stringify(cache));
+  } catch {}
+}
+
+function rememberGuestbookTimestamp(item) {
+  const ts = normalizeGuestbookTimestamp(item?.ts);
+  const key = getGuestbookCacheKey(item);
+  if (!ts || !key) return;
+
+  const cache = readGuestbookTimestampCache();
+  cache[key] = ts;
+  writeGuestbookTimestampCache(cache);
+}
+
+function fillGuestbookTimestamp(item, fallbackMap) {
+  const normalizedTs = normalizeGuestbookTimestamp(item?.ts);
+  if (normalizedTs) {
+    const nextItem = { ...item, ts: normalizedTs };
+    rememberGuestbookTimestamp(nextItem);
+    return nextItem;
+  }
+
+  const key = getGuestbookCacheKey(item);
+  const fallbackTs = normalizeGuestbookTimestamp(fallbackMap[key]);
+  return fallbackTs ? { ...item, ts: fallbackTs } : item;
 }
 
 function escapeHtml(s) {
@@ -1276,8 +1321,17 @@ function build() {
   }
 
   function renderGB(items) {
+    const cachedTimestamps = readGuestbookTimestampCache();
+    __gbAll.forEach((item) => {
+      const ts = normalizeGuestbookTimestamp(item?.ts);
+      const key = getGuestbookCacheKey(item);
+      if (ts && key && !cachedTimestamps[key]) {
+        cachedTimestamps[key] = ts;
+      }
+    });
     __gbAll = Array.isArray(items)
       ? items
+          .map((item) => fillGuestbookTimestamp(item, cachedTimestamps))
           .filter((item) => String(item?.name || "").trim() && String(item?.msg || "").trim())
           .filter((item) => !isHeaderGuestbookEntry(item))
           .filter((item) => !isHiddenGuestbookEntry(item))
@@ -1290,6 +1344,7 @@ function build() {
 
   function prependGB(item) {
     if (!item) return;
+    rememberGuestbookTimestamp(item);
     __gbAll = [item, ...__gbAll];
     paintGB();
   }

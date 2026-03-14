@@ -705,6 +705,7 @@ function build() {
         <button class="btn btn--primary" type="submit" style="width:100%;">남기기</button>
       </form>
       <div id="gbList" class="gbList"></div>
+      <button id="gbMore" class="btn" type="button" style="width:100%; margin-top:10px; display:none;">더보기</button>
       <p class="muted" id="gbHint" style="margin-top:10px; font-size:12px; line-height:1.5;"></p>
     </section>
 
@@ -1262,6 +1263,7 @@ function build() {
 
   /* ===== Guestbook ===== */
   const gbListEl = $("#gbList");
+  const gbMoreBtn = $("#gbMore");
   const gbHint = $("#gbHint");
   const gbForm = $("#gbForm");
   const gbName = $("#gbName");
@@ -1269,7 +1271,9 @@ function build() {
   const gbSubmitBtn = gbForm?.querySelector('button[type="submit"]');
   const weddingDdayEl = $("#weddingDday");
 
+  const GB_INITIAL_VISIBLE = 5;
   let __gbAll = [];
+  let __gbVisible = GB_INITIAL_VISIBLE;
   let __gbSubmitting = false;
 
   function setGuestbookSubmitting(submitting) {
@@ -1279,15 +1283,28 @@ function build() {
     gbSubmitBtn.textContent = submitting ? "남기는 중..." : "남기기";
   }
 
+  function updateGbMoreBtn() {
+    if (!gbMoreBtn) return;
+    const remaining = Math.max(0, __gbAll.length - __gbVisible);
+    if (remaining <= 0) {
+      gbMoreBtn.style.display = "none";
+      return;
+    }
+
+    gbMoreBtn.style.display = "inline-flex";
+    gbMoreBtn.textContent = `더보기 (+${remaining}개)`;
+  }
+
   function paintGB() {
     gbListEl.innerHTML = "";
 
     if (!__gbAll.length) {
       gbListEl.innerHTML = `<div class="muted" style="padding:10px 2px;">아직 방명록이 없어요 🙂</div>`;
+      updateGbMoreBtn();
       return;
     }
 
-    __gbAll.forEach((it) => {
+    __gbAll.slice(0, __gbVisible).forEach((it) => {
       const div = document.createElement("div");
       div.className = "gbItem";
       const timeText = formatTime(it.ts);
@@ -1300,9 +1317,12 @@ function build() {
       `;
       gbListEl.appendChild(div);
     });
+
+    updateGbMoreBtn();
   }
 
   function renderGB(items) {
+    const wasExpanded = __gbAll.length > GB_INITIAL_VISIBLE && __gbVisible >= __gbAll.length;
     const cachedTimestamps = readGuestbookTimestampCache();
     __gbAll.forEach((item) => {
       const ts = normalizeGuestbookTimestamp(item?.ts);
@@ -1320,14 +1340,24 @@ function build() {
           .slice()
           .reverse()
       : [];
+    __gbVisible = wasExpanded ? __gbAll.length : Math.min(GB_INITIAL_VISIBLE, __gbAll.length);
     paintGB();
   }
 
   function prependGB(item) {
     if (!item) return;
+    const wasExpanded = __gbAll.length > GB_INITIAL_VISIBLE && __gbVisible >= __gbAll.length;
     rememberGuestbookTimestamp(item);
     __gbAll = [item, ...__gbAll];
+    __gbVisible = wasExpanded ? __gbAll.length : Math.min(GB_INITIAL_VISIBLE, __gbAll.length);
     paintGB();
+  }
+
+  if (gbMoreBtn) {
+    gbMoreBtn.addEventListener("click", () => {
+      __gbVisible = __gbAll.length;
+      paintGB();
+    });
   }
 
   if (!hasGuestbookEndpoint()) {

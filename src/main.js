@@ -187,7 +187,10 @@ function setIntroScrollLock(locked) {
 }
 
 function formatTime(ts) {
-  const d = new Date(ts);
+  const normalizedTs = normalizeGuestbookTimestamp(ts);
+  if (!normalizedTs) return "";
+
+  const d = new Date(normalizedTs);
   const yy = String(d.getFullYear()).slice(2);
   const mm = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
@@ -229,6 +232,29 @@ async function gbAddItem(name, msg) {
 function isHiddenGuestbookEntry(item) {
   const key = `${String(item?.name || "").trim()}::${String(item?.msg || "").trim()}`;
   return HIDDEN_GUESTBOOK_ENTRIES.has(key);
+}
+
+function isHeaderGuestbookEntry(item) {
+  const name = String(item?.name || "").trim().toLowerCase();
+  const msg = String(item?.msg || "").trim().toLowerCase();
+  return name === "name" && msg === "msg";
+}
+
+function normalizeGuestbookTimestamp(rawValue) {
+  if (typeof rawValue === "number") {
+    return Number.isFinite(rawValue) && rawValue > 0 ? rawValue : null;
+  }
+
+  const value = String(rawValue ?? "").trim();
+  if (!value) return null;
+
+  const numeric = Number(value);
+  if (Number.isFinite(numeric) && numeric > 0) {
+    return numeric;
+  }
+
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
 }
 
 function escapeHtml(s) {
@@ -1175,10 +1201,11 @@ function build() {
     __gbAll.slice(0, __gbVisible).forEach((it) => {
       const div = document.createElement("div");
       div.className = "gbItem";
+      const timeText = formatTime(it.ts);
       div.innerHTML = `
         <div class="gbMeta">
           <div class="gbName">${escapeHtml(it.name)}</div>
-          <div class="gbTime">${formatTime(it.ts)}</div>
+          ${timeText ? `<div class="gbTime">${timeText}</div>` : ""}
         </div>
         <div class="gbMsg">${escapeHtml(it.msg)}</div>
       `;
@@ -1190,7 +1217,12 @@ function build() {
 
   function renderGB(items) {
     __gbAll = Array.isArray(items)
-      ? items.filter((item) => !isHiddenGuestbookEntry(item)).slice().reverse()
+      ? items
+          .filter((item) => String(item?.name || "").trim() && String(item?.msg || "").trim())
+          .filter((item) => !isHeaderGuestbookEntry(item))
+          .filter((item) => !isHiddenGuestbookEntry(item))
+          .slice()
+          .reverse()
       : [];
     __gbVisible = GB_PAGE_SIZE;
     paintGB();

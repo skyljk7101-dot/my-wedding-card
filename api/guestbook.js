@@ -49,6 +49,85 @@ function isHiddenGuestbookEntry(item) {
   return HIDDEN_GUESTBOOK_ENTRIES.has(key);
 }
 
+function isHeaderGuestbookEntry(item) {
+  const name = String(item?.name || "").trim().toLowerCase();
+  const msg = String(item?.msg || "").trim().toLowerCase();
+  return name === "name" && msg === "msg";
+}
+
+function normalizeTimestamp(rawValue) {
+  if (typeof rawValue === "number") {
+    return Number.isFinite(rawValue) && rawValue > 0 ? rawValue : null;
+  }
+
+  const value = String(rawValue ?? "").trim();
+  if (!value) return null;
+
+  const numeric = Number(value);
+  if (Number.isFinite(numeric) && numeric > 0) {
+    return numeric;
+  }
+
+  const parsed = Date.parse(value);
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
+function getGuestbookField(item, keys) {
+  if (!item || typeof item !== "object") return undefined;
+
+  for (const key of keys) {
+    if (item[key] !== undefined && item[key] !== null) {
+      return item[key];
+    }
+  }
+
+  return undefined;
+}
+
+function normalizeGuestbookItems(payload) {
+  if (payload && typeof payload === "object" && !Array.isArray(payload) && payload.ok === false) {
+    throw new Error(`Guestbook list failed: ${payload.error || "unknown"}`);
+  }
+
+  const rawItems = Array.isArray(payload)
+    ? payload
+    : Array.isArray(payload?.items)
+      ? payload.items
+      : Array.isArray(payload?.data)
+        ? payload.data
+        : null;
+
+  if (!rawItems) {
+    throw new Error("Guestbook list failed: invalid json");
+  }
+
+  return rawItems
+    .map((item) => {
+      const normalizedItem = Array.isArray(item)
+        ? {
+            ts: item[0],
+            name: item[1],
+            msg: item[2],
+            ip: item[3],
+          }
+        : item;
+      const decoded = decodeGuestbookMessage(
+        getGuestbookField(normalizedItem, ["msg", "message", "content", "text"]),
+      );
+
+      return {
+        ts: normalizeTimestamp(
+          getGuestbookField(normalizedItem, ["ts", "timestamp", "createdAt", "date", "time"]),
+        ),
+        name: String(getGuestbookField(normalizedItem, ["name", "writer", "author"]) || "").trim(),
+        msg: String(decoded.msg || "").trim(),
+      };
+    })
+    .filter((item) => item.name && item.msg)
+    .filter((item) => !isHeaderGuestbookEntry(item))
+    .filter((item) => !isHiddenGuestbookEntry(item));
+}
+
 function getQueryValue(value) {
   return Array.isArray(value) ? value[0] : value;
 }
@@ -70,23 +149,7 @@ async function fetchGuestbookList() {
     throw new Error(`Guestbook list failed: ${res.status}`);
   }
 
-  const items = await res.json();
-  if (!Array.isArray(items)) {
-    throw new Error("Guestbook list failed: invalid json");
-  }
-
-  return items
-    .map((item) => {
-      const decoded = decodeGuestbookMessage(item?.msg);
-      const ts = Number(item?.ts);
-      return {
-        ts,
-        name: String(item?.name || ""),
-        msg: decoded.msg,
-      };
-    })
-    .filter((item) => Number.isFinite(item.ts) && item.ts > 0)
-    .filter((item) => !isHiddenGuestbookEntry(item));
+  return normalizeGuestbookItems(await res.json());
 }
 
 async function addGuestbookEntry({ name, msg, ip }) {

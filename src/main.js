@@ -613,7 +613,7 @@ function build() {
         </div>
         <div class="locationGuide__group">
           <div class="locationGuide__label">자차</div>
-          <div class="locationGuide__text">서울시 마포구 마포대로 92 효성해링턴스퀘어<br>건물 내 주차 가능<br><br>예식장 규정에 따라 화환 반입이 불가하여<br>마음만 감사히 받겠습니다.<br>(리본띠만 받습니다.)</div>
+          <div class="locationGuide__text">서울시 마포구 마포대로 92 효성해링턴스퀘어<br>건물 내 주차 가능<br><br><b>예식장 규정에 따라 화환 반입이 불가하여<br>마음만 감사히 받겠습니다.<br>(리본띠만 받습니다.)</b></div>
         </div>
       </div>
     </section>
@@ -1411,6 +1411,7 @@ function build() {
         m.includes("403") ? "방명록 저장 실패 (권한/배포 설정 403)" :
         m.includes("500") ? "방명록 저장 실패 (서버 오류 500)" :
         m.includes("invalid json") ? "방명록 저장 실패 (요청 형식/서버 응답 확인)" :
+        m.includes("blocked keyword") ? "사용할 수 없는 단어가 포함되어 있습니다." :
         m.includes("Failed to fetch") ? "방명록 저장 실패 (CORS/배포 권한/URL 확인)" :
         "방명록 저장 실패"
       );

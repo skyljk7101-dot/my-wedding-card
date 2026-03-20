@@ -1,8 +1,8 @@
 # Guestbook Apps Script Update
 
-The Vercel proxy in `api/guestbook.js` is already prepared to send IP data as a
-separate field. To make Google Sheets store that IP in a real `ip` column, the
-remote Apps Script project must also be updated.
+The Vercel proxy in `api/guestbook.js` already sends the guestbook IP as a
+separate field. To make Google Sheets store and display guestbook rows
+correctly, the remote Google Apps Script project must be updated too.
 
 Files:
 
@@ -16,17 +16,20 @@ Sheet layout:
 - `msg`
 - `ip`
 
-Display:
+Display behavior:
 
-- The `ts` column is written as a real spreadsheet date.
-- The sheet timezone is forced to `Asia/Seoul`.
-- The displayed format is `2026년 3월 14일 11시 22분 33초`.
-- The API still converts that value back to a Unix millisecond timestamp for the
-  wedding site and admin tools.
+- The `ts` column is stored as a real spreadsheet date, not plain Unix
+  milliseconds.
+- The spreadsheet timezone is forced to `Asia/Seoul`.
+- The display format is `2026년 3월 14일 11시 22분 33초`.
+- Legacy rows that still contain Unix milliseconds such as `1773480009254` are
+  automatically converted to readable spreadsheet dates after redeploy.
+- The public API still converts that value back to a Unix millisecond timestamp
+  for the wedding site and admin tools.
 
 Apply steps:
 
-1. Open the current Google Apps Script project.
+1. Open the current Google Apps Script project connected to the guestbook sheet.
 2. Replace the existing `doGet` / `doPost` code with the content of
    `scripts/guestbook-apps-script.gs`.
 3. Make sure the connected spreadsheet uses the sheet name `guestbook`.

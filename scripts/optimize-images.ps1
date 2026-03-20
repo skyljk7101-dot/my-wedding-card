@@ -1,6 +1,9 @@
 Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
+Write-Host "이미지 원본 사용을 위해 최적화 기능이 비활성화되었습니다."
+exit
+
 Add-Type -AssemblyName System.Drawing
 
 function Get-TotalBytes($items) {

@@ -565,7 +565,7 @@ function build() {
         <div class="ceremonyInfo__address">${d.wedding.address}</div>
       </div>
       <div class="grid2 ceremonyActions">
-        <button class="btn" id="calGoogleBtn" type="button">📅 구글 캘린더</button>
+        <a class="btn" id="calGoogleBtn" href="/wedding.ics">📅 구글 캘린더</a>
         <a class="btn" id="calAppleBtn" href="/wedding.ics">🍎 애플 캘린더</a>
       </div>
     </section>
@@ -1196,31 +1196,14 @@ function build() {
   const calGoogleBtn = $("#calGoogleBtn");
   const calAppleBtn  = $("#calAppleBtn");
 
-  const weddingISO   = d.wedding.dateTimeISO;           // "2026-05-31T14:00:00+09:00"
-  const weddingEnd   = "2026-05-31T15:30:00+09:00";    // 예식 종료 (약 1시간 30분 후)
-  const calTitle     = encodeURIComponent("이재기 ♡ 정다솜 결혼식");
-  const calLocation  = encodeURIComponent(d.wedding.address);
-  const calDetails   = encodeURIComponent(d.wedding.venueName);
-
-  // 구글 캘린더용 날짜 포맷 (UTC, YYYYMMDDTHHmmssZ)
-  function toGCal(isoStr) {
-    return new Date(isoStr).toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-  }
-
   if (calGoogleBtn) {
     calGoogleBtn.addEventListener("click", () => {
-      const url = `https://calendar.google.com/calendar/render?action=TEMPLATE`
-        + `&text=${calTitle}`
-        + `&dates=${toGCal(weddingISO)}/${toGCal(weddingEnd)}`
-        + `&location=${calLocation}`
-        + `&details=${calDetails}`;
-      window.open(url, "_blank", "noopener");
+      window.location.href = calGoogleBtn.getAttribute("href") || "/wedding.ics";
     });
   }
 
   if (calAppleBtn) {
     calAppleBtn.addEventListener("click", () => {
-      // 카카오톡 인앱 브라우저/iOS에서 Blob 다운로드가 막히는 경우가 있어 정적 ICS로 직접 이동한다.
       window.location.href = calAppleBtn.getAttribute("href") || "/wedding.ics";
     });
   }

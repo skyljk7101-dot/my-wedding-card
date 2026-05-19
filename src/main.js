@@ -482,10 +482,11 @@ function build() {
   const groomSms = `${groom.phone}?&body=${encode(`${groom.name}에게 축하 메시지를 남겨주세요 🙂`)}`;
 
   const { lat, lng } = d.wedding;
+  const venueMapName = d.wedding.venueSearchName || d.wedding.venueName;
 
-  const naverSearchUrl = `https://map.naver.com/v5/search/${encode(d.wedding.venueName)}?c=${lng},${lat},15,0,0,0,dh`;
-  const kakaoPlaceUrl = `https://map.kakao.com/link/map/${encode(d.wedding.venueName)},${lat},${lng}`;
-  const kakaoRouteUrl = `https://map.kakao.com/link/to/${encode(d.wedding.venueName)},${lat},${lng}`;
+  const naverSearchUrl = `https://map.naver.com/v5/search/${encode(venueMapName)}?c=${lng},${lat},15,0,0,0,dh`;
+  const kakaoPlaceUrl = `https://map.kakao.com/link/map/${encode(venueMapName)},${lat},${lng}`;
+  const kakaoRouteUrl = `https://map.kakao.com/link/to/${encode(venueMapName)},${lat},${lng}`;
 
   $("#app").innerHTML = `
   <div class="intro" id="intro" aria-hidden="false">
@@ -1212,7 +1213,7 @@ function build() {
   const naverRouteBtn = $("#naverRouteBtn");
   if (naverRouteBtn) {
     naverRouteBtn.addEventListener("click", () => {
-      const naverApp = `nmap://route/public?dlat=${lat}&dlng=${lng}&dname=${encode(d.wedding.venueName)}&appname=invite`;
+      const naverApp = `nmap://route/public?dlat=${lat}&dlng=${lng}&dname=${encode(venueMapName)}&appname=invite`;
       const start = Date.now();
       window.location.href = naverApp;
       setTimeout(() => {
@@ -1223,7 +1224,7 @@ function build() {
 
   const tmapBtn = $("#tmapBtn");
   if (tmapBtn) {
-    tmapBtn.addEventListener("click", () => openTmap({ name: d.wedding.venueName, lat, lng }));
+    tmapBtn.addEventListener("click", () => openTmap({ name: venueMapName, lat, lng }));
   }
 
   /* ===== Kakao share ===== */

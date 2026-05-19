@@ -14,6 +14,7 @@ export const INVITE = {
     dateTimeISO: "2026-05-31T14:00:00+09:00",
     dateText: "2026. 05. 31 (일) 14:00",
     venueName: "공덕 아펠가모 라로브홀",
+    venueSearchName: "공덕 아펠가모",
     address: "서울특별시 마포구 마포대로 92 효성헤링턴스퀘어 B동 7층",
     lat: 37.5445,
     lng: 126.9501,

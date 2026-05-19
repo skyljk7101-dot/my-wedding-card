@@ -16,8 +16,8 @@ export const INVITE = {
     venueName: "공덕 아펠가모 라로브홀",
     venueSearchName: "공덕 아펠가모",
     address: "서울특별시 마포구 마포대로 92 효성헤링턴스퀘어 B동 7층",
-    lat: 37.5445,
-    lng: 126.9501,
+    lat: 37.5423055,
+    lng: 126.9524957,
   },
 
   rsvpUrl: "https://docs.google.com/forms/d/e/1FAIpQLSf67UUsUr8CFRS_vOb3YXY73HOYIUH4b485_oE2xrwM8HhXcg/viewform?usp=publish",
